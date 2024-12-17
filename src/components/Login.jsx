@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   signInWithEmailAndPassword,
   signInWithPopup,
@@ -9,23 +10,57 @@ import {
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState(""); // Estado para el error
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setErrorMessage(""); // Limpiar cualquier mensaje de error anterior
+
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      alert("Inicio de sesión exitoso");
+      // Intentar iniciar sesión con Firebase
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+
+      // Obtener información adicional desde el backend
+      const response = await fetch(
+        `http://localhost:5000/api/users/${user.uid}`
+      );
+      if (response.ok) {
+        const userData = await response.json();
+        alert(`Bienvenido, ${userData.name}`);
+        navigate("/"); // Redirige a la ruta principal o dashboard
+      } else {
+        setErrorMessage(
+          "Usuario autenticado, pero no se encontraron datos adicionales."
+        );
+      }
     } catch (error) {
-      alert("Error al iniciar sesión: " + error.message);
+      if (
+        error.code === "auth/invalid-credential" ||
+        error.code === "auth/user-not-found"
+      ) {
+        setErrorMessage("Correo o contraseña incorrectos. Inténtalo de nuevo.");
+      } else {
+        setErrorMessage(
+          "Ocurrió un error al iniciar sesión. Inténtalo más tarde."
+        );
+      }
     }
   };
 
   const handleGoogleLogin = async () => {
     try {
-      await signInWithPopup(auth, googleProvider);
-      alert("Inicio de sesión con Google exitoso");
+      const result = await signInWithPopup(auth, googleProvider);
+      alert(`Bienvenido, ${result.user.displayName}`);
     } catch (error) {
-      alert("Error al iniciar sesión con Google: " + error.message);
+      setErrorMessage(
+        "Error al iniciar sesión con Google. Inténtalo de nuevo."
+      );
     }
   };
 
@@ -42,7 +77,7 @@ const Login = () => {
             <label className="block text-gray-700">Correo Electrónico</label>
             <input
               type="email"
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-400"
+              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-red-400"
               placeholder="correo@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -53,13 +88,20 @@ const Login = () => {
             <label className="block text-gray-700">Contraseña</label>
             <input
               type="password"
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-400"
+              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-red-400"
               placeholder="********"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
+
+          {/* Mostrar mensaje de error */}
+          {errorMessage && (
+            <div className="text-red-600 text-sm mb-4 text-center">
+              {errorMessage}
+            </div>
+          )}
 
           <button
             type="submit"
@@ -69,7 +111,7 @@ const Login = () => {
           </button>
         </form>
 
-        {/* Opciones adicionales */}
+        {/* Iniciar sesión con Google */}
         <div className="text-center my-4">
           <button
             onClick={handleGoogleLogin}
@@ -79,18 +121,15 @@ const Login = () => {
           </button>
         </div>
 
-        <div className="text-center text-sm text-gray-600">
-          <a href="#" className="hover:underline">
-            ¿Olvidaste tu contraseña?
-          </a>
-        </div>
-
-        <div className="text-center mt-4">
+        <div className="text-center">
           <p className="text-gray-600">
             ¿No tienes una cuenta?{" "}
-            <a href="#" className="text-red-600 hover:underline">
+            <button
+              onClick={() => navigate("/register")}
+              className="text-red-600 hover:underline"
+            >
               Regístrate aquí
-            </a>
+            </button>
           </p>
         </div>
       </div>
