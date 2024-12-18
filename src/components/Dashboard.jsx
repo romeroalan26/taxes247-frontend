@@ -61,13 +61,17 @@ const Dashboard = () => {
     navigate("/"); // Redirigir al login
   };
 
+  // Redirigir a la página de crear solicitud
+  const handleCreateRequest = () => {
+    navigate("/create-request");
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
       <header className="bg-red-600 text-white px-6 py-4 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Taxes247</h1>
         <div className="relative">
-          {/* Eliminar saludo redundante */}
           <button
             className="md:hidden text-white text-2xl"
             onClick={() => setIsMenuOpen((prev) => !prev)}
@@ -117,7 +121,7 @@ const Dashboard = () => {
           <h2 className="text-lg font-medium mb-4">Hola, {userName}!</h2>
           <button
             className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 flex items-center space-x-2"
-            onClick={() => alert("Crear Solicitud aún no está implementado.")}
+            onClick={handleCreateRequest}
           >
             <span className="text-2xl">+</span>
             <span>Crear Solicitud</span>
