@@ -4,12 +4,12 @@ import { auth, signOut } from "../firebaseConfig";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [userName, setUserName] = useState(""); // Estado para el nombre del usuario
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // Estado para el menú hamburguesa
-  const [requests, setRequests] = useState([]); // Estado para solicitudes
-  const menuRef = useRef(null); // Referencia para el menú desplegable
+  const [userName, setUserName] = useState("");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [requests, setRequests] = useState([]);
+  const menuRef = useRef(null);
 
-  // Verificar si el usuario está autenticado
+  // Verificar si el usuario está autenticado y cargar solicitudes
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (!user) {
@@ -17,6 +17,7 @@ const Dashboard = () => {
       } else {
         if (user.displayName) {
           setUserName(user.displayName);
+          fetchRequests(user.uid);
         } else {
           try {
             const response = await fetch(
@@ -37,33 +38,47 @@ const Dashboard = () => {
     });
     return () => unsubscribe();
   }, [navigate]);
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (user) {
+      setUserName(user.displayName || "Usuario");
+      fetchRequests(user.uid);
+    } else {
+      navigate("/");
+    }
+  }, [navigate]);
 
-  // Manejar clics fuera del menú para cerrarlo
+  // Cargar solicitudes desde el backend
+  const fetchRequests = async (userId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/requests/user/${userId}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setRequests(data);
+      } else {
+        console.error("Error al obtener las solicitudes");
+      }
+    } catch (error) {
+      console.error("Error al cargar solicitudes:", error);
+    }
+  };
+
+  // Manejar clic fuera del menú
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setIsMenuOpen(false);
       }
     };
-
-    if (isMenuOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
-
+    document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isMenuOpen]);
+  }, []);
 
-  // Función para cerrar sesión
   const handleLogout = async () => {
     await signOut(auth);
-    navigate("/"); // Redirigir al login
-  };
-
-  // Redirigir a la página de crear solicitud
-  const handleCreateRequest = () => {
-    navigate("/create-request");
+    navigate("/");
   };
 
   return (
@@ -114,51 +129,64 @@ const Dashboard = () => {
         </div>
       </header>
 
-      {/* Cuerpo del Dashboard */}
-      <main className="p-8 space-y-8">
-        {/* Crear Solicitud */}
-        <div className="flex flex-col items-center">
+      {/* Contenido */}
+      <main className="p-8">
+        <div className="flex flex-col items-center mb-6">
           <h2 className="text-lg font-medium mb-4">Hola, {userName}!</h2>
           <button
-            className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 flex items-center space-x-2"
-            onClick={handleCreateRequest}
+            className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700"
+            onClick={() => navigate("/create-request")}
           >
-            <span className="text-2xl">+</span>
-            <span>Crear Solicitud</span>
+            Crear Solicitud
           </button>
         </div>
 
         {/* Lista de Solicitudes */}
-        <div className="w-full md:w-3/4 mx-auto bg-white p-6 rounded-md shadow-md">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">
-            Lista de Solicitudes
-          </h2>
-          {requests.length > 0 ? (
-            <ul>
-              {requests.map((req, index) => (
-                <li key={index} className="mb-2 border-b pb-2">
-                  {req.title || `Solicitud ${index + 1}`}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-600">No tienes solicitudes registradas.</p>
-          )}
-        </div>
-
-        {/* Contactame */}
-        <div className="flex items-center justify-center space-x-4">
-          <p className="text-gray-700">¿Necesitas ayuda?</p>
-          <a
-            href="https://wa.me/18094039726"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-red-600 underline hover:text-red-800"
-          >
-            Contáctame
-          </a>
-        </div>
+        <h2 className="text-xl font-bold text-gray-800 mb-4">
+          Lista de Solicitudes
+        </h2>
+        {requests.length > 0 ? (
+          <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            {requests.map((req) => (
+              <div
+                key={req.confirmationNumber}
+                className="bg-white p-4 rounded-lg shadow-lg border"
+              >
+                <h3 className="text-lg font-bold text-red-600">
+                  {req.confirmationNumber}
+                </h3>
+                <p className="text-gray-600">
+                  <span className="font-bold">Estado:</span> {req.status}
+                </p>
+                <p className="text-gray-600">
+                  <span className="font-bold">Fecha:</span>{" "}
+                  {new Date(req.createdAt).toLocaleDateString()}
+                </p>
+                <button
+                  className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                  onClick={() => alert(`Detalles de ${req.confirmationNumber}`)}
+                >
+                  Ver Detalles
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-600">No tienes solicitudes registradas.</p>
+        )}
       </main>
+      {/* Contactame */}
+      <div className="flex items-center justify-center space-x-4">
+        <p className="text-gray-700">¿Necesitas ayuda?</p>
+        <a
+          href="https://wa.me/18094039726"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-red-600 underline hover:text-red-800"
+        >
+          Contáctame
+        </a>
+      </div>
     </div>
   );
 };

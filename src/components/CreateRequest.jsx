@@ -5,7 +5,6 @@ import { auth } from "../firebaseConfig";
 const CreateRequest = () => {
   const navigate = useNavigate();
 
-  // Estados del formulario
   const [formData, setFormData] = useState({
     ssn: "",
     birthDate: "",
@@ -25,6 +24,8 @@ const CreateRequest = () => {
   const [paymentStatus, setPaymentStatus] = useState("");
   const [error, setError] = useState("");
   const [userId, setUserId] = useState(""); // UID del usuario autenticado
+  const [isModalOpen, setIsModalOpen] = useState(false); // Estado del modal
+  const [confirmationNumber, setConfirmationNumber] = useState(""); // Número de confirmación
 
   // Obtener el UID del usuario autenticado al cargar el componente
   useEffect(() => {
@@ -89,10 +90,8 @@ const CreateRequest = () => {
 
       if (response.ok) {
         const data = await response.json();
-        alert(
-          `Solicitud enviada con éxito. Código: ${data.confirmationNumber}`
-        );
-        navigate("/dashboard");
+        setConfirmationNumber(data.confirmationNumber); // Guardar el número de confirmación
+        setIsModalOpen(true); // Abrir el modal después de enviar la solicitud
       } else {
         const errorResponse = await response.json();
         throw new Error(
@@ -209,6 +208,29 @@ const CreateRequest = () => {
           </form>
         </div>
       </div>
+
+      {/* Modal de Confirmación */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h3 className="text-xl font-bold text-center mb-4">
+              ¡Solicitud enviada!
+            </h3>
+            <p className="text-gray-700 text-center mb-4">
+              Tu solicitud se ha enviado correctamente.
+            </p>
+            <p className="text-xl font-bold text-red-600 text-center mb-6">
+              Número de Confirmación: {confirmationNumber}
+            </p>
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700"
+            >
+              Aceptar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
