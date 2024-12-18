@@ -32,8 +32,8 @@ const Login = () => {
       );
       if (response.ok) {
         const userData = await response.json();
-        alert(`Bienvenido, ${userData.name}`);
-        navigate("/"); // Redirige a la ruta principal o dashboard
+        //alert(`Bienvenido, ${userData.name}`);
+        navigate("/dashboard"); // Redirige al dashboard
       } else {
         setErrorMessage(
           "Usuario autenticado, pero no se encontraron datos adicionales."
@@ -56,7 +56,8 @@ const Login = () => {
   const handleGoogleLogin = async () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      alert(`Bienvenido, ${result.user.displayName}`);
+      //alert(`Bienvenido, ${result.user.displayName}`);
+      navigate("/dashboard"); // Redirige al dashboard
     } catch (error) {
       setErrorMessage(
         "Error al iniciar sesión con Google. Inténtalo de nuevo."
@@ -65,7 +66,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-red-100">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg w-96">
         <h2 className="text-2xl font-bold text-red-600 text-center mb-6">
           Iniciar Sesión
