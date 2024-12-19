@@ -4,6 +4,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail, // Importar la función para restablecer contraseñas
   signOut,
 } from "firebase/auth";
 
@@ -29,4 +30,5 @@ export {
   signInWithPopup,
   signInWithEmailAndPassword,
   signOut,
+  sendPasswordResetEmail, // Exportar la función de restablecimiento de contraseña
 };

@@ -154,6 +154,17 @@ const Login = () => {
               </button>
             </p>
           </div>
+          <div className="text-center">
+            <p className="text-gray-600">
+              ¿Olvidaste tu contraseña?{" "}
+              <button
+                onClick={() => navigate("/forgot-password")}
+                className="text-red-600 hover:underline"
+              >
+                Recupérala aquí.
+              </button>
+            </p>
+          </div>
         </div>
         {/* Preguntas frecuentes */}
         <div className="mt-12 w-full max-w-2xl">
