@@ -4,6 +4,7 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import Dashboard from "./components/Dashboard";
 import CreateRequest from "./components/CreateRequest"; // Importamos el nuevo componente
+import ActivateAccount from "./components/ActivateAccount";
 
 function App() {
   return (
@@ -12,7 +13,8 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/create-request" element={<CreateRequest />} />{" "}
+        <Route path="/create-request" element={<CreateRequest />} />
+        <Route path="/activate/:token" element={<ActivateAccount />} />{" "}
         {/* Nueva ruta */}
       </Routes>
     </BrowserRouter>

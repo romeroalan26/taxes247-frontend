@@ -30,13 +30,12 @@ const Login = () => {
       const response = await fetch(
         `http://localhost:5000/api/users/${user.uid}`
       );
+      const data = await response.json();
+
       if (response.ok) {
-        const userData = await response.json();
         navigate("/dashboard"); // Redirige al dashboard
       } else {
-        setErrorMessage(
-          "Usuario autenticado, pero no se encontraron datos adicionales."
-        );
+        setErrorMessage(data.message || "Error al autenticar el usuario.");
       }
     } catch (error) {
       if (
