@@ -1,6 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../firebaseConfig";
+import { ClipLoader } from "react-spinners";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+
+const statusSteps = [
+  "Pendiente de pago",
+  "Pago recibido",
+  "En revisión",
+  "Documentación incompleta",
+  "En proceso con el IRS",
+  "Aprobada",
+  "Completada",
+  "Rechazada",
+];
 
 const CreateRequest = () => {
   const navigate = useNavigate();
@@ -13,21 +26,25 @@ const CreateRequest = () => {
     phone: "",
     accountNumber: "",
     bankName: "",
-    accountType: "Savings", // Default a Savings
+    accountType: "Savings",
     routingNumber: "",
     address: "",
-    requestType: "Estándar", // Default a Estándar
+    requestType: "Estándar",
     paymentMethod: "",
     w2Files: [],
   });
 
-  const [paymentStatus, setPaymentStatus] = useState("");
   const [error, setError] = useState("");
-  const [userId, setUserId] = useState(""); // UID del usuario autenticado
-  const [isModalOpen, setIsModalOpen] = useState(false); // Estado del modal
-  const [confirmationNumber, setConfirmationNumber] = useState(""); // Número de confirmación
+  const [userId, setUserId] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [confirmationNumber, setConfirmationNumber] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [showSensitiveFields, setShowSensitiveFields] = useState({
+    ssn: false,
+    accountNumber: false,
+    routingNumber: false,
+  });
 
-  // Obtener el UID del usuario autenticado al cargar el componente
   useEffect(() => {
     const user = auth.currentUser;
     if (user && user.uid) {
@@ -38,13 +55,11 @@ const CreateRequest = () => {
     }
   }, [navigate]);
 
-  // Manejar cambios en los inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Manejar subida de archivos W2
   const handleFileUpload = (e) => {
     const files = Array.from(e.target.files);
     if (files.length > 3) {
@@ -54,32 +69,28 @@ const CreateRequest = () => {
     setFormData((prev) => ({ ...prev, w2Files: files }));
   };
 
-  // Verificar método de pago
-  const handlePayment = () => {
-    if (formData.paymentMethod === "Zelle") {
-      setPaymentStatus("Pendiente de pago");
-      return true; // Permitir envío
-    } else {
-      alert("Pago con PayPal o Tarjeta aún no implementado.");
-      return false;
-    }
+  const toggleFieldVisibility = (field) => {
+    setShowSensitiveFields((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
   };
 
-  // Enviar el formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
-    if (!handlePayment()) {
-      setError("Completa el pago antes de enviar la solicitud.");
-      return;
-    }
+    const initialStatus =
+      formData.paymentMethod === "Zelle"
+        ? "Pendiente de pago"
+        : "Pago recibido";
 
     try {
       const requestData = {
         ...formData,
-        userId, // UID del usuario autenticado
-        status: paymentStatus || "Pago realizado",
-        w2Files: formData.w2Files.map((file) => file.name), // Enviar solo nombres de archivos
+        userId,
+        status: initialStatus,
+        w2Files: formData.w2Files.map((file) => file.name),
       };
 
       const response = await fetch("http://localhost:5000/api/requests", {
@@ -90,8 +101,8 @@ const CreateRequest = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setConfirmationNumber(data.confirmationNumber); // Guardar el número de confirmación
-        setIsModalOpen(true); // Abrir el modal después de enviar la solicitud
+        setConfirmationNumber(data.confirmationNumber);
+        setIsModalOpen(true);
       } else {
         const errorResponse = await response.json();
         throw new Error(
@@ -101,12 +112,13 @@ const CreateRequest = () => {
     } catch (error) {
       console.error("Error al enviar la solicitud:", error);
       setError("Hubo un problema al enviar la solicitud. Intenta de nuevo.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
-      {/* Botón Atrás */}
       <div className="flex justify-end p-4">
         <button
           className="text-red-600 underline hover:text-red-800"
@@ -116,7 +128,6 @@ const CreateRequest = () => {
         </button>
       </div>
 
-      {/* Formulario */}
       <div className="flex items-center justify-center flex-1">
         <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl">
           <h2 className="text-2xl font-bold text-red-600 mb-6">
@@ -124,34 +135,91 @@ const CreateRequest = () => {
           </h2>
           <form onSubmit={handleSubmit}>
             {[
-              { name: "ssn", label: "Número de Social Security", type: "text" },
-              { name: "birthDate", label: "Fecha de Nacimiento", type: "date" },
-              { name: "fullName", label: "Nombre Completo", type: "text" },
-              { name: "email", label: "Correo Electrónico", type: "email" },
-              { name: "phone", label: "Número de Teléfono", type: "tel" },
-              { name: "address", label: "Dirección en USA", type: "text" },
-              { name: "bankName", label: "Nombre del Banco", type: "text" },
+              {
+                name: "ssn",
+                label: "Número de Social Security",
+                type: showSensitiveFields.ssn ? "text" : "password",
+                placeholder: "123-45-6789",
+              },
+              {
+                name: "birthDate",
+                label: "Fecha de Nacimiento",
+                type: "date",
+              },
+              {
+                name: "fullName",
+                label: "Nombre Completo",
+                type: "text",
+                placeholder: "Juan Pérez",
+              },
+              {
+                name: "email",
+                label: "Correo Electrónico",
+                type: "email",
+                placeholder: "correo@example.com",
+              },
+              {
+                name: "phone",
+                label: "Número de Teléfono",
+                type: "tel",
+                placeholder: "809-555-1234",
+              },
+              {
+                name: "address",
+                label: "Dirección en USA",
+                type: "text",
+                placeholder: "123 Main St, Anytown, CA",
+              },
+              {
+                name: "bankName",
+                label: "Nombre del Banco",
+                type: "text",
+                placeholder: "Bank of America",
+              },
               {
                 name: "accountNumber",
                 label: "Número de Cuenta",
-                type: "text",
+                type: showSensitiveFields.accountNumber ? "text" : "password",
+                placeholder: "123456789",
               },
-              { name: "routingNumber", label: "Número de Ruta", type: "text" },
+              {
+                name: "routingNumber",
+                label: "Número de Ruta",
+                type: showSensitiveFields.routingNumber ? "text" : "password",
+                placeholder: "987654321",
+              },
             ].map((field) => (
               <div key={field.name} className="mb-4">
                 <label className="block text-gray-700">{field.label}</label>
-                <input
-                  type={field.type}
-                  name={field.name}
-                  value={formData[field.name]}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-red-400"
-                  required
-                />
+                <div className="relative">
+                  <input
+                    type={field.type}
+                    name={field.name}
+                    value={formData[field.name]}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-red-400 pr-10"
+                    placeholder={field.placeholder || ""}
+                    required
+                  />
+                  {(field.name === "ssn" ||
+                    field.name === "accountNumber" ||
+                    field.name === "routingNumber") && (
+                    <button
+                      type="button"
+                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-blue-600 hover:text-blue-800"
+                      onClick={() => toggleFieldVisibility(field.name)}
+                    >
+                      {showSensitiveFields[field.name] ? (
+                        <FaEyeSlash />
+                      ) : (
+                        <FaEye />
+                      )}
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
 
-            {/* Tipo de Cuenta */}
             <div className="mb-4">
               <label className="block text-gray-700">Tipo de Cuenta</label>
               <select
@@ -166,7 +234,6 @@ const CreateRequest = () => {
               </select>
             </div>
 
-            {/* Método de Pago */}
             <div className="mb-4">
               <label className="block text-gray-700">Método de Pago</label>
               <select
@@ -183,7 +250,6 @@ const CreateRequest = () => {
               </select>
             </div>
 
-            {/* Subida de Archivos */}
             <div className="mb-4">
               <label className="block text-gray-700">Subir Archivos W2</label>
               <input
@@ -195,21 +261,23 @@ const CreateRequest = () => {
               />
             </div>
 
-            {/* Mensaje de Error */}
             {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
 
-            {/* Botón de Enviar */}
             <button
               type="submit"
               className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700"
+              disabled={isLoading}
             >
-              Enviar Solicitud
+              {isLoading ? (
+                <ClipLoader size={20} color="#ffffff" />
+              ) : (
+                "Enviar Solicitud"
+              )}
             </button>
           </form>
         </div>
       </div>
 
-      {/* Modal de Confirmación */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
@@ -217,7 +285,8 @@ const CreateRequest = () => {
               ¡Solicitud enviada!
             </h3>
             <p className="text-gray-700 text-center mb-4">
-              Tu solicitud se ha enviado correctamente.
+              Tu solicitud se ha enviado correctamente. Hemos enviado un correo
+              electrónico con tu número de confirmación.
             </p>
             <p className="text-xl font-bold text-red-600 text-center mb-6">
               Número de Confirmación: {confirmationNumber}

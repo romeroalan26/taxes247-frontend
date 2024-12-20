@@ -2,6 +2,17 @@ import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, signOut } from "../firebaseConfig";
 
+const statusSteps = [
+  "Pendiente de pago",
+  "Pago recibido",
+  "En revisión",
+  "Documentación incompleta",
+  "En proceso con el IRS",
+  "Aprobada",
+  "Completada",
+  "Rechazada",
+];
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const [userName, setUserName] = useState("");
@@ -38,6 +49,7 @@ const Dashboard = () => {
     });
     return () => unsubscribe();
   }, [navigate]);
+
   useEffect(() => {
     const user = auth.currentUser;
     if (user) {
@@ -79,6 +91,11 @@ const Dashboard = () => {
   const handleLogout = async () => {
     await signOut(auth);
     navigate("/");
+  };
+
+  const calculateProgress = (status) => {
+    const currentStepIndex = statusSteps.indexOf(status);
+    return ((currentStepIndex + 1) / statusSteps.length) * 100;
   };
 
   return (
@@ -162,6 +179,20 @@ const Dashboard = () => {
                   <span className="font-bold">Fecha:</span>{" "}
                   {new Date(req.createdAt).toLocaleDateString()}
                 </p>
+                {/* Barra de Progreso */}
+                <div className="mt-4">
+                  <p className="text-gray-600 mb-2">Progreso:</p>
+                  <div className="w-full bg-gray-200 rounded-full h-4">
+                    <div
+                      className="bg-green-600 h-4 rounded-full"
+                      style={{ width: `${calculateProgress(req.status)}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-sm text-gray-600 mt-2">
+                    Paso {statusSteps.indexOf(req.status) + 1} de{" "}
+                    {statusSteps.length}
+                  </p>
+                </div>
                 <button
                   className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
                   onClick={() => alert(`Detalles de ${req.confirmationNumber}`)}
