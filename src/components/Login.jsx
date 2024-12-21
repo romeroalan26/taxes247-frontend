@@ -28,7 +28,7 @@ const Login = () => {
 
       // Obtener información adicional desde el backend
       const response = await fetch(
-        `http://localhost:5000/api/users/${user.uid}`
+        `${import.meta.env.VITE_API_URL}/users/${user.uid}`
       );
       const data = await response.json();
 

@@ -13,7 +13,7 @@ const ActivateAccount = () => {
     const activateAccount = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/users/activate/${token}`
+          `${import.meta.env.VITE_API_URL}/users/activate/${token}`
         );
         if (response.ok) {
           setMessage("¡Cuenta activada con éxito! Redirigiendo al login...");
