@@ -93,7 +93,7 @@ const CreateRequest = () => {
         w2Files: formData.w2Files.map((file) => file.name),
       };
 
-      const response = await fetch("http://localhost:5000/api/requests", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/requests`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestData),
