@@ -32,7 +32,7 @@ const Dashboard = () => {
         } else {
           try {
             const response = await fetch(
-              `http://localhost:5000/api/users/${user.uid}`
+              `${import.meta.env.VITE_API_URL}/users/${user.uid}`
             );
             if (response.ok) {
               const userData = await response.json();
@@ -64,7 +64,7 @@ const Dashboard = () => {
   const fetchRequests = async (userId) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/requests/user/${userId}`
+        `${import.meta.env.VITE_API_URL}/requests/user/${userId}`
       );
       if (response.ok) {
         const data = await response.json();
