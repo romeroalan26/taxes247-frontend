@@ -83,9 +83,10 @@ const Login = () => {
             ¡Bienvenido a Taxes247!
           </h2>
           <p className="text-gray-700 max-w-sm text-center">
-            Simplifica tu proceso de declaración de impuestos con nuestra
-            plataforma. Aquí podrás registrar tus datos, realizar pagos y dar
-            seguimiento a tus solicitudes de manera fácil y rápida.
+            Simplifica y asegura tu proceso de declaración de impuestos con
+            nuestra plataforma. Registra tus datos de forma segura, realiza
+            pagos con confianza y da seguimiento a tus solicitudes de manera
+            fácil y eficiente..
           </p>
         </div>
         {/* Formulario de Login */}
