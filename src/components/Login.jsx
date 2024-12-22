@@ -6,16 +6,19 @@ import {
   auth,
   googleProvider,
 } from "../firebaseConfig";
+import { ClipLoader } from "react-spinners";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState(""); // Estado para el error
+  const [isLoading, setIsLoading] = useState(false); // Estado para el spinner
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMessage(""); // Limpiar cualquier mensaje de error anterior
+    setIsLoading(true); // Mostrar el spinner
 
     try {
       // Intentar iniciar sesión con Firebase
@@ -48,10 +51,15 @@ const Login = () => {
           "Ocurrió un error al iniciar sesión. Inténtalo más tarde."
         );
       }
+    } finally {
+      setIsLoading(false); // Ocultar el spinner
     }
   };
 
   const handleGoogleLogin = async () => {
+    setErrorMessage("");
+    setIsLoading(true); // Mostrar el spinner
+
     try {
       const result = await signInWithPopup(auth, googleProvider);
       navigate("/dashboard"); // Redirige al dashboard
@@ -59,6 +67,8 @@ const Login = () => {
       setErrorMessage(
         "Error al iniciar sesión con Google. Inténtalo de nuevo."
       );
+    } finally {
+      setIsLoading(false); // Ocultar el spinner
     }
   };
 
@@ -86,7 +96,7 @@ const Login = () => {
             Simplifica y asegura tu proceso de declaración de impuestos con
             nuestra plataforma. Registra tus datos de forma segura, realiza
             pagos con confianza y da seguimiento a tus solicitudes de manera
-            fácil y eficiente..
+            fácil y eficiente.
           </p>
         </div>
         {/* Formulario de Login */}
@@ -128,9 +138,14 @@ const Login = () => {
 
             <button
               type="submit"
-              className="w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700"
+              className="w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700 flex justify-center items-center"
+              disabled={isLoading}
             >
-              Iniciar Sesión
+              {isLoading ? (
+                <ClipLoader size={20} color="#ffffff" />
+              ) : (
+                "Iniciar Sesión"
+              )}
             </button>
           </form>
 
@@ -138,9 +153,14 @@ const Login = () => {
           <div className="text-center my-4">
             <button
               onClick={handleGoogleLogin}
-              className="w-full bg-gray-200 text-gray-700 py-2 rounded-md hover:bg-gray-300"
+              className="w-full bg-gray-200 text-gray-700 py-2 rounded-md hover:bg-gray-300 flex justify-center items-center"
+              disabled={isLoading}
             >
-              Iniciar sesión con Google
+              {isLoading ? (
+                <ClipLoader size={20} color="#000000" />
+              ) : (
+                "Iniciar sesión con Google"
+              )}
             </button>
           </div>
 
