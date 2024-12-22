@@ -13,7 +13,8 @@ const ActivateAccount = () => {
     const activateAccount = async () => {
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/users/activate/${token}`
+          //`${import.meta.env.VITE_API_URL}/users/activate/${token}`
+          `https://taxes247-backend.onrender.com/api/users/activate/${token}`
         );
         if (response.ok) {
           setMessage("¡Cuenta activada con éxito! Redirigiendo al login...");
