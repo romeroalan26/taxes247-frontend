@@ -64,8 +64,7 @@ const Dashboard = () => {
   const fetchRequests = async (userId) => {
     try {
       const response = await fetch(
-        //`${import.meta.env.VITE_API_URL}/requests/user/${userId}`
-        `https://taxes247-backend.onrender.com/api/requests/users/${userId}`
+        `${import.meta.env.VITE_API_URL}/requests/user/${userId}`
       );
       if (response.ok) {
         const data = await response.json();

@@ -93,14 +93,11 @@ const CreateRequest = () => {
         w2Files: formData.w2Files.map((file) => file.name),
       };
 
-      const response = await fetch(
-        /*`${import.meta.env.VITE_API_URL}/requests`*/ `https://taxes247-backend.onrender.com/api/requests`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(requestData),
-        }
-      );
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/requests`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestData),
+      });
 
       if (response.ok) {
         const data = await response.json();

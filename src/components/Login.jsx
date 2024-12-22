@@ -28,8 +28,7 @@ const Login = () => {
 
       // Obtener información adicional desde el backend
       const response = await fetch(
-        `https://taxes247-backend.onrender.com/api/users/${user.uid}`
-        //`${import.meta.env.VITE_API_URL}/users/${user.uid}`
+        `${import.meta.env.VITE_API_URL}/users/${user.uid}`
       );
       const data = await response.json();
 

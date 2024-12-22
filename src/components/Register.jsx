@@ -32,20 +32,17 @@ const Register = () => {
       const user = userCredential.user;
 
       // Enviar datos adicionales al backend
-      const response = await fetch(
-        `https://taxes247-backend.onrender.com/api/users`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            uid: user.uid,
-            name,
-            email,
-            phone,
-            registeredAt: new Date(),
-          }),
-        }
-      );
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/users`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          uid: user.uid,
+          name,
+          email,
+          phone,
+          registeredAt: new Date(),
+        }),
+      });
 
       if (response.ok) {
         setIsSuccess(true); // Mostrar modal de éxito
