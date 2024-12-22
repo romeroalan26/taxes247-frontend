@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    { "source": "/activate/:path*", "destination": "/" },
+    { "source": "/dashboard/:path*", "destination": "/" },
+    { "source": "/forgot-password/:path*", "destination": "/" },
+    { "source": "/create-request/:path*", "destination": "/" }
+  ]
+}
