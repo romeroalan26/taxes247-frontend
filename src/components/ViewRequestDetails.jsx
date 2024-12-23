@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { ClipLoader } from "react-spinners";
 
 const ViewRequestDetails = () => {
   const { id } = useParams(); // Obtener el ID de la solicitud desde la URL
@@ -31,14 +32,6 @@ const ViewRequestDetails = () => {
     fetchRequestDetails();
   }, [id]);
 
-  if (loading) {
-    return <p className="text-center mt-8">Cargando detalles...</p>;
-  }
-
-  if (!request) {
-    return <p className="text-center mt-8">Solicitud no encontrada.</p>;
-  }
-
   const maskData = (data) => {
     return data.replace(/.(?=.{4})/g, "*");
   };
@@ -53,6 +46,21 @@ const ViewRequestDetails = () => {
   const handlePrint = () => {
     window.print();
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <ClipLoader size={50} color="#1E3A8A" />
+          <p className="mt-4 text-blue-600">Cargando detalles...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!request) {
+    return <p className="text-center mt-8">Solicitud no encontrada.</p>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center p-4">
