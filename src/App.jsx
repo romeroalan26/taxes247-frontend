@@ -5,7 +5,8 @@ import Register from "./components/Register";
 import Dashboard from "./components/Dashboard";
 import CreateRequest from "./components/CreateRequest";
 import ActivateAccount from "./components/ActivateAccount";
-import ForgotPassword from "./components/ForgotPassword"; // Importar ForgotPassword
+import ForgotPassword from "./components/ForgotPassword";
+import ViewRequestDetails from "./components/ViewRequestDetails"; // Importar el nuevo componente
 
 function App() {
   return (
@@ -16,7 +17,9 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/create-request" element={<CreateRequest />} />
         <Route path="/activate/:token" element={<ActivateAccount />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />{" "}
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/request/:id" element={<ViewRequestDetails />} />{" "}
+        {/* Nueva ruta */}
       </Routes>
     </BrowserRouter>
   );
