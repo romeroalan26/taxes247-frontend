@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, signOut } from "../firebaseConfig";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const statusSteps = [
   "Pendiente de pago",
@@ -18,6 +20,8 @@ const Dashboard = () => {
   const [userName, setUserName] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [requests, setRequests] = useState([]);
+  const [loadingUser, setLoadingUser] = useState(true);
+  const [loadingRequests, setLoadingRequests] = useState(true);
   const menuRef = useRef(null);
 
   // Verificar si el usuario está autenticado y cargar solicitudes
@@ -45,6 +49,7 @@ const Dashboard = () => {
             setUserName("Usuario");
           }
         }
+        setLoadingUser(false);
       }
     });
     return () => unsubscribe();
@@ -74,6 +79,8 @@ const Dashboard = () => {
       }
     } catch (error) {
       console.error("Error al cargar solicitudes:", error);
+    } finally {
+      setLoadingRequests(false);
     }
   };
 
@@ -149,7 +156,9 @@ const Dashboard = () => {
       {/* Contenido */}
       <main className="p-8">
         <div className="flex flex-col items-center mb-6">
-          <h2 className="text-lg font-medium mb-4">Hola, {userName}!</h2>
+          <h2 className="text-lg font-medium mb-4">
+            Hola, {loadingUser ? <Skeleton width={100} /> : userName}!
+          </h2>
           <button
             className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700"
             onClick={() => navigate("/create-request")}
@@ -162,7 +171,13 @@ const Dashboard = () => {
         <h2 className="text-xl font-bold text-gray-800 mb-4">
           Lista de Solicitudes
         </h2>
-        {requests.length > 0 ? (
+        {loadingRequests ? (
+          <div className="space-y-4">
+            {[...Array(3)].map((_, i) => (
+              <Skeleton key={i} height={100} />
+            ))}
+          </div>
+        ) : requests.length > 0 ? (
           <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {requests.map((req) => (
               <div
@@ -195,7 +210,7 @@ const Dashboard = () => {
                 </div>
                 <button
                   className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-                  onClick={() => alert(`Detalles de ${req.confirmationNumber}`)}
+                  onClick={() => navigate(`/request/${req._id}`)} // Asegúrate de que `req._id` esté disponible
                 >
                   Ver Detalles
                 </button>
