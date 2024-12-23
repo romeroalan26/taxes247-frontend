@@ -228,7 +228,7 @@ const CreateRequest = () => {
               className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-red-400"
               required
             >
-              <option value="Savings">Savings</option>
+              <option value="Savings">Saving</option>
               <option value="Checkings">Checkings</option>
             </select>
           </div>
