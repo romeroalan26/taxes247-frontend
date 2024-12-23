@@ -156,7 +156,7 @@ const Dashboard = () => {
       {/* Contenido */}
       <main className="p-8">
         <div className="flex flex-col items-center mb-6">
-          <h2 className="text-lg font-medium mb-4">
+          <h2 className="text-xl font-bold text-gray-800 mb-4">
             Hola, {loadingUser ? <Skeleton width={100} /> : userName}
           </h2>
           <button
