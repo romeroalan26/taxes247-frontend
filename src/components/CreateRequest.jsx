@@ -118,164 +118,162 @@ const CreateRequest = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col p-4">
-      <div className="flex justify-end p-4">
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center p-4">
+      <div className="w-full max-w-2xl flex justify-end mb-4">
         <button
-          className="absolute top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
           onClick={() => navigate("/dashboard")}
         >
           Atrás
         </button>
       </div>
 
-      <div className="flex items-center justify-center flex-1">
-        <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl">
-          <h2 className="text-2xl font-bold text-red-600 mb-6">
-            Crear Solicitud
-          </h2>
-          <form onSubmit={handleSubmit}>
-            {[
-              {
-                name: "ssn",
-                label: "Número de Social Security",
-                type: showSensitiveFields.ssn ? "text" : "password",
-                placeholder: "123-45-6789",
-              },
-              {
-                name: "birthDate",
-                label: "Fecha de Nacimiento",
-                type: "date",
-              },
-              {
-                name: "fullName",
-                label: "Nombre Completo",
-                type: "text",
-                placeholder: "Juan Pérez",
-              },
-              {
-                name: "email",
-                label: "Correo Electrónico",
-                type: "email",
-                placeholder: "correo@example.com",
-              },
-              {
-                name: "phone",
-                label: "Número de Teléfono",
-                type: "tel",
-                placeholder: "809-555-1234",
-              },
-              {
-                name: "address",
-                label: "Dirección en USA",
-                type: "text",
-                placeholder: "123 Main St, Anytown, CA",
-              },
-              {
-                name: "bankName",
-                label: "Nombre del Banco",
-                type: "text",
-                placeholder: "Bank of America",
-              },
-              {
-                name: "accountNumber",
-                label: "Número de Cuenta",
-                type: showSensitiveFields.accountNumber ? "text" : "password",
-                placeholder: "123456789",
-              },
-              {
-                name: "routingNumber",
-                label: "Número de Ruta",
-                type: showSensitiveFields.routingNumber ? "text" : "password",
-                placeholder: "987654321",
-              },
-            ].map((field) => (
-              <div key={field.name} className="mb-4">
-                <label className="block text-gray-700">{field.label}</label>
-                <div className="relative">
-                  <input
-                    type={field.type}
-                    name={field.name}
-                    value={formData[field.name]}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-red-400 pr-10"
-                    placeholder={field.placeholder || ""}
-                    required
-                  />
-                  {(field.name === "ssn" ||
-                    field.name === "accountNumber" ||
-                    field.name === "routingNumber") && (
-                    <button
-                      type="button"
-                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-blue-600 hover:text-blue-800"
-                      onClick={() => toggleFieldVisibility(field.name)}
-                    >
-                      {showSensitiveFields[field.name] ? (
-                        <FaEyeSlash />
-                      ) : (
-                        <FaEye />
-                      )}
-                    </button>
-                  )}
-                </div>
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl">
+        <h2 className="text-2xl font-bold text-red-600 mb-6">
+          Crear Solicitud
+        </h2>
+        <form onSubmit={handleSubmit}>
+          {[
+            {
+              name: "ssn",
+              label: "Número de Social Security",
+              type: showSensitiveFields.ssn ? "text" : "password",
+              placeholder: "123-45-6789",
+            },
+            {
+              name: "birthDate",
+              label: "Fecha de Nacimiento",
+              type: "date",
+            },
+            {
+              name: "fullName",
+              label: "Nombre Completo",
+              type: "text",
+              placeholder: "Juan Pérez",
+            },
+            {
+              name: "email",
+              label: "Correo Electrónico",
+              type: "email",
+              placeholder: "correo@example.com",
+            },
+            {
+              name: "phone",
+              label: "Número de Teléfono",
+              type: "tel",
+              placeholder: "809-555-1234",
+            },
+            {
+              name: "address",
+              label: "Dirección en USA",
+              type: "text",
+              placeholder: "123 Main St, Anytown, CA",
+            },
+            {
+              name: "bankName",
+              label: "Nombre del Banco",
+              type: "text",
+              placeholder: "Bank of America",
+            },
+            {
+              name: "accountNumber",
+              label: "Número de Cuenta",
+              type: showSensitiveFields.accountNumber ? "text" : "password",
+              placeholder: "123456789",
+            },
+            {
+              name: "routingNumber",
+              label: "Número de Ruta",
+              type: showSensitiveFields.routingNumber ? "text" : "password",
+              placeholder: "987654321",
+            },
+          ].map((field) => (
+            <div key={field.name} className="mb-4">
+              <label className="block text-gray-700">{field.label}</label>
+              <div className="relative">
+                <input
+                  type={field.type}
+                  name={field.name}
+                  value={formData[field.name]}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-red-400 pr-10"
+                  placeholder={field.placeholder || ""}
+                  required
+                />
+                {(field.name === "ssn" ||
+                  field.name === "accountNumber" ||
+                  field.name === "routingNumber") && (
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-blue-600 hover:text-blue-800"
+                    onClick={() => toggleFieldVisibility(field.name)}
+                  >
+                    {showSensitiveFields[field.name] ? (
+                      <FaEyeSlash />
+                    ) : (
+                      <FaEye />
+                    )}
+                  </button>
+                )}
               </div>
-            ))}
-
-            <div className="mb-4">
-              <label className="block text-gray-700">Tipo de Cuenta</label>
-              <select
-                name="accountType"
-                value={formData.accountType}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-red-400"
-                required
-              >
-                <option value="Savings">Savings</option>
-                <option value="Checkings">Checkings</option>
-              </select>
             </div>
+          ))}
 
-            <div className="mb-4">
-              <label className="block text-gray-700">Método de Pago</label>
-              <select
-                name="paymentMethod"
-                value={formData.paymentMethod}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-red-400"
-                required
-              >
-                <option value="">Seleccionar</option>
-                <option value="PayPal">PayPal</option>
-                <option value="Tarjeta">Tarjeta</option>
-                <option value="Zelle">Zelle</option>
-              </select>
-            </div>
-
-            <div className="mb-4">
-              <label className="block text-gray-700">Subir Archivos W2</label>
-              <input
-                type="file"
-                multiple
-                accept=".pdf"
-                onChange={handleFileUpload}
-                className="w-full px-4 py-2 border rounded-md"
-              />
-            </div>
-
-            {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
-
-            <button
-              type="submit"
-              className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700"
-              disabled={isLoading}
+          <div className="mb-4">
+            <label className="block text-gray-700">Tipo de Cuenta</label>
+            <select
+              name="accountType"
+              value={formData.accountType}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-red-400"
+              required
             >
-              {isLoading ? (
-                <ClipLoader size={20} color="#ffffff" />
-              ) : (
-                "Enviar Solicitud"
-              )}
-            </button>
-          </form>
-        </div>
+              <option value="Savings">Savings</option>
+              <option value="Checkings">Checkings</option>
+            </select>
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-gray-700">Método de Pago</label>
+            <select
+              name="paymentMethod"
+              value={formData.paymentMethod}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-red-400"
+              required
+            >
+              <option value="">Seleccionar</option>
+              <option value="PayPal">PayPal</option>
+              <option value="Tarjeta">Tarjeta</option>
+              <option value="Zelle">Zelle</option>
+            </select>
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-gray-700">Subir Archivos W2</label>
+            <input
+              type="file"
+              multiple
+              accept=".pdf"
+              onChange={handleFileUpload}
+              className="w-full px-4 py-2 border rounded-md"
+            />
+          </div>
+
+          {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
+
+          <button
+            type="submit"
+            className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ClipLoader size={20} color="#ffffff" />
+            ) : (
+              "Enviar Solicitud"
+            )}
+          </button>
+        </form>
       </div>
 
       {isModalOpen && (

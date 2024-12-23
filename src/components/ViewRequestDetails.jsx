@@ -55,16 +55,18 @@ const ViewRequestDetails = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8 flex flex-col items-center">
-      <button
-        className="absolute top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-        onClick={() => navigate("/dashboard")}
-      >
-        Atrás
-      </button>
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center p-4">
+      <div className="w-full max-w-2xl flex justify-end mb-4">
+        <button
+          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+          onClick={() => navigate("/dashboard")}
+        >
+          Atrás
+        </button>
+      </div>
 
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
-        <h2 className="text-2xl font-bold text-red-600 mb-6 text-center">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl">
+        <h2 className="text-2xl font-bold text-red-600 mb-6">
           Detalles de la Solicitud
         </h2>
 
