@@ -79,24 +79,35 @@ const CreateRequest = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError("");
+
+    if (!userId) {
+      setError("No se puede enviar la solicitud. Por favor, vuelve a iniciar sesión.");
+      console.error("User ID no está disponible.");
+      setIsLoading(false);
+      return;
+    }
 
     const initialStatus =
-      formData.paymentMethod === "Zelle"
-        ? "Pendiente de pago"
-        : "Pago recibido";
+      formData.paymentMethod === "Zelle" ? "Pendiente de pago" : "Pago recibido";
 
     try {
-      const requestData = {
-        ...formData,
-        userId,
-        status: initialStatus,
-        w2Files: formData.w2Files.map((file) => file.name),
-      };
+      const formDataPayload = new FormData();
+
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key === "w2Files" && value.length > 0) {
+          value.forEach((file) => formDataPayload.append("w2Files", file));
+        } else {
+          formDataPayload.append(key, value);
+        }
+      });
+
+      formDataPayload.append("userId", userId);
+      formDataPayload.append("status", initialStatus);
 
       const response = await fetch(`${import.meta.env.VITE_API_URL}/requests`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestData),
+        body: formDataPayload,
       });
 
       if (response.ok) {
@@ -111,7 +122,10 @@ const CreateRequest = () => {
       }
     } catch (error) {
       console.error("Error al enviar la solicitud:", error);
-      setError("Hubo un problema al enviar la solicitud. Intenta de nuevo.");
+      setError(
+        error.message ||
+          "Hubo un problema al enviar la solicitud. Intenta de nuevo."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -220,20 +234,6 @@ const CreateRequest = () => {
           ))}
 
           <div className="mb-4">
-            <label className="block text-gray-700">Tipo de Cuenta</label>
-            <select
-              name="accountType"
-              value={formData.accountType}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-red-400"
-              required
-            >
-              <option value="Savings">Saving</option>
-              <option value="Checkings">Checkings</option>
-            </select>
-          </div>
-
-          <div className="mb-4">
             <label className="block text-gray-700">Método de Pago</label>
             <select
               name="paymentMethod"
@@ -242,10 +242,10 @@ const CreateRequest = () => {
               className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-red-400"
               required
             >
-              <option value="">Seleccionar</option>
-              <option value="PayPal">PayPal</option>
-              <option value="Tarjeta">Tarjeta</option>
+              <option value="">Selecciona un método</option>
               <option value="Zelle">Zelle</option>
+              <option value="PayPal">PayPal</option>
+              <option value="Tarjeta de Crédito">Tarjeta de Crédito</option>
             </select>
           </div>
 
