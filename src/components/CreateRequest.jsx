@@ -88,8 +88,7 @@ const CreateRequest = () => {
       return;
     }
 
-    const initialStatus =
-      formData.paymentMethod === "Zelle" ? "Pendiente de pago" : "Pago recibido";
+    const initialStatus = "Recibido";
 
     try {
       const formDataPayload = new FormData();
