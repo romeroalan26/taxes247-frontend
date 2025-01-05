@@ -87,14 +87,23 @@ const Login = () => {
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
       <header className="bg-red-600 text-white px-6 py-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Taxes247</h1>
-        <button
-          onClick={() => window.open("https://wa.me/18094039726", "_blank")}
-          className="bg-white text-red-600 px-4 py-2 rounded-md hover:bg-gray-200"
-        >
-          Contacto
-        </button>
-      </header>
+  <h1 className="text-2xl font-bold">Taxes247</h1>
+  <div className="flex space-x-4"> {/* Contenedor para agrupar los botones */}
+    <button
+      onClick={() => navigate("/pricing")}
+      className="bg-white text-red-600 px-4 py-2 rounded-md hover:bg-gray-200"
+    >
+      Precios
+    </button>
+    <button
+      onClick={() => window.open("https://wa.me/18094039726", "_blank")}
+      className="bg-white text-red-600 px-4 py-2 rounded-md hover:bg-gray-200"
+    >
+      Contacto
+    </button>
+  </div>
+</header>
+
 
       {/* Contenido principal */}
       <main className="flex flex-col items-center justify-center p-8">
