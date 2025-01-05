@@ -1,74 +1,85 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
+  auth,
   signInWithEmailAndPassword,
   signInWithPopup,
-  auth,
   googleProvider,
+  sendPasswordResetEmail,
 } from "../firebaseConfig";
 import { ClipLoader } from "react-spinners";
+import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState(""); // Estado para el error
-  const [isLoading, setIsLoading] = useState(false); // Estado para el spinner
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { setUser } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setErrorMessage(""); // Limpiar cualquier mensaje de error anterior
-    setIsLoading(true); // Mostrar el spinner
+    setErrorMessage("");
+    setIsLoading(true);
 
     try {
-      // Intentar iniciar sesión con Firebase
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const user = userCredential.user;
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const authUser = userCredential.user;
 
-      // Obtener información adicional desde el backend
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/users/${user.uid}`
-      );
-      const data = await response.json();
-
-      if (response.ok) {
-        navigate("/dashboard"); // Redirige al dashboard
-      } else {
-        setErrorMessage(data.message || "Error al autenticar el usuario.");
-      }
+      const updatedUser = {
+        uid: authUser.uid,
+        email: authUser.email,
+        name: authUser.displayName || "Usuario",
+      };
+      setUser(updatedUser);
+      localStorage.setItem("authUser", JSON.stringify(updatedUser));
+      navigate("/dashboard");
     } catch (error) {
-      if (
-        error.code === "auth/invalid-credential" ||
-        error.code === "auth/user-not-found"
-      ) {
-        setErrorMessage("Correo o contraseña incorrectos. Inténtalo de nuevo.");
-      } else {
-        setErrorMessage(
-          "Ocurrió un error al iniciar sesión. Inténtalo más tarde."
-        );
-      }
+      setErrorMessage("Error al iniciar sesión. Revisa tus credenciales.");
+      console.error("Error al iniciar sesión:", error);
     } finally {
-      setIsLoading(false); // Ocultar el spinner
+      setIsLoading(false);
     }
   };
 
   const handleGoogleLogin = async () => {
     setErrorMessage("");
-    setIsLoading(true); // Mostrar el spinner
+    setIsLoading(true);
 
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      navigate("/dashboard"); // Redirige al dashboard
+      const authUser = result.user;
+
+      const updatedUser = {
+        uid: authUser.uid,
+        email: authUser.email,
+        name: authUser.displayName || "Usuario",
+      };
+      setUser(updatedUser);
+      localStorage.setItem("authUser", JSON.stringify(updatedUser));
+      navigate("/dashboard");
     } catch (error) {
-      setErrorMessage(
-        "Error al iniciar sesión con Google. Inténtalo de nuevo."
-      );
+      setErrorMessage("Error al iniciar sesión con Google. Inténtalo más tarde.");
+      console.error("Error al iniciar sesión con Google:", error);
     } finally {
-      setIsLoading(false); // Ocultar el spinner
+      setIsLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    setErrorMessage("");
+    if (!email) {
+      setErrorMessage("Por favor, ingresa tu correo electrónico para recuperar la contraseña.");
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setErrorMessage("Correo de recuperación enviado. Por favor, revisa tu bandeja de entrada.");
+    } catch (error) {
+      setErrorMessage("Error al enviar el correo de recuperación.");
+      console.error("Error al enviar correo de recuperación:", error);
     }
   };
 
@@ -89,22 +100,18 @@ const Login = () => {
       <main className="flex flex-col items-center justify-center p-8">
         {/* Texto de bienvenida */}
         <div className="mb-8 text-center">
-          <h2 className="text-3xl font-bold text-red-600 mb-4">
-            ¡Bienvenido a Taxes247!
-          </h2>
+          <h2 className="text-3xl font-bold text-red-600 mb-4">¡Bienvenido a Taxes247!</h2>
           <p className="text-gray-700 max-w-sm text-center">
-            Simplifica y asegura tu proceso de declaración de impuestos con
+          Simplifica y asegura tu proceso de declaración de impuestos con
             nuestra plataforma. Registra tus datos de forma segura, realiza
             pagos con confianza y da seguimiento a tus solicitudes de manera
             fácil y eficiente.
           </p>
         </div>
+
         {/* Formulario de Login */}
         <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-          <h2 className="text-2xl font-bold text-red-600 text-center mb-6">
-            Iniciar Sesión
-          </h2>
-
+          <h2 className="text-2xl font-bold text-red-600 text-center mb-6">Iniciar Sesión</h2>
           <form onSubmit={handleLogin}>
             <div className="mb-4">
               <label className="block text-gray-700">Correo Electrónico</label>
@@ -130,51 +137,29 @@ const Login = () => {
             </div>
 
             {/* Mostrar mensaje de error */}
-            {errorMessage && (
-              <div className="text-red-600 text-sm mb-4 text-center">
-                {errorMessage}
-              </div>
-            )}
+            {errorMessage && <div className="text-red-600 text-sm mb-4 text-center">{errorMessage}</div>}
 
             <button
               type="submit"
               className="w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700 flex justify-center items-center"
               disabled={isLoading}
             >
-              {isLoading ? (
-                <ClipLoader size={20} color="#ffffff" />
-              ) : (
-                "Iniciar Sesión"
-              )}
+              {isLoading ? <ClipLoader size={20} color="#ffffff" /> : "Iniciar Sesión"}
             </button>
           </form>
 
-          {/* Iniciar sesión con Google */}
+          {/* Login con Google */}
           <div className="text-center my-4">
             <button
               onClick={handleGoogleLogin}
               className="w-full bg-gray-200 text-gray-700 py-2 rounded-md hover:bg-gray-300 flex justify-center items-center"
               disabled={isLoading}
             >
-              {isLoading ? (
-                <ClipLoader size={20} color="#000000" />
-              ) : (
-                "Iniciar sesión con Google"
-              )}
+              {isLoading ? <ClipLoader size={20} color="#000000" /> : "Iniciar sesión con Google"}
             </button>
           </div>
 
-          <div className="text-center">
-            <p className="text-gray-600">
-              ¿No tienes una cuenta?{" "}
-              <button
-                onClick={() => navigate("/register")}
-                className="text-red-600 hover:underline"
-              >
-                Regístrate aquí
-              </button>
-            </p>
-          </div>
+          {/* Recuperar contraseña */}
           <div className="text-center">
             <p className="text-gray-600">
               ¿Olvidaste tu contraseña?{" "}
@@ -186,9 +171,20 @@ const Login = () => {
               </button>
             </p>
           </div>
-        </div>
-        {/* Preguntas frecuentes */}
-        <div className="mt-12 w-full max-w-2xl">
+
+          {/* Registrarse */}
+          <div className="text-center mt-4">
+            <p className="text-gray-600">
+              ¿No tienes una cuenta?{" "}
+              <button
+                onClick={() => navigate("/register")}
+                className="text-red-600 hover:underline"
+              >
+                Regístrate aquí
+              </button>
+            </p>
+          </div>
+        </div>        <div className="mt-12 w-full max-w-2xl">
           <h3 className="text-xl font-bold text-red-600 mb-4">
             Preguntas Frecuentes
           </h3>
@@ -313,6 +309,7 @@ const Login = () => {
             </details>
           </div>
         </div>
+        
       </main>
     </div>
   );
