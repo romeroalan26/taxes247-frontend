@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth, signOut } from "../firebaseConfig";
+import { useAuth } from "../context/AuthContext"; // Importar el contexto
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
@@ -17,56 +17,51 @@ const statusSteps = [
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [userName, setUserName] = useState("");
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, logout } = useAuth(); // Contexto actualizado
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // Estado para el menú desplegable
   const [requests, setRequests] = useState([]);
-  const [loadingUser, setLoadingUser] = useState(true);
   const [loadingRequests, setLoadingRequests] = useState(true);
   const menuRef = useRef(null);
-
-  // Verificar si el usuario está autenticado y cargar solicitudes
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      if (!user) {
-        navigate("/"); // Si no está autenticado, redirigir al login
-      } else {
-        if (user.displayName) {
-          setUserName(user.displayName);
-          fetchRequests(user.uid);
-        } else {
-          try {
-            const response = await fetch(
-              `${import.meta.env.VITE_API_URL}/users/${user.uid}`
-            );
-            if (response.ok) {
-              const userData = await response.json();
-              setUserName(userData.name);
-            } else {
-              setUserName("Usuario");
-            }
-          } catch (error) {
-            console.error("Error al obtener datos del usuario:", error);
-            setUserName("Usuario");
-          }
-        }
-        setLoadingUser(false);
-      }
-    });
-    return () => unsubscribe();
-  }, [navigate]);
+  const [loadingName, setLoadingName] = useState(true); // Estado para el indicador de carga del nombre
+  const [userName, setUserName] = useState(null); // Estado para manejar el nombre del usuario
 
   useEffect(() => {
-    const user = auth.currentUser;
     if (user) {
-      setUserName(user.displayName || "Usuario");
-      fetchRequests(user.uid);
-    } else {
-      navigate("/");
+      if (user.name === "Usuario") {
+        setUserName(user.displayName);
+      } else {
+        setUserName(user.name);
+      }
+      setLoadingName(false); // Terminar carga del nombre
     }
-  }, [navigate]);
+  }, [user]);
 
-  // Cargar solicitudes desde el backend
+  useEffect(() => {
+    if (!user) {
+      navigate("/");
+    } else {
+      fetchRequests(user.uid);
+    }
+  }, [user, navigate]);
+
   const fetchRequests = async (userId) => {
+    const cachedRequests = localStorage.getItem("requests");
+
+    if (cachedRequests) {
+      const parsedCache = JSON.parse(cachedRequests);
+      const now = new Date().getTime();
+
+      // Verificar si los datos en el caché aún son válidos
+      if (now - parsedCache.timestamp < 30 * 60 * 1000) {
+        setRequests(parsedCache.data); // Usar los datos del caché
+        setLoadingRequests(false);
+        return;
+      } else {
+        localStorage.removeItem("requests"); // Eliminar datos expirados
+      }
+    }
+
+    // Si no hay caché válido, hacer la llamada al backend
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/requests/user/${userId}`
@@ -74,6 +69,13 @@ const Dashboard = () => {
       if (response.ok) {
         const data = await response.json();
         setRequests(data);
+
+        // Guardar la respuesta en el localStorage con un timestamp
+        const cache = {
+          data: data,
+          timestamp: new Date().getTime(),
+        };
+        localStorage.setItem("requests", JSON.stringify(cache));
       } else {
         console.error("Error al obtener las solicitudes");
       }
@@ -84,7 +86,6 @@ const Dashboard = () => {
     }
   };
 
-  // Manejar clic fuera del menú
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -95,15 +96,14 @@ const Dashboard = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleLogout = async () => {
-    await signOut(auth);
-    navigate("/");
-  };
-
   const calculateProgress = (status) => {
     const currentStepIndex = statusSteps.indexOf(status);
     return ((currentStepIndex + 1) / statusSteps.length) * 100;
   };
+
+  if (!user) {
+    return <div className="flex justify-center items-center min-h-screen">Cargando...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -125,13 +125,7 @@ const Dashboard = () => {
           >
             <button
               className="block px-4 py-2 hover:bg-red-100 w-full text-left"
-              onClick={() => alert("Cambiar idioma aún no está implementado.")}
-            >
-              Cambiar Idioma
-            </button>
-            <button
-              className="block px-4 py-2 hover:bg-red-100 w-full text-left"
-              onClick={handleLogout}
+              onClick={logout}
             >
               Cerrar Sesión
             </button>
@@ -139,14 +133,8 @@ const Dashboard = () => {
         </div>
         <div className="hidden md:flex items-center space-x-4">
           <button
-            className="bg-red-700 px-4 py-2 rounded-md hover:bg-red-800"
-            onClick={() => alert("Cambiar idioma aún no está implementado.")}
-          >
-            Cambiar Idioma
-          </button>
-          <button
             className="bg-gray-200 text-red-600 px-4 py-2 rounded-md hover:bg-gray-300"
-            onClick={handleLogout}
+            onClick={logout}
           >
             Cerrar Sesión
           </button>
@@ -157,8 +145,9 @@ const Dashboard = () => {
       <main className="p-8">
         <div className="flex flex-col items-center mb-6">
           <h2 className="text-xl font-bold text-gray-800 mb-4">
-            Hola, {loadingUser ? <Skeleton width={100} /> : userName}
+            Hola, {loadingName ? <Skeleton width={100} /> : userName}
           </h2>
+
           <button
             className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700"
             onClick={() => navigate("/create-request")}
@@ -168,9 +157,7 @@ const Dashboard = () => {
         </div>
 
         {/* Lista de Solicitudes */}
-        <h2 className="text-xl font-bold text-gray-800 mb-4">
-          Lista de Solicitudes
-        </h2>
+        <h2 className="text-xl font-bold text-gray-800 mb-4">Lista de Solicitudes</h2>
         {loadingRequests ? (
           <div className="space-y-4">
             {[...Array(3)].map((_, i) => (
@@ -184,9 +171,7 @@ const Dashboard = () => {
                 key={req.confirmationNumber}
                 className="bg-white p-4 rounded-lg shadow-lg border"
               >
-                <h3 className="text-lg font-bold text-red-600">
-                  {req.confirmationNumber}
-                </h3>
+                <h3 className="text-lg font-bold text-red-600">{req.confirmationNumber}</h3>
                 <p className="text-gray-600">
                   <span className="font-bold">Estado:</span> {req.status}
                 </p>
@@ -194,7 +179,6 @@ const Dashboard = () => {
                   <span className="font-bold">Fecha:</span>{" "}
                   {new Date(req.createdAt).toLocaleDateString()}
                 </p>
-                {/* Barra de Progreso */}
                 <div className="mt-4">
                   <p className="text-gray-600 mb-2">Progreso:</p>
                   <div className="w-full bg-gray-200 rounded-full h-4">
@@ -204,13 +188,12 @@ const Dashboard = () => {
                     ></div>
                   </div>
                   <p className="text-sm text-gray-600 mt-2">
-                    Paso {statusSteps.indexOf(req.status) + 1} de{" "}
-                    {statusSteps.length}
+                    Paso {statusSteps.indexOf(req.status) + 1} de {statusSteps.length}
                   </p>
                 </div>
                 <button
                   className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-                  onClick={() => navigate(`/request/${req._id}`)} // Asegúrate de que `req._id` esté disponible
+                  onClick={() => navigate(`/request/${req._id}`)}
                 >
                   Ver Detalles
                 </button>

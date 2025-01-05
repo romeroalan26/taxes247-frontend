@@ -12,6 +12,23 @@ const ViewRequestDetails = () => {
 
   useEffect(() => {
     const fetchRequestDetails = async () => {
+      // Revisar si los detalles de la solicitud están en localStorage
+      const cachedRequest = localStorage.getItem(`request_${id}`);
+      if (cachedRequest) {
+        const parsedCache = JSON.parse(cachedRequest);
+        const now = new Date().getTime();
+
+        // Verificar si el caché aún es válido (30 minutos)
+        if (now - parsedCache.timestamp < 15 * 60 * 1000) {
+          setRequest(parsedCache.data);
+          setLoading(false);
+          return;
+        } else {
+          localStorage.removeItem(`request_${id}`); // Eliminar caché expirado
+        }
+      }
+
+      // Si no hay caché válido, hacer la solicitud al backend
       try {
         const response = await fetch(
           `${import.meta.env.VITE_API_URL}/requests/${id}`
@@ -19,6 +36,13 @@ const ViewRequestDetails = () => {
         if (response.ok) {
           const data = await response.json();
           setRequest(data);
+
+          // Guardar en localStorage con un timestamp
+          const cache = {
+            data: data,
+            timestamp: new Date().getTime(),
+          };
+          localStorage.setItem(`request_${id}`, JSON.stringify(cache));
         } else {
           console.error("Error al obtener los detalles de la solicitud");
         }

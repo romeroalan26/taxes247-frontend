@@ -4,7 +4,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   signInWithEmailAndPassword,
-  sendPasswordResetEmail, // Importar la función para restablecer contraseñas
+  sendPasswordResetEmail,
   signOut,
 } from "firebase/auth";
 
@@ -21,8 +21,8 @@ const firebaseConfig = {
 
 // Inicializar Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const googleProvider = new GoogleAuthProvider();
+const auth = getAuth(app); // Inicializa el servicio de autenticación
+const googleProvider = new GoogleAuthProvider(); // Configuración del proveedor de Google
 
 export {
   auth,
@@ -30,5 +30,5 @@ export {
   signInWithPopup,
   signInWithEmailAndPassword,
   signOut,
-  sendPasswordResetEmail, // Exportar la función de restablecimiento de contraseña
+  sendPasswordResetEmail,
 };
