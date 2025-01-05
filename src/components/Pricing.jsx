@@ -6,17 +6,25 @@ const Pricing = () => {
 
   const pricingOptions = [
     {
-      title: "Declaración Estándar",
+      title: "Plan Estándar",
       price: "$60",
-      description: "Una declaración básica para tus impuestos.",
-      features: ["Preparación completa", "Presentación segura", "Asistencia personalizada"],
+      description: "Ideal para quienes necesitan una declaración básica de impuestos.",
+      features: [
+        "Declaración de impuestos básica",
+        "Presentación segura",
+        "Asistencia personalizada por correo y WhatsApp",
+      ],
     },
     {
-      title: "Declaración Premium",
+      title: "Plan Premium",
       price: "$150",
-      description:
-        "Declaración de impuestos con bono adicional.",
-      features: ["Preparación completa", "Presentación segura", "Asistencia personalizada", "Bono de entre $900 y $1200 dólares."],
+      description: "Maximiza tu reembolso y disfruta de soporte prioritario.",
+      features: [
+        "Todo lo incluido en el plan estándar",
+        "Procesamiento prioritario",
+        "Soporte prioritario por WhatsApp y correo",
+        "Bono adicional estimado de US$900 a US$1,200",
+      ],
     },
   ];
 
@@ -25,9 +33,9 @@ const Pricing = () => {
       {/* Header */}
       <header className="bg-red-600 text-white px-6 py-4 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Taxes247</h1>
-        <div>
+        <div className="flex space-x-4">
           <button
-            className="bg-red-700 mr-4 px-4 py-2 hover:bg-red-800 rounded-md"
+            className="bg-red-700 px-4 py-2 rounded-md hover:bg-red-800"
             onClick={() => navigate("/")}
           >
             Login
@@ -46,32 +54,39 @@ const Pricing = () => {
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">
           Opciones de Precios
         </h2>
-        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 max-w-4xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
           {pricingOptions.map((option, index) => (
             <div
               key={index}
-              className="bg-white p-6 rounded-lg shadow-lg border text-center"
+              className="border rounded-lg p-6 hover:shadow-lg transition-shadow cursor-pointer hover:border-red-500"
             >
-              <h3 className="text-2xl font-bold text-red-600 mb-4">
-                {option.title}
-              </h3>
-              <p className="text-4xl font-bold text-gray-800 mb-4">
-                {option.price}
+              <h3 className="text-xl font-bold text-red-600 mb-4">{option.title}</h3>
+              <p className="text-3xl font-bold text-gray-800 mb-4">
+                {option.price} <span className="text-sm text-gray-600">USD</span>
               </p>
               <p className="text-gray-600 mb-6">{option.description}</p>
-              <ul className="text-left space-y-2 mb-6">
+              <ul className="space-y-3 text-gray-600 mb-6 text-left">
                 {option.features.map((feature, i) => (
-                  <li
-                    key={i}
-                    className="text-gray-800 flex items-center"
-                  >
-                    <span className="mr-2">✅</span>
+                  <li key={i} className="flex items-center">
+                    <svg
+                      className="w-5 h-5 text-green-500 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M5 13l4 4L19 7"
+                      ></path>
+                    </svg>
                     {feature}
                   </li>
                 ))}
               </ul>
               <button
-                className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 w-full"
+                className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition-colors"
                 onClick={() => navigate("/")}
               >
                 Comenzar

@@ -1,16 +1,17 @@
-import React from 'react';
+import React from "react";
 
 const PricingModal = ({ onSelect, onClose }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-8 rounded-lg shadow-lg max-w-4xl w-full mx-4">
+      {/* Contenedor del modal con scroll */}
+      <div className="bg-white p-8 rounded-lg shadow-lg max-w-4xl w-full mx-4 overflow-y-auto max-h-[90vh]">
         <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
           Selecciona tu Plan
         </h2>
         <div className="grid md:grid-cols-2 gap-6">
           {/* Plan Estándar */}
-          <div 
-            onClick={() => onSelect('standard', 60)}
+          <div
+            onClick={() => onSelect("standard", 60)}
             className="border rounded-lg p-6 hover:shadow-lg transition-shadow cursor-pointer hover:border-red-500"
           >
             <h3 className="text-xl font-bold text-red-600 mb-4">Plan Estándar</h3>
@@ -19,22 +20,37 @@ const PricingModal = ({ onSelect, onClose }) => {
             </p>
             <ul className="space-y-3 text-gray-600 mb-6">
               <li className="flex items-center">
-                <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                <svg
+                  className="w-5 h-5 text-green-500 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M5 13l4 4L19 7"
+                  ></path>
                 </svg>
                 Declaración de impuestos básica
               </li>
+
               <li className="flex items-center">
-                <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                <svg
+                  className="w-5 h-5 text-green-500 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M5 13l4 4L19 7"
+                  ></path>
                 </svg>
-                Procesamiento estándar
-              </li>
-              <li className="flex items-center">
-                <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-                Soporte por correo electrónico
+                Soporte por WhatsApp y correo electrónico
               </li>
             </ul>
             <button className="w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition-colors">
@@ -43,8 +59,8 @@ const PricingModal = ({ onSelect, onClose }) => {
           </div>
 
           {/* Plan Premium */}
-          <div 
-            onClick={() => onSelect('premium', 150)}
+          <div
+            onClick={() => onSelect("premium", 150)}
             className="border rounded-lg p-6 hover:shadow-lg transition-shadow cursor-pointer hover:border-red-500"
           >
             <h3 className="text-xl font-bold text-red-600 mb-4">Plan Premium</h3>
@@ -56,26 +72,66 @@ const PricingModal = ({ onSelect, onClose }) => {
             </div>
             <ul className="space-y-3 text-gray-600 mb-6">
               <li className="flex items-center">
-                <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                <svg
+                  className="w-5 h-5 text-green-500 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M5 13l4 4L19 7"
+                  ></path>
                 </svg>
                 Todo lo del plan estándar
               </li>
               <li className="flex items-center">
-                <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                <svg
+                  className="w-5 h-5 text-green-500 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M5 13l4 4L19 7"
+                  ></path>
                 </svg>
                 Procesamiento prioritario
               </li>
               <li className="flex items-center">
-                <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                <svg
+                  className="w-5 h-5 text-green-500 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M5 13l4 4L19 7"
+                  ></path>
                 </svg>
-                Soporte prioritario por WhatsApp
+                Soporte prioritario por WhatsApp y correo electrónico
               </li>
               <li className="flex items-center">
-                <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                <svg
+                  className="w-5 h-5 text-green-500 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M5 13l4 4L19 7"
+                  ></path>
                 </svg>
                 Maximización de reembolso
               </li>
@@ -85,7 +141,7 @@ const PricingModal = ({ onSelect, onClose }) => {
             </button>
           </div>
         </div>
-        <button 
+        <button
           onClick={onClose}
           className="mt-6 w-full bg-gray-200 text-gray-800 py-2 rounded-md hover:bg-gray-300 transition-colors"
         >
