@@ -144,9 +144,9 @@ const Dashboard = () => {
       {/* Contenido */}
       <main className="p-8">
         <div className="flex flex-col items-center mb-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">
-            Hola, {loadingName ? <Skeleton width={100} /> : userName}
-          </h2>
+        <h2 className="text-xl font-bold text-gray-800 mb-4">
+  Hola, {loadingName || !userName ? <Skeleton width={100} /> : userName}
+</h2>
 
           <button
             className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700"
