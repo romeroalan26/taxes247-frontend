@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { auth, signOut } from "../firebaseConfig";
+import api from '../utils/api';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
-    // Intentar cargar el usuario desde el localStorage
     const storedUser = localStorage.getItem("authUser");
     return storedUser ? JSON.parse(storedUser) : null;
   });
@@ -15,51 +15,57 @@ export const AuthProvider = ({ children }) => {
     const unsubscribe = auth.onAuthStateChanged(async (authUser) => {
       if (authUser) {
         try {
-          // Hacer una solicitud al backend para obtener más información del usuario
-          const response = await fetch(
-            `${import.meta.env.VITE_API_URL}/users/${authUser.uid}`
-          );
-
-          if (response.ok) {
-            const userData = await response.json();
+          // Intentar obtener el usuario del backend
+          const { ok, data, status } = await api.get(`/users/${authUser.uid}`);
+  
+          if (ok) {
+            // Usuario existe, actualizar estado
             const updatedUser = {
               uid: authUser.uid,
               email: authUser.email,
-              name: userData.name || authUser.displayName,
+              name: data.name || authUser.displayName || "Usuario",
             };
-
             setUser(updatedUser);
             localStorage.setItem("authUser", JSON.stringify(updatedUser));
-          } else {
-            console.error("Error al obtener los datos del usuario desde el backend.");
-            // Usar datos básicos de Firebase si el backend falla
-            const fallbackUser = {
-              uid: authUser.uid,
+          } else if (status === 404 && authUser.providerData[0]?.providerId === 'google.com') {
+            // Usuario no existe y es login con Google, crearlo
+            const { ok: createOk, data: createData } = await api.post('/users/login', {
               email: authUser.email,
-              name: authUser.displayName,
-            };
-
-            setUser(fallbackUser);
-            localStorage.setItem("authUser", JSON.stringify(fallbackUser));
+              name: authUser.displayName || "Usuario",
+              isGoogleLogin: true,
+              uid: authUser.uid
+            });
+  
+            if (createOk) {
+              const newUser = {
+                uid: authUser.uid,
+                email: authUser.email,
+                name: authUser.displayName || "Usuario",
+              };
+              setUser(newUser);
+              localStorage.setItem("authUser", JSON.stringify(newUser));
+            } else {
+              // Si hay error al crear el usuario
+              await auth.signOut();
+              localStorage.removeItem("authUser");
+              setUser(null);
+            }
+          } else {
+            // Cualquier otro error
+            await auth.signOut();
+            localStorage.removeItem("authUser");
+            setUser(null);
           }
         } catch (error) {
-          console.error("Error al conectar con el backend:", error);
-          const fallbackUser = {
-            uid: authUser.uid,
-            email: authUser.email,
-            name: authUser.displayName,
-          };
-
-          setUser(fallbackUser);
-          localStorage.setItem("authUser", JSON.stringify(fallbackUser));
+          console.error("Error en auth state change:", error);
         }
       } else {
-        setUser(null);
         localStorage.removeItem("authUser");
+        setUser(null);
       }
       setLoading(false);
     });
-
+  
     return () => unsubscribe();
   }, []);
 
@@ -67,24 +73,33 @@ export const AuthProvider = ({ children }) => {
     try {
       await signOut(auth);
       setUser(null);
-  
-      // Eliminar claves relacionadas con los requests
-      localStorage.removeItem("requests"); // Elimina el listado de requests
-  
-      // Eliminar todos los requests específicos por ID
-      Object.keys(localStorage).forEach((key) => {
-        if (key.startsWith("request_")) {
-          localStorage.removeItem(key);
-        }
-      });
-  
-      localStorage.removeItem("authUser");
-      localStorage.removeItem("user");
+      
+      const keysToRemove = [
+        "authUser",
+        "user",
+        "requests",
+        "authError",
+        ...Object.keys(localStorage).filter(key => key.startsWith("request_"))
+      ];
+
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+
     } catch (error) {
-      console.error("Error al cerrar sesión:", error);
+      // Si hay error al cerrar sesión, intentamos limpiar localStorage de todos modos
+      try {
+        const keysToRemove = [
+          "authUser",
+          "user",
+          "requests",
+          "authError",
+          ...Object.keys(localStorage).filter(key => key.startsWith("request_"))
+        ];
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+      } catch (e) {
+        // Si falla la limpieza del localStorage, no hacer nada
+      }
     }
   };
-  
 
   return (
     <AuthContext.Provider value={{ user, setUser, loading, logout }}>
@@ -100,3 +115,5 @@ export const useAuth = () => {
   }
   return context;
 };
+
+export default AuthProvider;

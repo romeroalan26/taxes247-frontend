@@ -45,22 +45,27 @@ const Dashboard = () => {
   }, [user, navigate]);
 
   const fetchRequests = async (userId) => {
+    // Si venimos de crear una solicitud, ignoramos el caché
+    const fromCreateRequest = localStorage.getItem("fromCreateRequest");
     const cachedRequests = localStorage.getItem("requests");
-
-    if (cachedRequests) {
+  
+    if (cachedRequests && !fromCreateRequest) {
       const parsedCache = JSON.parse(cachedRequests);
       const now = new Date().getTime();
-
+  
       // Verificar si los datos en el caché aún son válidos
       if (now - parsedCache.timestamp < 30 * 60 * 1000) {
-        setRequests(parsedCache.data); // Usar los datos del caché
+        setRequests(parsedCache.data);
         setLoadingRequests(false);
         return;
       } else {
-        localStorage.removeItem("requests"); // Eliminar datos expirados
+        localStorage.removeItem("requests");
       }
     }
-
+  
+    // Limpiar el flag de navegación
+    localStorage.removeItem("fromCreateRequest");
+  
     // Si no hay caché válido, hacer la llamada al backend
     try {
       const response = await fetch(
@@ -69,7 +74,7 @@ const Dashboard = () => {
       if (response.ok) {
         const data = await response.json();
         setRequests(data);
-
+  
         // Guardar la respuesta en el localStorage con un timestamp
         const cache = {
           data: data,

@@ -6,6 +6,10 @@ import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
   signOut,
+  EmailAuthProvider,
+  fetchSignInMethodsForEmail,
+  linkWithCredential,
+  createUserWithEmailAndPassword
 } from "firebase/auth";
 
 // Configuración de Firebase (reemplaza con tus datos)
@@ -31,4 +35,8 @@ export {
   signInWithEmailAndPassword,
   signOut,
   sendPasswordResetEmail,
+  EmailAuthProvider,
+  fetchSignInMethodsForEmail,
+  linkWithCredential,
+  createUserWithEmailAndPassword
 };
