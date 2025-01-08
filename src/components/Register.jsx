@@ -19,55 +19,50 @@ const Register = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    setErrorMessage(""); // Limpiar cualquier error previo
-    setIsLoading(true); // Mostrar animación de carga
-
+    setErrorMessage("");
+    setIsLoading(true);
+  
     try {
-      // Crear usuario en Firebase Authentication
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      const user = userCredential.user;
-
-      // Enviar datos adicionales al backend
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/users`, {
+      // 1. Primero crear usuario en Firebase
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const firebaseUser = userCredential.user;
+  
+      // 2. Luego registrar en nuestro backend
+      const backendResponse = await fetch(`${import.meta.env.VITE_API_URL}/users/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          uid: user.uid,
           name,
           email,
           phone,
-          registeredAt: new Date(),
+          uid: firebaseUser.uid // Enviamos el uid de Firebase
         }),
       });
-
-      if (response.ok) {
-        setIsSuccess(true); // Mostrar modal de éxito
-      } else {
-        const error = await response.json();
-        setErrorMessage(
-          error.message || "Error al guardar datos adicionales en el servidor."
-        );
+  
+      if (!backendResponse.ok) {
+        // Si hay error en el backend, eliminar usuario de Firebase
+        await firebaseUser.delete();
+        const error = await backendResponse.json();
+        throw new Error(error.message);
       }
+  
+      // 3. Si todo está bien, mostrar éxito
+      setIsSuccess(true);
+  
     } catch (error) {
+      console.error("Error en el registro:", error);
+      
       if (error.code === "auth/email-already-in-use") {
-        setErrorMessage(
-          "El correo electrónico ya está en uso. Intenta con otro."
-        );
+        setErrorMessage("El correo electrónico ya está en uso. Intenta con otro.");
       } else if (error.code === "auth/weak-password") {
-        setErrorMessage(
-          "La contraseña es demasiado débil. Debe tener al menos 6 caracteres."
-        );
+        setErrorMessage("La contraseña es demasiado débil. Debe tener al menos 6 caracteres.");
+      } else if (error.code === "auth/invalid-email") {
+        setErrorMessage("El correo electrónico no es válido.");
       } else {
-        setErrorMessage(
-          "Ocurrió un error al registrar el usuario. Inténtalo de nuevo."
-        );
+        setErrorMessage(error.message || "Ocurrió un error al registrar el usuario. Inténtalo de nuevo.");
       }
     } finally {
-      setIsLoading(false); // Ocultar animación de carga
+      setIsLoading(false);
     }
   };
 

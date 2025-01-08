@@ -98,25 +98,25 @@ const CreateRequest = () => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
-
+  
     if (!selectedPlan) {
       setError("Por favor selecciona un plan antes de continuar.");
       setIsLoading(false);
       return;
     }
-
+  
     if (!userId) {
       setError("No se puede enviar la solicitud. Por favor, vuelve a iniciar sesión.");
       console.error("User ID no está disponible.");
       setIsLoading(false);
       return;
     }
-
+  
     const initialStatus = "Recibido";
-
+  
     try {
       const formDataPayload = new FormData();
-
+  
       Object.entries(formData).forEach(([key, value]) => {
         if (key === "w2Files" && value.length > 0) {
           value.forEach((file) => formDataPayload.append("w2Files", file));
@@ -124,17 +124,19 @@ const CreateRequest = () => {
           formDataPayload.append(key, value);
         }
       });
-
+  
       formDataPayload.append("userId", userId);
       formDataPayload.append("status", initialStatus);
-
+  
       const response = await fetch(`${import.meta.env.VITE_API_URL}/requests`, {
         method: "POST",
         body: formDataPayload,
       });
-
+  
       if (response.ok) {
         const data = await response.json();
+        // Limpiar el caché de solicitudes en localStorage
+        localStorage.removeItem("requests");
         setConfirmationNumber(data.confirmationNumber);
         setIsModalOpen(true);
       } else {
@@ -148,6 +150,34 @@ const CreateRequest = () => {
       setIsLoading(false);
     }
   };
+  
+  // En el modal de confirmación
+  {isModalOpen && (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+        <h3 className="text-xl font-bold text-center mb-4">
+          ¡Solicitud enviada!
+        </h3>
+        <p className="text-gray-700 text-center mb-4">
+          Tu solicitud se ha enviado correctamente. Hemos enviado un correo
+          electrónico con tu número de confirmación.
+        </p>
+        <p className="text-xl font-bold text-red-600 text-center mb-6">
+          Número de Confirmación: {confirmationNumber}
+        </p>
+        <button
+          onClick={() => {
+            // Limpiar el caché antes de navegar
+            localStorage.removeItem("requests");
+            navigate("/dashboard");
+          }}
+          className="w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700"
+        >
+          Aceptar
+        </button>
+      </div>
+    </div>
+  )}
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center p-4">

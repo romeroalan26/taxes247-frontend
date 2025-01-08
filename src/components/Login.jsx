@@ -5,10 +5,13 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   googleProvider,
-  sendPasswordResetEmail,
+  fetchSignInMethodsForEmail,
+  EmailAuthProvider,
+  linkWithCredential
 } from "../firebaseConfig";
 import { ClipLoader } from "react-spinners";
 import { useAuth } from "../context/AuthContext";
+import api from '../utils/api';
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -22,35 +25,82 @@ const Login = () => {
     e.preventDefault();
     setErrorMessage("");
     setIsLoading(true);
-
+  
     try {
+      // Verificar métodos de inicio de sesión
+      const methods = await fetchSignInMethodsForEmail(auth, email);
+      
+      if (methods.includes('google.com')) {
+        setErrorMessage(
+          "Esta cuenta está registrada con Google. Por favor, usa el botón 'Iniciar sesión con Google'."
+        );
+        setIsLoading(false);
+        return;
+      }
+  
+      // Login con Firebase
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const authUser = userCredential.user;
-
+  
+      // Primero, actualizar el UID en el backend
+      const updateResponse = await api.post('/users/update-uid', {
+        email: authUser.email,
+        uid: authUser.uid
+      });
+  
+      if (!updateResponse.ok) {
+        console.warn('No se pudo actualizar el UID, pero continuamos...');
+      }
+  
+      // Verificar estado de activación
+      const { ok, data } = await api.post('/users/login', {
+        email: authUser.email,
+        isGoogleLogin: false,
+        uid: authUser.uid  // Enviamos el uid también aquí
+      });
+  
+      if (!ok) {
+        await auth.signOut();
+        setErrorMessage(data.message);
+        return;
+      }
+  
       const updatedUser = {
         uid: authUser.uid,
         email: authUser.email,
-        name: authUser.displayName || "Usuario",
+        name: data.user.name || "Usuario",
       };
       setUser(updatedUser);
       localStorage.setItem("authUser", JSON.stringify(updatedUser));
       navigate("/dashboard");
+  
     } catch (error) {
-      setErrorMessage("Error al iniciar sesión. Revisa tus credenciales.");
-      console.error("Error al iniciar sesión:", error);
+      let errorMessage = "Error al iniciar sesión. Por favor, inténtalo de nuevo.";
+      
+      if (error.code === "auth/invalid-credential") {
+        errorMessage = "Credenciales incorrectas. Verifica tu email y contraseña.";
+      } else if (error.code === "auth/too-many-requests") {
+        errorMessage = "Demasiados intentos fallidos. Por favor, intenta más tarde.";
+      }
+      
+      setErrorMessage(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
-
+  
   const handleGoogleLogin = async () => {
     setErrorMessage("");
     setIsLoading(true);
-
+  
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const authUser = result.user;
-
+  
+      // No necesitamos vincular las cuentas aquí ya que eso puede causar problemas
+      // y firebase maneja esto internamente
+  
+      // Solo establecemos el usuario en el contexto y localStorage
       const updatedUser = {
         uid: authUser.uid,
         email: authUser.email,
@@ -59,9 +109,17 @@ const Login = () => {
       setUser(updatedUser);
       localStorage.setItem("authUser", JSON.stringify(updatedUser));
       navigate("/dashboard");
+  
     } catch (error) {
-      setErrorMessage("Error al iniciar sesión con Google. Inténtalo más tarde.");
-      console.error("Error al iniciar sesión con Google:", error);
+      let errorMessage = "Error al iniciar sesión con Google. Por favor, inténtalo más tarde.";
+      
+      if (error.code === "auth/popup-closed-by-user") {
+        errorMessage = "Inicio de sesión cancelado. Inténtalo de nuevo.";
+      } else if (error.code === "auth/account-exists-with-different-credential") {
+        errorMessage = "Esta cuenta ya está registrada con otro método de inicio de sesión.";
+      }
+      
+      setErrorMessage(errorMessage);
     } finally {
       setIsLoading(false);
     }
