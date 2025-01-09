@@ -6,12 +6,25 @@ import {
   signInWithPopup,
   googleProvider,
   fetchSignInMethodsForEmail,
-  EmailAuthProvider,
-  linkWithCredential
 } from "../firebaseConfig";
 import { ClipLoader } from "react-spinners";
 import { useAuth } from "../context/AuthContext";
 import api from '../utils/api';
+import { 
+  FileText, 
+  Mail, 
+  Lock, 
+  ChevronRight, 
+  MessageCircle,
+  HelpCircle,
+  DollarSign,
+  Calendar,
+  AlertCircle,
+  FileQuestion,
+  Clock,
+  CheckCircle2,
+  BellRing 
+} from "lucide-react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -142,241 +155,247 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Header */}
-      <header className="bg-red-600 text-white px-6 py-4 flex items-center justify-between">
-  <h1 className="text-2xl font-bold">Taxes247</h1>
-  <div className="flex space-x-4"> {/* Contenedor para agrupar los botones */}
-    <button
-      onClick={() => navigate("/pricing")}
-      className="bg-white text-red-600 px-4 py-2 rounded-md hover:bg-gray-200"
-    >
-      Precios
-    </button>
-    <button
-      onClick={() => window.open("https://wa.me/18094039726", "_blank")}
-      className="bg-white text-red-600 px-4 py-2 rounded-md hover:bg-gray-200"
-    >
-      Contacto
-    </button>
-  </div>
-</header>
-
-
-      {/* Contenido principal */}
-      <main className="flex flex-col items-center justify-center p-8">
-        {/* Texto de bienvenida */}
-        <div className="mb-8 text-center">
-          <h2 className="text-3xl font-bold text-red-600 mb-4">¡Bienvenido a Taxes247!</h2>
-          <p className="text-gray-700 max-w-sm text-center">
-          Simplifica y asegura tu proceso de declaración de impuestos con
-            nuestra plataforma. Registra tus datos de forma segura, realiza
-            pagos con confianza y da seguimiento a tus solicitudes de manera
-            fácil y eficiente.
-          </p>
-        </div>
-
-        {/* Formulario de Login */}
-        <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-          <h2 className="text-2xl font-bold text-red-600 text-center mb-6">Iniciar Sesión</h2>
-          <form onSubmit={handleLogin}>
-            <div className="mb-4">
-              <label className="block text-gray-700">Correo Electrónico</label>
-              <input
-                type="email"
-                className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-red-400"
-                placeholder="correo@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+    <div className="min-h-screen bg-gray-50">
+      {/* Header Mejorado */}
+      <header className="bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-2">
+              <FileText className="w-8 h-8" />
+              <h1 className="text-2xl font-bold">Taxes247</h1>
             </div>
-            <div className="mb-6">
-              <label className="block text-gray-700">Contraseña</label>
-              <input
-                type="password"
-                className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-red-400"
-                placeholder="********"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+            <div className="flex space-x-4">
+              <button
+                onClick={() => navigate("/pricing")}
+                className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-white/10 hover:bg-white/20 transition-colors duration-200"
+              >
+                <DollarSign className="w-4 h-4 mr-2" />
+                Precios
+              </button>
+              <button
+                onClick={() => window.open("https://wa.me/18094039726", "_blank")}
+                className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-white/10 hover:bg-white/20 transition-colors duration-200"
+              >
+                <MessageCircle className="w-4 h-4 mr-2" />
+                Contacto
+              </button>
             </div>
-
-            {/* Mostrar mensaje de error */}
-            {errorMessage && <div className="text-red-600 text-sm mb-4 text-center">{errorMessage}</div>}
-
-            <button
-              type="submit"
-              className="w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700 flex justify-center items-center"
-              disabled={isLoading}
-            >
-              {isLoading ? <ClipLoader size={20} color="#ffffff" /> : "Iniciar Sesión"}
-            </button>
-          </form>
-
-          {/* Login con Google */}
-          <div className="text-center my-4">
-            <button
-              onClick={handleGoogleLogin}
-              className="w-full bg-gray-200 text-gray-700 py-2 rounded-md hover:bg-gray-300 flex justify-center items-center"
-              disabled={isLoading}
-            >
-              {isLoading ? <ClipLoader size={20} color="#000000" /> : "Iniciar sesión con Google"}
-            </button>
-          </div>
-
-          {/* Recuperar contraseña */}
-          <div className="text-center">
-            <p className="text-gray-600">
-              ¿Olvidaste tu contraseña?{" "}
-              <button
-                onClick={() => navigate("/forgot-password")}
-                className="text-red-600 hover:underline"
-              >
-                Recupérala aquí.
-              </button>
-            </p>
-          </div>
-
-          {/* Registrarse */}
-          <div className="text-center mt-4">
-            <p className="text-gray-600">
-              ¿No tienes una cuenta?{" "}
-              <button
-                onClick={() => navigate("/register")}
-                className="text-red-600 hover:underline"
-              >
-                Regístrate aquí
-              </button>
-            </p>
-          </div>
-        </div>        <div className="mt-12 w-full max-w-2xl">
-          <h3 className="text-xl font-bold text-red-600 mb-4">
-            Preguntas Frecuentes
-          </h3>
-          <div className="space-y-4">
-            <details className="bg-white shadow rounded-md p-4">
-              <summary className="font-medium cursor-pointer">
-                ¿Qué es un formulario W-2 y quién lo necesita?
-              </summary>
-              <p className="text-gray-700 mt-2">
-                Un formulario W-2 es un documento proporcionado por tu empleador
-                que reporta tus ingresos y los impuestos retenidos durante el
-                año. Es necesario para presentar tu declaración de impuestos.
-              </p>
-            </details>
-            <details className="bg-white shadow rounded-md p-4">
-              <summary className="font-medium cursor-pointer">
-                ¿Cuáles son las fechas límite para presentar mis impuestos?
-              </summary>
-              <p className="text-gray-700 mt-2">
-                Generalmente, la fecha límite para presentar tus impuestos es el
-                15 de abril de cada año. Si cae en un fin de semana o feriado,
-                se extiende al siguiente día hábil.
-              </p>
-            </details>
-            <details className="bg-white shadow rounded-md p-4">
-              <summary className="font-medium cursor-pointer">
-                ¿Qué debo hacer si no puedo pagar mis impuestos?
-              </summary>
-              <p className="text-gray-700 mt-2">
-                Si no puedes pagar tus impuestos, puedes presentar tu
-                declaración a tiempo para evitar multas adicionales. Además,
-                puedes solicitar un plan de pagos al IRS visitando{" "}
-                <a
-                  href="https://www.irs.gov/payments/online-payment-agreement-application"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-red-600 underline hover:text-red-800"
-                >
-                  esta página
-                </a>
-                .
-              </p>
-            </details>
-            <details className="bg-white shadow rounded-md p-4">
-              <summary className="font-medium cursor-pointer">
-                ¿Cómo puedo rastrear mi reembolso?
-              </summary>
-              <p className="text-gray-700 mt-2">
-                Puedes rastrear tu reembolso utilizando la herramienta "¿Dónde
-                está mi reembolso?" en el sitio web del IRS:{" "}
-                <a
-                  href="https://www.irs.gov/refunds"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-red-600 underline hover:text-red-800"
-                >
-                  ¿Dónde está mi reembolso?
-                </a>
-                .
-              </p>
-            </details>
-            <details className="bg-white shadow rounded-md p-4">
-              <summary className="font-medium cursor-pointer">
-                ¿Qué sucede si presento mis impuestos tarde?
-              </summary>
-              <p className="text-gray-700 mt-2">
-                Si presentas tus impuestos tarde y debes dinero, podrías
-                enfrentar multas e intereses por retraso. Si esperas recibir un
-                reembolso, no hay multa, pero es mejor presentarlos lo antes
-                posible.
-              </p>
-            </details>
-            <details className="bg-white shadow rounded-md p-4">
-              <summary className="font-medium cursor-pointer">
-                ¿Qué documentos necesito para presentar mis impuestos?
-              </summary>
-              <p className="text-gray-700 mt-2">
-                Los documentos necesarios incluyen formularios W-2, 1099, estado
-                de cuenta de intereses hipotecarios, recibos de donaciones
-                caritativas, y cualquier otro documento relacionado con ingresos
-                y deducciones.
-              </p>
-            </details>
-            <details className="bg-white shadow rounded-md p-4">
-              <summary className="font-medium cursor-pointer">
-                ¿Quién califica para el Crédito Tributario por Ingreso del
-                Trabajo (EITC)?
-              </summary>
-              <p className="text-gray-700 mt-2">
-                El EITC está disponible para contribuyentes de bajos ingresos
-                que cumplan con ciertos requisitos. Puedes verificar tu
-                elegibilidad en la herramienta de EITC del IRS:{" "}
-                <a
-                  href="https://www.irs.gov/credits-deductions/individuals/earned-income-tax-credit-eitc"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-red-600 underline hover:text-red-800"
-                >
-                  Crédito Tributario por Ingreso del Trabajo (EITC)
-                </a>
-                .
-              </p>
-            </details>
-            <details className="bg-white shadow rounded-md p-4">
-              <summary className="font-medium cursor-pointer">
-                ¿Cómo puedo obtener una extensión para presentar mis impuestos?
-              </summary>
-              <p className="text-gray-700 mt-2">
-                Puedes solicitar una extensión automática de seis meses
-                utilizando el formulario 4868. Más información está disponible
-                en la página oficial del IRS:{" "}
-                <a
-                  href="https://www.irs.gov/forms-pubs/extension-of-time-to-file-your-tax-return"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-red-600 underline hover:text-red-800"
-                >
-                  Extensión de tiempo
-                </a>
-                .
-              </p>
-            </details>
           </div>
         </div>
-        
+      </header>
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="flex flex-col lg:flex-row gap-12 items-start">
+          {/* Sección de Login */}
+          <div className="flex-1 w-full lg:w-1/2">
+            {/* Banner de Bienvenida */}
+            <div className="bg-gradient-to-r from-red-600 to-red-700 rounded-t-xl p-8 text-white">
+              <h2 className="text-3xl font-bold mb-4">¡Bienvenido a Taxes247!</h2>
+              <p className="text-red-100">
+                Simplifica y asegura tu proceso de declaración de impuestos con
+                nuestra plataforma. Gestiona tus solicitudes de manera fácil y eficiente.
+              </p>
+            </div>
+
+            {/* Formulario */}
+            <div className="bg-white rounded-b-xl shadow-lg p-8">
+              <form onSubmit={handleLogin} className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Correo Electrónico
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Mail className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      type="email"
+                      className="block w-full pl-10 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      placeholder="correo@ejemplo.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Contraseña
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Lock className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      type="password"
+                      className="block w-full pl-10 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      placeholder="********"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+
+                {errorMessage && (
+                  <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-lg">
+                    <AlertCircle className="w-5 h-5" />
+                    <p className="text-sm">{errorMessage}</p>
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-3 px-4 rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-200 flex items-center justify-center gap-2"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <ClipLoader size={20} color="#ffffff" />
+                  ) : (
+                    <>
+                      Iniciar Sesión
+                      <ChevronRight className="w-5 h-5" />
+                    </>
+                  )}
+                </button>
+
+                <div className="relative my-6">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-200"></div>
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-2 bg-white text-gray-500">O continúa con</span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleGoogleLogin}
+                  className="w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors duration-200 flex items-center justify-center gap-2"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <ClipLoader size={20} color="#000000" />
+                  ) : (
+                    <>
+                      <svg className="w-5 h-5" viewBox="0 0 24 24">
+                        <path
+                          fill="currentColor"
+                          d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                        />
+                        <path
+                          fill="#34A853"
+                          d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                        />
+                        <path
+                          fill="#FBBC05"
+                          d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                        />
+                        <path
+                          fill="#EA4335"
+                          d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                        />
+                        <path fill="none" d="M1 1h22v22H1z" />
+                      </svg>
+                      Iniciar sesión con Google
+                    </>
+                  )}
+                </button>
+
+                <div className="space-y-4 text-center">
+                  <button
+                    type="button"
+                    onClick={() => navigate("/forgot-password")}
+                    className="text-sm text-red-600 hover:text-red-700"
+                  >
+                    ¿Olvidaste tu contraseña?
+                  </button>
+
+                  <div className="text-sm">
+                    ¿No tienes una cuenta?{" "}
+                    <button
+                      type="button"
+                      onClick={() => navigate("/register")}
+                      className="font-medium text-red-600 hover:text-red-700"
+                    >
+                      Regístrate aquí
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          {/* FAQ Section - Rediseñado */}
+          <div className="flex-1 w-full lg:w-1/2">
+            <div className="bg-white rounded-xl shadow-lg p-8">
+              <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <HelpCircle className="w-6 h-6 text-red-600" />
+                Preguntas Frecuentes
+              </h3>
+              
+              <div className="space-y-4">
+                {[
+                  {
+                    icon: <FileQuestion className="w-5 h-5 text-red-600" />,
+                    question: "¿Qué es un formulario W-2 y quién lo necesita?",
+                    answer: "Un formulario W-2 es un documento proporcionado por tu empleador que reporta tus ingresos y los impuestos retenidos durante el año. Es necesario para presentar tu declaración de impuestos."
+                  },
+                  {
+                    icon: <Calendar className="w-5 h-5 text-red-600" />,
+                    question: "¿Cuáles son las fechas límite para presentar mis impuestos?",
+                    answer: "Generalmente, la fecha límite para presentar tus impuestos es el 15 de abril de cada año. Si cae en un fin de semana o feriado, se extiende al siguiente día hábil."
+                  },
+                  {
+                    icon: <DollarSign className="w-5 h-5 text-red-600" />,
+                    question: "¿Qué debo hacer si no puedo pagar mis impuestos?",
+                    answer: "Si no puedes pagar tus impuestos, presenta tu declaración a tiempo para evitar multas adicionales y solicita un plan de pagos al IRS."
+                  },
+                  {
+                    icon: <Clock className="w-5 h-5 text-red-600" />,
+                    question: "¿Qué sucede si presento mis impuestos tarde?",
+                    answer: "Si presentas tus impuestos tarde y debes dinero, podrías enfrentar multas e intereses. Si esperas un reembolso, no hay multa, pero es mejor presentarlos pronto."
+                  }
+                ].map((faq, index) => (
+                  <details
+                    key={index}
+                    className="group bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+                  >
+                    <summary className="flex items-center gap-3 p-4 font-medium cursor-pointer list-none">
+                      {faq.icon}
+                      {faq.question}
+                      <ChevronRight className="w-5 h-5 ml-auto transition-transform group-open:rotate-90" />
+                    </summary>
+                    <div className="px-4 pb-4 text-gray-600">
+                      {faq.answer}
+                    </div>
+                  </details>
+                ))}
+              </div>
+
+              <div className="mt-6 p-4 bg-red-50 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <BellRing className="w-6 h-6 text-red-600 flex-shrink-0 mt-1" />
+                  <div>
+                    <h4 className="font-medium text-red-900">¿Necesitas más ayuda?</h4>
+                    <p className="mt-1 text-sm text-red-700">
+                      Nuestro equipo está disponible para responder todas tus preguntas.
+                      <a
+                        href="https://wa.me/18094039726"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block mt-2 text-red-600 hover:text-red-700 font-medium"
+                      >
+                        Contactar soporte →
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   );

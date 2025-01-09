@@ -1,48 +1,63 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { getAuth } from "firebase/auth";
 import { ClipLoader } from "react-spinners";
+import { Eye, EyeOff, ArrowLeft, Printer, Shield } from "lucide-react";
 
 const ViewRequestDetails = () => {
-  const { id } = useParams(); // Obtener el ID de la solicitud desde la URL
+  const { id } = useParams();
   const navigate = useNavigate();
   const [request, setRequest] = useState(null);
   const [loading, setLoading] = useState(true);
   const [visibleFields, setVisibleFields] = useState({});
+  const auth = getAuth();
 
   useEffect(() => {
     const fetchRequestDetails = async () => {
-      // Revisar si los detalles de la solicitud están en localStorage
       const cachedRequest = localStorage.getItem(`request_${id}`);
       if (cachedRequest) {
         const parsedCache = JSON.parse(cachedRequest);
         const now = new Date().getTime();
 
-        // Verificar si el caché aún es válido (30 minutos)
         if (now - parsedCache.timestamp < 15 * 60 * 1000) {
           setRequest(parsedCache.data);
           setLoading(false);
           return;
         } else {
-          localStorage.removeItem(`request_${id}`); // Eliminar caché expirado
+          localStorage.removeItem(`request_${id}`);
         }
       }
 
-      // Si no hay caché válido, hacer la solicitud al backend
       try {
+        const currentUser = auth.currentUser;
+        if (!currentUser) {
+          navigate("/login");
+          return;
+        }
+
+        const token = await currentUser.getIdToken();
+        
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/requests/${id}`
+          `${import.meta.env.VITE_API_URL}/requests/${id}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          }
         );
+
         if (response.ok) {
           const data = await response.json();
           setRequest(data);
 
-          // Guardar en localStorage con un timestamp
           const cache = {
             data: data,
             timestamp: new Date().getTime(),
           };
           localStorage.setItem(`request_${id}`, JSON.stringify(cache));
+        } else if (response.status === 401) {
+          navigate("/login");
         } else {
           console.error("Error al obtener los detalles de la solicitud");
         }
@@ -54,7 +69,7 @@ const ViewRequestDetails = () => {
     };
 
     fetchRequestDetails();
-  }, [id]);
+  }, [id, navigate, auth]);
 
   const maskData = (data) => {
     return data.replace(/.(?=.{4})/g, "*");
@@ -83,128 +98,164 @@ const ViewRequestDetails = () => {
   }
 
   if (!request) {
-    return <p className="text-center mt-8">Solicitud no encontrada.</p>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-xl text-gray-600">Solicitud no encontrada.</p>
+          <button
+            className="mt-4 inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+            onClick={() => navigate("/dashboard")}
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Volver al Dashboard
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center p-4">
-      <div className="w-full max-w-2xl flex justify-end mb-4">
-        <button
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-          onClick={() => navigate("/dashboard")}
-        >
-          Atrás
-        </button>
-      </div>
-
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl">
-        <h2 className="text-2xl font-bold text-red-600 mb-6">
-          Detalles de la Solicitud
-        </h2>
-
-        <div className="space-y-4">
-          <div>
-            <p className="text-gray-700 font-bold">Código de Confirmación:</p>
-            <p className="text-gray-800">{request.confirmationNumber}</p>
-          </div>
-
-          <div>
-            <p className="text-gray-700 font-bold">Nombre Completo:</p>
-            <p className="text-gray-800">{request.fullName}</p>
-          </div>
-
-          <div>
-            <p className="text-gray-700 font-bold">Correo Electrónico:</p>
-            <p className="text-gray-800">{request.email}</p>
-          </div>
-
-          <div>
-            <p className="text-gray-700 font-bold">Teléfono:</p>
-            <p className="text-gray-800">{request.phone}</p>
-          </div>
-
-          <div>
-            <p className="text-gray-700 font-bold">Dirección:</p>
-            <p className="text-gray-800">{request.address}</p>
-          </div>
-
-          <div>
-            <p className="text-gray-700 font-bold">Estado:</p>
-            <p className="text-gray-800">{request.status}</p>
-          </div>
-
-          {/* Mostrar datos sensibles */}
-          <div>
-            <p className="text-gray-700 font-bold">
-              Número de Seguro Social (SSN):
-            </p>
-            <div className="flex items-center">
-              <p className="text-gray-800">
-                {visibleFields.ssn ? request.ssn : maskData(request.ssn)}
-              </p>
-              <button
-                className="ml-2 text-blue-600 hover:text-blue-800"
-                onClick={() => toggleVisibility("ssn")}
-              >
-                {visibleFields.ssn ? (
-                  <AiFillEyeInvisible size={20} />
-                ) : (
-                  <AiFillEye size={20} />
-                )}
-              </button>
-            </div>
-          </div>
-
-          <div>
-            <p className="text-gray-700 font-bold">Número de Cuenta:</p>
-            <div className="flex items-center">
-              <p className="text-gray-800">
-                {visibleFields.accountNumber
-                  ? request.accountNumber
-                  : maskData(request.accountNumber)}
-              </p>
-              <button
-                className="ml-2 text-blue-600 hover:text-blue-800"
-                onClick={() => toggleVisibility("accountNumber")}
-              >
-                {visibleFields.accountNumber ? (
-                  <AiFillEyeInvisible size={20} />
-                ) : (
-                  <AiFillEye size={20} />
-                )}
-              </button>
-            </div>
-          </div>
-
-          <div>
-            <p className="text-gray-700 font-bold">Número de Ruta:</p>
-            <div className="flex items-center">
-              <p className="text-gray-800">
-                {visibleFields.routingNumber
-                  ? request.routingNumber
-                  : maskData(request.routingNumber)}
-              </p>
-              <button
-                className="ml-2 text-blue-600 hover:text-blue-800"
-                onClick={() => toggleVisibility("routingNumber")}
-              >
-                {visibleFields.routingNumber ? (
-                  <AiFillEyeInvisible size={20} />
-                ) : (
-                  <AiFillEye size={20} />
-                )}
-              </button>
-            </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16 items-center">
+            <h1 className="text-2xl font-bold text-red-600">Detalles de Solicitud</h1>
+            <button
+              className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+              onClick={() => navigate("/dashboard")}
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Volver
+            </button>
           </div>
         </div>
+      </header>
 
-        <button
-          className="mt-6 w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
-          onClick={handlePrint}
-        >
-          Imprimir
-        </button>
-      </div>
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Tarjeta Principal */}
+        <div className="bg-white rounded-xl shadow-sm border p-8">
+          {/* Código de Confirmación y Estado */}
+          <div className="flex justify-between items-start mb-8 pb-6 border-b">
+            <div>
+              <p className="text-sm font-medium text-gray-500">Código de Confirmación</p>
+              <p className="text-2xl font-bold text-gray-900">{request.confirmationNumber}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-sm font-medium text-gray-500">Estado</p>
+              <p className="text-lg font-semibold text-green-600">{request.status}</p>
+            </div>
+          </div>
+
+          {/* Información Personal */}
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <p className="text-sm font-medium text-gray-500">Nombre Completo</p>
+                <p className="mt-1 text-gray-900">{request.fullName}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Correo Electrónico</p>
+                <p className="mt-1 text-gray-900">{request.email}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Teléfono</p>
+                <p className="mt-1 text-gray-900">{request.phone}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500">Dirección</p>
+                <p className="mt-1 text-gray-900">{request.address}</p>
+              </div>
+            </div>
+
+            {/* Información Sensible */}
+            <div className="mt-8 pt-6 border-t">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <Shield className="h-5 w-5 mr-2 text-red-600" />
+                Información Sensible
+              </h3>
+              
+              <div className="space-y-4">
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium text-gray-500">
+                      Número de Seguro Social (SSN)
+                    </p>
+                    <button
+                      className="text-red-600 hover:text-red-700"
+                      onClick={() => toggleVisibility("ssn")}
+                    >
+                      {visibleFields.ssn ? (
+                        <EyeOff className="h-5 w-5" />
+                      ) : (
+                        <Eye className="h-5 w-5" />
+                      )}
+                    </button>
+                  </div>
+                  <p className="mt-1 font-mono text-gray-900">
+                    {visibleFields.ssn ? request.ssn : maskData(request.ssn)}
+                  </p>
+                </div>
+
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium text-gray-500">
+                      Número de Cuenta
+                    </p>
+                    <button
+                      className="text-red-600 hover:text-red-700"
+                      onClick={() => toggleVisibility("accountNumber")}
+                    >
+                      {visibleFields.accountNumber ? (
+                        <EyeOff className="h-5 w-5" />
+                      ) : (
+                        <Eye className="h-5 w-5" />
+                      )}
+                    </button>
+                  </div>
+                  <p className="mt-1 font-mono text-gray-900">
+                    {visibleFields.accountNumber
+                      ? request.accountNumber
+                      : maskData(request.accountNumber)}
+                  </p>
+                </div>
+
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium text-gray-500">
+                      Número de Ruta
+                    </p>
+                    <button
+                      className="text-red-600 hover:text-red-700"
+                      onClick={() => toggleVisibility("routingNumber")}
+                    >
+                      {visibleFields.routingNumber ? (
+                        <EyeOff className="h-5 w-5" />
+                      ) : (
+                        <Eye className="h-5 w-5" />
+                      )}
+                    </button>
+                  </div>
+                  <p className="mt-1 font-mono text-gray-900">
+                    {visibleFields.routingNumber
+                      ? request.routingNumber
+                      : maskData(request.routingNumber)}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Botón de Imprimir */}
+          <button
+            className="mt-8 w-full inline-flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+            onClick={handlePrint}
+          >
+            <Printer className="h-5 w-5 mr-2" />
+            Imprimir Detalles
+          </button>
+        </div>
+      </main>
     </div>
   );
 };

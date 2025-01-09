@@ -1,8 +1,19 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; // Importar el contexto
+import { useAuth } from "../context/AuthContext";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import { 
+  FileText, 
+  LogOut, 
+  Menu, 
+  Plus, 
+  Activity,
+  ChevronRight, 
+  Clock,
+  Calendar,
+  MessageCircle
+} from "lucide-react";
 
 const statusSteps = [
   "Pendiente de pago",
@@ -15,24 +26,42 @@ const statusSteps = [
   "Rechazada",
 ];
 
+const getStatusColor = (status) => {
+  switch (status) {
+    case "Pendiente de pago":
+      return "bg-yellow-100 text-yellow-800";
+    case "Pago recibido":
+      return "bg-blue-100 text-blue-800";
+    case "En revisión":
+      return "bg-purple-100 text-purple-800";
+    case "Documentación incompleta":
+      return "bg-orange-100 text-orange-800";
+    case "En proceso con el IRS":
+      return "bg-cyan-100 text-cyan-800";
+    case "Aprobada":
+      return "bg-green-100 text-green-800";
+    case "Completada":
+      return "bg-green-200 text-green-900";
+    case "Rechazada":
+      return "bg-red-100 text-red-800";
+    default:
+      return "bg-gray-100 text-gray-800";
+  }
+};
+
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { user, logout } = useAuth(); // Contexto actualizado
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // Estado para el menú desplegable
+  const { user, logout } = useAuth();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [requests, setRequests] = useState([]);
   const [loadingRequests, setLoadingRequests] = useState(true);
-  const menuRef = useRef(null);
-  const [loadingName, setLoadingName] = useState(true); // Estado para el indicador de carga del nombre
-  const [userName, setUserName] = useState(null); // Estado para manejar el nombre del usuario
+  const [loadingName, setLoadingName] = useState(true);
+  const [userName, setUserName] = useState(null);
 
   useEffect(() => {
     if (user) {
-      if (user.name === "Usuario") {
-        setUserName(user.displayName);
-      } else {
-        setUserName(user.name);
-      }
-      setLoadingName(false); // Terminar carga del nombre
+      setUserName(user.name === "Usuario" ? user.displayName : user.name);
+      setLoadingName(false);
     }
   }, [user]);
 
@@ -45,28 +74,23 @@ const Dashboard = () => {
   }, [user, navigate]);
 
   const fetchRequests = async (userId) => {
-    // Si venimos de crear una solicitud, ignoramos el caché
     const fromCreateRequest = localStorage.getItem("fromCreateRequest");
     const cachedRequests = localStorage.getItem("requests");
-  
+
     if (cachedRequests && !fromCreateRequest) {
       const parsedCache = JSON.parse(cachedRequests);
       const now = new Date().getTime();
-  
-      // Verificar si los datos en el caché aún son válidos
+
       if (now - parsedCache.timestamp < 30 * 60 * 1000) {
         setRequests(parsedCache.data);
         setLoadingRequests(false);
         return;
-      } else {
-        localStorage.removeItem("requests");
       }
+      localStorage.removeItem("requests");
     }
-  
-    // Limpiar el flag de navegación
+
     localStorage.removeItem("fromCreateRequest");
-  
-    // Si no hay caché válido, hacer la llamada al backend
+
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/requests/user/${userId}`
@@ -74,15 +98,10 @@ const Dashboard = () => {
       if (response.ok) {
         const data = await response.json();
         setRequests(data);
-  
-        // Guardar la respuesta en el localStorage con un timestamp
-        const cache = {
-          data: data,
-          timestamp: new Date().getTime(),
-        };
-        localStorage.setItem("requests", JSON.stringify(cache));
-      } else {
-        console.error("Error al obtener las solicitudes");
+        localStorage.setItem(
+          "requests",
+          JSON.stringify({ data, timestamp: new Date().getTime() })
+        );
       }
     } catch (error) {
       console.error("Error al cargar solicitudes:", error);
@@ -90,16 +109,6 @@ const Dashboard = () => {
       setLoadingRequests(false);
     }
   };
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setIsMenuOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   const calculateProgress = (status) => {
     const currentStepIndex = statusSteps.indexOf(status);
@@ -111,116 +120,167 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-red-600 text-white px-6 py-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Taxes247</h1>
-        <div className="relative">
-          <button
-            className="md:hidden text-white text-2xl"
-            onClick={() => setIsMenuOpen((prev) => !prev)}
-          >
-            ☰
-          </button>
-          <div
-            ref={menuRef}
-            className={`absolute right-0 mt-2 bg-white text-red-600 rounded-md shadow-lg ${
-              isMenuOpen ? "block" : "hidden"
-            }`}
-          >
-            <button
-              className="block px-4 py-2 hover:bg-red-100 w-full text-left"
-              onClick={logout}
-            >
-              Cerrar Sesión
-            </button>
+      <header className="bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center">
+              <FileText className="w-8 h-8" />
+              <h1 className="ml-2 text-2xl font-bold">Taxes247</h1>
+            </div>
+            
+            <div className="hidden md:block">
+              <button
+                onClick={logout}
+                className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-700 focus:ring-white transition-colors duration-200"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Cerrar Sesión
+              </button>
+            </div>
+
+            <div className="md:hidden">
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="p-2 rounded-md hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-700 focus:ring-white"
+              >
+                <Menu className="w-6 h-6" />
+              </button>
+            </div>
           </div>
-        </div>
-        <div className="hidden md:flex items-center space-x-4">
-          <button
-            className="bg-gray-200 text-red-600 px-4 py-2 rounded-md hover:bg-gray-300"
-            onClick={logout}
-          >
-            Cerrar Sesión
-          </button>
+          
+          {/* Mobile menu */}
+          {isMenuOpen && (
+            <div className="md:hidden pb-3">
+              <button
+                onClick={logout}
+                className="mt-1 block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-red-800 w-full text-left"
+              >
+                <LogOut className="w-4 h-4 inline mr-2" />
+                Cerrar Sesión
+              </button>
+            </div>
+          )}
         </div>
       </header>
 
-      {/* Contenido */}
-      <main className="p-8">
-        <div className="flex flex-col items-center mb-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">
-  Hola, {loadingName || !userName ? <Skeleton width={100} /> : userName}
-</h2>
-
-          <button
-            className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700"
-            onClick={() => navigate("/create-request")}
-          >
-            Crear Solicitud
-          </button>
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Welcome Section */}
+        <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8">
+          <div className="p-6 sm:p-8 bg-gradient-to-r from-red-600 to-red-700">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+              <div className="text-white">
+                <h2 className="text-2xl font-bold mb-2">
+                  {loadingName || !userName ? (
+                    <Skeleton width={200} />
+                  ) : (
+                    `¡Bienvenido, ${userName}!`
+                  )}
+                </h2>
+                <p className="text-red-100">Gestiona tus declaraciones de impuestos de forma fácil</p>
+              </div>
+              <button
+                onClick={() => navigate("/create-request")}
+                className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-red-600 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200"
+              >
+                <Plus className="w-5 h-5 mr-2" />
+                Nueva Solicitud
+              </button>
+            </div>
+          </div>
         </div>
 
-        {/* Lista de Solicitudes */}
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Lista de Solicitudes</h2>
-        {loadingRequests ? (
-          <div className="space-y-4">
-            {[...Array(3)].map((_, i) => (
-              <Skeleton key={i} height={100} />
-            ))}
-          </div>
-        ) : requests.length > 0 ? (
-          <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-            {requests.map((req) => (
-              <div
-                key={req.confirmationNumber}
-                className="bg-white p-4 rounded-lg shadow-lg border"
-              >
-                <h3 className="text-lg font-bold text-red-600">{req.confirmationNumber}</h3>
-                <p className="text-gray-600">
-                  <span className="font-bold">Estado:</span> {req.status}
-                </p>
-                <p className="text-gray-600">
-                  <span className="font-bold">Fecha:</span>{" "}
-                  {new Date(req.createdAt).toLocaleDateString()}
-                </p>
-                <div className="mt-4">
-                  <p className="text-gray-600 mb-2">Progreso:</p>
-                  <div className="w-full bg-gray-200 rounded-full h-4">
-                    <div
-                      className="bg-green-600 h-4 rounded-full"
-                      style={{ width: `${calculateProgress(req.status)}%` }}
-                    ></div>
-                  </div>
-                  <p className="text-sm text-gray-600 mt-2">
-                    Paso {statusSteps.indexOf(req.status) + 1} de {statusSteps.length}
-                  </p>
-                </div>
-                <button
-                  className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-                  onClick={() => navigate(`/request/${req._id}`)}
+        {/* Requests Section */}
+        <div className="mb-8">
+          <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
+            <Activity className="w-6 h-6 mr-2 text-red-600" />
+            Tus Solicitudes
+          </h2>
+
+          {loadingRequests ? (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {[...Array(3)].map((_, i) => (
+                <Skeleton key={i} height={200} />
+              ))}
+            </div>
+          ) : requests.length > 0 ? (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {requests.map((req) => (
+                <div
+                  key={req.confirmationNumber}
+                  className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
                 >
-                  Ver Detalles
-                </button>
-              </div>
-            ))}
+                  <div className="p-6">
+                    <div className="flex justify-between items-start mb-4">
+                      <span className="text-lg font-semibold text-red-600">
+                        #{req.confirmationNumber}
+                      </span>
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(req.status)}`}>
+                        {req.status}
+                      </span>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-center text-gray-600">
+                        <Calendar className="w-4 h-4 mr-2" />
+                        <span className="text-sm">
+                          {new Date(req.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                          <div
+                            className="h-2 bg-red-600 rounded-full transition-all duration-500"
+                            style={{ width: `${calculateProgress(req.status)}%` }}
+                          />
+                        </div>
+                        <div className="flex items-center text-sm text-gray-500">
+                          <Clock className="w-4 h-4 mr-2" />
+                          <span>
+                            Paso {statusSteps.indexOf(req.status) + 1} de {statusSteps.length}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => navigate(`/request/${req._id}`)}
+                      className="mt-4 w-full inline-flex items-center justify-center px-4 py-2 border border-red-600 text-sm font-medium rounded-md text-red-600 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200"
+                    >
+                      Ver Detalles
+                      <ChevronRight className="w-4 h-4 ml-2" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl shadow-md p-6 text-center text-gray-600">
+              <p>No tienes solicitudes registradas.</p>
+            </div>
+          )}
+        </div>
+
+        {/* Help Section */}
+        <div className="text-center">
+          <div className="inline-flex items-center gap-4 bg-white rounded-lg shadow-md px-6 py-4">
+            <MessageCircle className="w-5 h-5 text-red-600" />
+            <span className="text-gray-700">¿Necesitas ayuda?</span>
+            <a
+              href="https://wa.me/18094039726"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-red-600 hover:text-red-800 flex items-center gap-1 transition-colors duration-200"
+            >
+              Contáctame
+              <ChevronRight className="w-4 h-4" />
+            </a>
           </div>
-        ) : (
-          <p className="text-gray-600">No tienes solicitudes registradas.</p>
-        )}
+        </div>
       </main>
-      {/* Contactame */}
-      <div className="flex items-center justify-center space-x-4">
-        <p className="text-gray-700">¿Necesitas ayuda?</p>
-        <a
-          href="https://wa.me/18094039726"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-red-600 underline hover:text-red-800"
-        >
-          Contáctame
-        </a>
-      </div>
     </div>
   );
 };
