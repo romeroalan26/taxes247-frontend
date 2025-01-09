@@ -2,198 +2,338 @@ import React, { useState } from "react";
 import { auth } from "../firebaseConfig";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import Modal from "react-modal";
 import { ClipLoader } from "react-spinners";
-
-Modal.setAppElement("#root"); // Necesario para react-modal
+import {
+  FileText,
+  User,
+  Mail,
+  Phone,
+  Lock,
+  LogIn,
+  MessageCircle,
+  AlertCircle,
+  CheckCircle2,
+  ArrowRight,
+  Shield,
+  UserPlus
+} from "lucide-react";
 
 const Register = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [errorMessage, setErrorMessage] = useState(""); // Estado para el error
-  const [isSuccess, setIsSuccess] = useState(false); // Estado para el modal de éxito
-  const [isLoading, setIsLoading] = useState(false); // Estado para mostrar el spinner de carga
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    name: "",
+    phone: ""
+  });
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
     setErrorMessage("");
     setIsLoading(true);
-  
+
     try {
-      // 1. Primero crear usuario en Firebase
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
       const firebaseUser = userCredential.user;
-  
-      // 2. Luego registrar en nuestro backend
-      const backendResponse = await fetch(`${import.meta.env.VITE_API_URL}/users/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          email,
-          phone,
-          uid: firebaseUser.uid // Enviamos el uid de Firebase
-        }),
-      });
-  
+
+      const backendResponse = await fetch(
+        `${import.meta.env.VITE_API_URL}/users/register`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            uid: firebaseUser.uid
+          }),
+        }
+      );
+
       if (!backendResponse.ok) {
-        // Si hay error en el backend, eliminar usuario de Firebase
         await firebaseUser.delete();
         const error = await backendResponse.json();
         throw new Error(error.message);
       }
-  
-      // 3. Si todo está bien, mostrar éxito
+
       setIsSuccess(true);
-  
     } catch (error) {
       console.error("Error en el registro:", error);
+      let errorMsg = "Ocurrió un error al registrar el usuario. Inténtalo de nuevo.";
       
       if (error.code === "auth/email-already-in-use") {
-        setErrorMessage("El correo electrónico ya está en uso. Intenta con otro.");
+        errorMsg = "El correo electrónico ya está en uso. Intenta con otro.";
       } else if (error.code === "auth/weak-password") {
-        setErrorMessage("La contraseña es demasiado débil. Debe tener al menos 6 caracteres.");
+        errorMsg = "La contraseña es demasiado débil. Debe tener al menos 6 caracteres.";
       } else if (error.code === "auth/invalid-email") {
-        setErrorMessage("El correo electrónico no es válido.");
-      } else {
-        setErrorMessage(error.message || "Ocurrió un error al registrar el usuario. Inténtalo de nuevo.");
+        errorMsg = "El correo electrónico no es válido.";
       }
+      
+      setErrorMessage(errorMsg);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const closeModal = () => {
-    setIsSuccess(false); // Cerrar el modal
-    navigate("/"); // Redirigir al login
-  };
-
   return (
-    <div className="min-h-screen flex flex-col bg-gray-100">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-red-600 text-white px-6 py-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Taxes247</h1>
-        <div>
-          <button
-            className="bg-red-700 mr-4 px-4 py-2 hover:bg-red-800  text-left rounded-md"
-            onClick={() => navigate("/")}
-          >
-            Login
-          </button>
-          <button
-            onClick={() => window.open("https://wa.me/18094039726", "_blank")}
-            className="bg-white text-red-600 px-4 py-2 rounded-md hover:bg-gray-200"
-          >
-            Contacto
-          </button>
+      <header className="bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-2">
+              <FileText className="w-8 h-8" />
+              <h1 className="text-2xl font-bold">Taxes247</h1>
+            </div>
+            <div className="flex space-x-4">
+              <button
+                onClick={() => navigate("/")}
+                className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-white/10 hover:bg-white/20 transition-colors duration-200"
+              >
+                <LogIn className="w-4 h-4 mr-2" />
+                Login
+              </button>
+              <button
+                onClick={() => window.open("https://wa.me/18094039726", "_blank")}
+                className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-white text-red-600 hover:bg-red-50 transition-colors duration-200"
+              >
+                <MessageCircle className="w-4 h-4 mr-2" />
+                Contacto
+              </button>
+            </div>
+          </div>
         </div>
       </header>
 
-      {/* Formulario de Registro */}
-      <div className="flex-1 flex items-center justify-center">
-        <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-          <h2 className="text-2xl font-bold text-red-600 text-center mb-6">
-            Registro de Usuario
-          </h2>
-          <form onSubmit={handleRegister}>
-            <div className="mb-4">
-              <label className="block text-gray-700">Nombre Completo</label>
-              <input
-                type="text"
-                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-400"
-                placeholder="John Doe"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700">Correo Electrónico</label>
-              <input
-                type="email"
-                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-400"
-                placeholder="correo@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700">Número de Teléfono</label>
-              <input
-                type="tel"
-                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-400"
-                placeholder="809-123-4567"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                required
-              />
-            </div>
-            <div className="mb-6">
-              <label className="block text-gray-700">Contraseña</label>
-              <input
-                type="password"
-                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-400"
-                placeholder="********"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-
-            {/* Mostrar mensaje de error */}
-            {errorMessage && (
-              <div className="text-red-600 text-sm mb-4 text-center">
-                {errorMessage}
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="flex flex-col lg:flex-row gap-12 items-start">
+          {/* Registration Form */}
+          <div className="flex-1 w-full lg:w-1/2">
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+              {/* Form Header */}
+              <div className="bg-gradient-to-r from-red-600 to-red-700 px-6 py-8 text-white">
+                <div className="flex items-center space-x-3 mb-4">
+                  <UserPlus className="w-8 h-8" />
+                  <h2 className="text-2xl font-bold">Crear Cuenta</h2>
+                </div>
+                <p className="text-red-100">
+                  Únete a nosotros y comienza a gestionar tus declaraciones de impuestos de manera segura y eficiente.
+                </p>
               </div>
-            )}
 
-            <button
-              type="submit"
-              className="w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700 flex justify-center items-center"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <ClipLoader color="#fff" size={24} />
-              ) : (
-                "Registrarse"
-              )}
-            </button>
-          </form>
-        </div>
-      </div>
+              {/* Form Content */}
+              <div className="p-6">
+                <form onSubmit={handleRegister} className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Nombre Completo
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <User className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <input
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        className="block w-full pl-10 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                        placeholder="John Doe"
+                        required
+                      />
+                    </div>
+                  </div>
 
-      {/* Modal de Éxito */}
-      <Modal
-        isOpen={isSuccess}
-        onRequestClose={closeModal}
-        contentLabel="Registro Exitoso"
-        className="fixed inset-0 flex items-center justify-center"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-50"
-      >
-        <div className="bg-white p-6 rounded-lg shadow-lg w-80 text-center">
-          <h2 className="text-2xl font-bold text-green-600 mb-4">
-            ¡Registro Exitoso!
-          </h2>
-          <p className="text-gray-700 mb-4">
-            Tu cuenta ha sido registrada correctamente. Te hemos enviado un
-            correo electrónico con un enlace para activar tu cuenta.
-          </p>
-          <p className="text-gray-500 text-sm">
-            Por favor, revisa tu bandeja de entrada y sigue las instrucciones
-            del correo para completar la activación.
-          </p>
-          <button
-            onClick={closeModal}
-            className="mt-4 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
-          >
-            Ir al Login
-          </button>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Correo Electrónico
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Mail className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className="block w-full pl-10 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                        placeholder="correo@ejemplo.com"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Teléfono
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Phone className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        className="block w-full pl-10 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                        placeholder="809-555-1234"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Contraseña
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Lock className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <input
+                        type="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        className="block w-full pl-10 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                        placeholder="********"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {errorMessage && (
+                    <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-lg">
+                      <AlertCircle className="w-5 h-5" />
+                      <p className="text-sm">{errorMessage}</p>
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-3 px-4 rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-200 flex items-center justify-center space-x-2"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <ClipLoader size={20} color="#ffffff" />
+                    ) : (
+                      <>
+                        <span>Crear Cuenta</span>
+                        <ArrowRight className="w-5 h-5" />
+                      </>
+                    )}
+                  </button>
+
+                  <div className="text-center text-sm text-gray-600">
+                    ¿Ya tienes una cuenta?{" "}
+                    <button
+                      type="button"
+                      onClick={() => navigate("/")}
+                      className="text-red-600 hover:text-red-700 font-medium"
+                    >
+                      Inicia sesión aquí
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          {/* Benefits Section */}
+          <div className="flex-1 w-full lg:w-1/2">
+            <div className="bg-white rounded-xl shadow-lg p-8">
+              <h3 className="text-xl font-bold text-gray-900 mb-6">
+                Beneficios de registrarte
+              </h3>
+              
+              <div className="space-y-6">
+                {[
+                  {
+                    icon: <Shield className="w-6 h-6 text-red-600" />,
+                    title: "Seguridad Garantizada",
+                    description: "Tu información está protegida con los más altos estándares de seguridad."
+                  },
+                  {
+                    icon: <CheckCircle2 className="w-6 h-6 text-red-600" />,
+                    title: "Proceso Simplificado",
+                    description: "Gestiona tus declaraciones de impuestos de manera fácil y eficiente."
+                  },
+                  {
+                    icon: <MessageCircle className="w-6 h-6 text-red-600" />,
+                    title: "Soporte Personalizado",
+                    description: "Acceso a asistencia dedicada por WhatsApp y correo electrónico."
+                  }
+                ].map((benefit, index) => (
+                  <div key={index} className="flex items-start space-x-4">
+                    <div className="flex-shrink-0">
+                      {benefit.icon}
+                    </div>
+                    <div>
+                      <h4 className="text-lg font-medium text-gray-900">
+                        {benefit.title}
+                      </h4>
+                      <p className="text-gray-600">
+                        {benefit.description}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
-      </Modal>
+      </main>
+
+      {/* Success Modal */}
+      {isSuccess && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl p-8 max-w-md w-full mx-4">
+            <div className="text-center">
+              <div className="flex justify-center mb-4">
+                <div className="bg-green-100 rounded-full p-3">
+                  <CheckCircle2 className="w-12 h-12 text-green-500" />
+                </div>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                ¡Registro Exitoso!
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Tu cuenta ha sido registrada correctamente. Te hemos enviado un
+                correo electrónico con un enlace para activar tu cuenta.
+              </p>
+              <p className="text-sm text-gray-500 mb-6">
+                Por favor, revisa tu bandeja de entrada y sigue las instrucciones
+                del correo para completar la activación.
+              </p>
+              <button
+                onClick={() => {
+                  setIsSuccess(false);
+                  navigate("/");
+                }}
+                className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-3 px-4 rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-200 flex items-center justify-center space-x-2"
+              >
+                <span>Ir al Login</span>
+                <LogIn className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
