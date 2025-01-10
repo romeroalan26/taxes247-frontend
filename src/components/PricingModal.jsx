@@ -1,10 +1,32 @@
-import React from "react";
-import { CheckCircle2, X, Zap, Clock, MessageCircle, DollarSign } from "lucide-react";
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { 
+  X, 
+  CheckCircle2, 
+  Clock, 
+  MessageCircle, 
+  DollarSign,
+  ShieldCheck
+} from "lucide-react";
 
 const PricingModal = ({ onSelect, onClose }) => {
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/', { replace: true });
+    }
+  }, [user, loading, navigate]);
+
+  if (loading || !user) {
+    return null;
+  }
+
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-xl max-w-4xl w-full mx-auto overflow-hidden animate-fade-in">
+      <div className="bg-white rounded-2xl shadow-xl max-w-xl w-full mx-auto overflow-hidden animate-fade-in">
         {/* Header */}
         <div className="relative bg-gradient-to-r from-red-600 to-red-700 px-8 py-12 text-center">
           <button
@@ -13,137 +35,83 @@ const PricingModal = ({ onSelect, onClose }) => {
           >
             <X className="h-6 w-6" />
           </button>
+          <div className="flex justify-center mb-4">
+            <ShieldCheck className="h-12 w-12 text-white" />
+          </div>
           <h2 className="text-3xl font-bold text-white mb-2">
-            Elige el Plan Perfecto para Ti
+            Plan de Declaración de Impuestos
           </h2>
           <p className="text-red-100">
-            Selecciona el plan que mejor se adapte a tus necesidades
+            Gestiona tu declaración de impuestos de forma segura y eficiente
           </p>
         </div>
 
-        {/* Planes */}
+        {/* Plan Content */}
         <div className="p-8">
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Plan Estándar */}
-            <div className="relative bg-white rounded-xl border-2 border-gray-100 overflow-hidden hover:border-red-500 hover:shadow-lg transition-all duration-300">
-              <div className="p-6">
-                <div className="mb-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Plan Estándar</h3>
-                  <p className="text-gray-500 text-sm">Para declaraciones simples</p>
-                </div>
-
-                <div className="flex items-baseline mb-6">
-                  <span className="text-4xl font-bold text-gray-900">$60</span>
+          <div className="bg-white rounded-xl border-2 border-red-100 overflow-hidden hover:border-red-500 transition-all duration-300">
+            <div className="p-6">
+              {/* Precio */}
+              <div className="text-center mb-8">
+                <div className="flex items-baseline justify-center mb-2">
+                  <span className="text-5xl font-bold text-gray-900">$60</span>
                   <span className="text-gray-500 ml-2">USD</span>
                 </div>
-
-                <div className="space-y-4 mb-8">
-                  <div className="flex items-start">
-                    <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5 mr-3 shrink-0" />
-                    <span className="text-gray-600">
-                      Declaración de impuestos básica con soporte estándar
-                    </span>
-                  </div>
-                  <div className="flex items-start">
-                    <Clock className="h-5 w-5 text-green-500 mt-0.5 mr-3 shrink-0" />
-                    <span className="text-gray-600">
-                      Tiempo de procesamiento regular
-                    </span>
-                  </div>
-                  <div className="flex items-start">
-                    <MessageCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 shrink-0" />
-                    <span className="text-gray-600">
-                      Soporte por WhatsApp y correo electrónico
-                    </span>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => onSelect("standard", 60)}
-                  className="w-full bg-gray-900 text-white py-3 px-4 rounded-lg hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
-                >
-                  Seleccionar Estándar
-                </button>
-              </div>
-            </div>
-
-            {/* Plan Premium */}
-            <div className="relative bg-white rounded-xl border-2 border-red-500 overflow-hidden shadow-lg">
-              <div className="absolute top-4 right-4">
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-600">
-                  Recomendado
-                </span>
+                <p className="text-gray-600">Pagas cuando te depositen</p>
               </div>
 
-              <div className="p-6">
-                <div className="mb-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">Plan Premium</h3>
-                  <p className="text-gray-500 text-sm">Maximiza tu reembolso</p>
+              {/* Características */}
+              <div className="space-y-4 mb-8">
+                <div className="flex items-start">
+                  <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5 mr-3 shrink-0" />
+                  <span className="text-gray-600">
+                    Declaración de impuestos completa y profesional
+                  </span>
+                </div>
+                <div className="flex items-start">
+                  <ShieldCheck className="h-5 w-5 text-green-500 mt-0.5 mr-3 shrink-0" />
+                  <span className="text-gray-600">
+                    Proceso seguro y confiable
+                  </span>
+                </div>
+                <div className="flex items-start">
+                  <Clock className="h-5 w-5 text-green-500 mt-0.5 mr-3 shrink-0" />
+                  <span className="text-gray-600">
+                    Procesamiento eficiente de tu declaración
+                  </span>
+                </div>
+                <div className="flex items-start">
+                  <MessageCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 shrink-0" />
+                  <span className="text-gray-600">
+                    Soporte personalizado por WhatsApp y correo electrónico
+                  </span>
                 </div>
 
-                <div className="flex items-baseline mb-4">
-                  <span className="text-4xl font-bold text-gray-900">$150</span>
-                  <span className="text-gray-500 ml-2">USD</span>
-                </div>
-
-                <div className="bg-green-50 border border-green-100 rounded-lg p-3 mb-6">
-                  <div className="flex items-center">
-                    <DollarSign className="h-5 w-5 text-green-600 mr-2" />
-                    <div>
-                      <p className="text-sm font-medium text-green-900">
-                        Bono Estimado
-                      </p>
-                      <p className="text-sm text-green-700">
-                        $900 - $1,200 extra
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-4 mb-8">
-                  <div className="flex items-start">
-                    <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5 mr-3 shrink-0" />
-                    <span className="text-gray-600">
-                      Todo lo incluido en el plan estándar
-                    </span>
-                  </div>
-                  <div className="flex items-start">
-                    <Zap className="h-5 w-5 text-green-500 mt-0.5 mr-3 shrink-0" />
-                    <span className="text-gray-600">
-                      Procesamiento prioritario y atención preferencial
-                    </span>
-                  </div>
-                  <div className="flex items-start">
-                    <DollarSign className="h-5 w-5 text-green-500 mt-0.5 mr-3 shrink-0" />
-                    <span className="text-gray-600">
-                      Maximización de reembolso garantizada
-                    </span>
-                  </div>
-                  <div className="flex items-start">
-                    <MessageCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 shrink-0" />
-                    <span className="text-gray-600">
-                      Soporte prioritario 24/7 por WhatsApp
-                    </span>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => onSelect("premium", 150)}
-                  className="w-full bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
-                >
-                  <Zap className="h-5 w-5" />
-                  Seleccionar Premium
-                </button>
               </div>
+
+              <button
+                onClick={() => onSelect("standard", 60)}
+                className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-3 px-4 rounded-lg hover:from-red-700 hover:to-red-800 transition-colors flex items-center justify-center gap-2"
+              >
+                <span>Comenzar Ahora</span>
+                <CheckCircle2 className="w-5 h-5" />
+              </button>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="mt-8 w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-200 transition-colors"
+            className="mt-6 w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-200 transition-colors"
           >
             Cancelar
           </button>
+
+          {/* Garantía */}
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-500">
+              Tu información está segura y protegida. 
+              Contamos con soporte dedicado para ayudarte en cada paso del proceso.
+            </p>
+          </div>
         </div>
       </div>
     </div>
