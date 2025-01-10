@@ -56,7 +56,7 @@ const PricingModal = ({ onSelect, onClose }) => {
                   <span className="text-5xl font-bold text-gray-900">$60</span>
                   <span className="text-gray-500 ml-2">USD</span>
                 </div>
-                <p className="text-gray-600">Pagas cuando te depositen</p>
+                <p className="text-gray-600">Pago único</p>
               </div>
 
               {/* Características */}
@@ -85,7 +85,12 @@ const PricingModal = ({ onSelect, onClose }) => {
                     Soporte personalizado por WhatsApp y correo electrónico
                   </span>
                 </div>
-
+                <div className="flex items-start">
+                  <DollarSign className="h-5 w-5 text-green-500 mt-0.5 mr-3 shrink-0" />
+                  <span className="text-gray-600">
+                    Maximización de tu reembolso
+                  </span>
+                </div>
               </div>
 
               <button
