@@ -20,6 +20,7 @@ const ActivateAccount = () => {
   const [countdown, setCountdown] = useState(3);
 
   useEffect(() => {
+    let timer;
     const activateAccount = async () => {
       try {
         const response = await fetch(
@@ -28,7 +29,10 @@ const ActivateAccount = () => {
         if (response.ok) {
           setStatus("success");
           setMessage("¡Cuenta activada con éxito!");
-          startCountdown();
+          // Iniciamos el contador aquí
+          timer = setInterval(() => {
+            setCountdown((prev) => prev - 1);
+          }, 1000);
         } else {
           const error = await response.json();
           setStatus("error");
@@ -42,20 +46,19 @@ const ActivateAccount = () => {
     };
 
     activateAccount();
-  }, [token, navigate]);
 
-  const startCountdown = () => {
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          navigate("/");
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
+    // Cleanup del timer
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [token]);
+
+  // Efecto separado para manejar la navegación
+  useEffect(() => {
+    if (status === "success" && countdown <= 0) {
+      navigate("/");
+    }
+  }, [countdown, status, navigate]);
 
   const getStatusConfig = () => {
     switch (status) {

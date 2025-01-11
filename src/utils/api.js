@@ -1,13 +1,24 @@
 // api.js
+import { auth } from '../firebaseConfig';
+
 const api = {
   async request(url, options = {}) {
     try {
+      // Obtener el token actual si hay un usuario autenticado
+      let headers = {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      };
+
+      // Solo intentar obtener el token si hay un usuario autenticado
+      if (auth.currentUser) {
+        const token = await auth.currentUser.getIdToken();
+        headers.Authorization = `Bearer ${token}`;
+      }
+
       const response = await fetch(`${import.meta.env.VITE_API_URL}${url}`, {
         ...options,
-        headers: {
-          'Content-Type': 'application/json',
-          ...options.headers,
-        },
+        headers,
       });
 
       // Para GET requests que retornan 404, manejamos silenciosamente
@@ -22,6 +33,13 @@ const api = {
       const data = await response.json();
 
       if (!response.ok) {
+        // Si hay error de autorización, emitir evento
+        if (response.status === 401 || response.status === 403) {
+          window.dispatchEvent(new CustomEvent('unauthorized', {
+            detail: { message: data.message }
+          }));
+        }
+
         return {
           ok: false,
           status: response.status,
@@ -35,6 +53,13 @@ const api = {
         data,
       };
     } catch (error) {
+      // Si el error es por token inválido o expirado
+      if (error.code === 'auth/id-token-expired' || error.code === 'auth/invalid-id-token') {
+        window.dispatchEvent(new CustomEvent('unauthorized', {
+          detail: { message: "Sesión expirada. Por favor, vuelve a iniciar sesión." }
+        }));
+      }
+
       // Manejamos errores de red silenciosamente
       return {
         ok: false,
@@ -54,6 +79,17 @@ const api = {
       method: 'POST',
       body: JSON.stringify(body),
     });
+  },
+
+  // Método auxiliar para verificar si hay un token válido
+  async hasValidToken() {
+    try {
+      if (!auth.currentUser) return false;
+      await auth.currentUser.getIdToken(true); // Forzar actualización del token
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 };
 

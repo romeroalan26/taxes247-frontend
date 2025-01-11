@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getAuth } from "firebase/auth";
 import { ClipLoader } from "react-spinners";
 import { Eye, EyeOff, ArrowLeft, Printer, Shield } from "lucide-react";
-
+import api from '../utils/api'; // Añadir esta importación
 const ViewRequestDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -29,47 +29,32 @@ const ViewRequestDetails = () => {
       }
 
       try {
-        const currentUser = auth.currentUser;
-        if (!currentUser) {
-          navigate("/login");
-          return;
-        }
+        // Usar el servicio API centralizado
+        const { ok, data, status } = await api.get(`/requests/${id}`);
 
-        const token = await currentUser.getIdToken();
-        
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/requests/${id}`,
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          }
-        );
-
-        if (response.ok) {
-          const data = await response.json();
+        if (ok) {
           setRequest(data);
-
+          // Guardar en caché
           const cache = {
-            data: data,
+            data,
             timestamp: new Date().getTime(),
           };
           localStorage.setItem(`request_${id}`, JSON.stringify(cache));
-        } else if (response.status === 401) {
-          navigate("/login");
-        } else {
-          console.error("Error al obtener los detalles de la solicitud");
+        } else if (status === 401 || status === 403) {
+          navigate("/");
+        } else if (status === 404) {
+          setRequest(null);
         }
       } catch (error) {
         console.error("Error al cargar detalles de la solicitud:", error);
+        setRequest(null);
       } finally {
         setLoading(false);
       }
     };
 
     fetchRequestDetails();
-  }, [id, navigate, auth]);
+  }, [id, navigate]);
 
   const maskData = (data) => {
     return data.replace(/.(?=.{4})/g, "*");

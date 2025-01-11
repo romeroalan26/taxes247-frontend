@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { auth } from "../firebaseConfig";
+import api from '../utils/api';
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { 
@@ -76,11 +78,11 @@ const Dashboard = () => {
   const fetchRequests = async (userId) => {
     const fromCreateRequest = localStorage.getItem("fromCreateRequest");
     const cachedRequests = localStorage.getItem("requests");
-
+  
     if (cachedRequests && !fromCreateRequest) {
       const parsedCache = JSON.parse(cachedRequests);
       const now = new Date().getTime();
-
+  
       if (now - parsedCache.timestamp < 30 * 60 * 1000) {
         setRequests(parsedCache.data);
         setLoadingRequests(false);
@@ -88,13 +90,23 @@ const Dashboard = () => {
       }
       localStorage.removeItem("requests");
     }
-
+  
     localStorage.removeItem("fromCreateRequest");
-
+  
     try {
+      const token = await auth.currentUser.getIdToken(); // Obtener el token de Firebase Auth
+  
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/requests/user/${userId}`
+        `${import.meta.env.VITE_API_URL}/requests/user/${userId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`, // Agregar el token al encabezado
+            "Content-Type": "application/json",
+          },
+        }
       );
+  
       if (response.ok) {
         const data = await response.json();
         setRequests(data);
@@ -102,6 +114,11 @@ const Dashboard = () => {
           "requests",
           JSON.stringify({ data, timestamp: new Date().getTime() })
         );
+      } else if (response.status === 401 || response.status === 403) {
+        console.warn("No autorizado o token expirado.");
+        navigate("/"); // Redirigir al login si el token no es válido
+      } else {
+        console.error("Error al obtener las solicitudes");
       }
     } catch (error) {
       console.error("Error al cargar solicitudes:", error);
@@ -109,6 +126,7 @@ const Dashboard = () => {
       setLoadingRequests(false);
     }
   };
+  
 
   const calculateProgress = (status) => {
     const currentStepIndex = statusSteps.indexOf(status);
