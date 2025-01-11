@@ -55,21 +55,11 @@ const Login = () => {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const authUser = userCredential.user;
   
-      // Primero, actualizar el UID en el backend
-      const updateResponse = await api.post('/users/update-uid', {
-        email: authUser.email,
-        uid: authUser.uid
-      });
-  
-      if (!updateResponse.ok) {
-        console.warn('No se pudo actualizar el UID, pero continuamos...');
-      }
-  
       // Verificar estado de activación
       const { ok, data } = await api.post('/users/login', {
         email: authUser.email,
         isGoogleLogin: false,
-        uid: authUser.uid  // Enviamos el uid también aquí
+        uid: authUser.uid
       });
   
       if (!ok) {
