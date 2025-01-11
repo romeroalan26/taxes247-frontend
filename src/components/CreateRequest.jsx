@@ -131,6 +131,9 @@ const CreateRequest = () => {
     const initialStatus = "Recibido";
   
     try {
+      // Obtener el token actual
+      const token = await auth.currentUser.getIdToken();
+      
       const formDataPayload = new FormData();
   
       Object.entries(formData).forEach(([key, value]) => {
@@ -146,17 +149,26 @@ const CreateRequest = () => {
   
       const response = await fetch(`${import.meta.env.VITE_API_URL}/requests`, {
         method: "POST",
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
         body: formDataPayload,
       });
   
       if (response.ok) {
         const data = await response.json();
-        // Limpiar el caché de solicitudes en localStorage
         localStorage.removeItem("requests");
         setConfirmationNumber(data.confirmationNumber);
         setIsModalOpen(true);
       } else {
         const errorResponse = await response.json();
+        
+        // Si hay error de autorización, redirigir al login
+        if (response.status === 401 || response.status === 403) {
+          navigate("/");
+          return;
+        }
+        
         throw new Error(errorResponse.message || "Error al guardar la solicitud.");
       }
     } catch (error) {
