@@ -90,8 +90,8 @@ const ViewRequestDetails = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <ClipLoader size={50} color="#1E3A8A" />
-          <p className="mt-4 text-blue-600">Cargando detalles...</p>
+          <ClipLoader size={50} color="#C92020" />
+          
         </div>
       </div>
     );
