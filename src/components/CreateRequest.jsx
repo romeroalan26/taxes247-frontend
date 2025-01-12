@@ -186,96 +186,95 @@ const handleNumericInput = (e, maxLength) => {
   }
 };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-  
-    if (!validateSSN(formData.ssn)) {
-      setError("Por favor, ingresa un número de Social Security válido (XXX-XX-XXXX).");
-      return;
-    }
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!selectedPlan) {
-      setError("Por favor selecciona un plan antes de continuar.");
-      setIsLoading(false);
-      return;
-    }
+  // Resetear errores
+  setError("");
 
-    if (!userId) {
-      setError("No se puede enviar la solicitud. Por favor, vuelve a iniciar sesión.");
-      setIsLoading(false);
-      return;
-    }
+  // Validaciones iniciales
+  if (!validateSSN(formData.ssn)) {
+    setError("Por favor, ingresa un número de Social Security válido (XXX-XX-XXXX).");
+    return;
+  }
 
-    if (w2Files.length === 0) {
-      setError("Por favor, sube al menos un archivo W2.");
-      setIsLoading(false);
-      return;
-    }
-    if (!validateRoutingNumber(formData.routingNumber)) {
-      setError("El número de ruta debe tener exactamente 9 dígitos.");
-      return;
-    }
-  
-    if (!validateAccountNumber(formData.accountNumber)) {
-      setError("El número de cuenta debe tener entre 5 y 17 dígitos.");
-      return;
-    }
-  
-    if (!(w2Files.length > 0 && w2Files.every((file) => file instanceof File))) {
-      setError("Archivos W2 no válidos. Intenta de nuevo.");
-      setIsLoading(false);
-      return;
-    }
-    
-    // Procesa el formulario si pasa todas las validaciones
-    setError(""); // Limpia errores
-    setIsLoading(true);
-    try {
-      const token = await auth.currentUser.getIdToken();
-      const formDataPayload = new FormData();
+  if (!validateRoutingNumber(formData.routingNumber)) {
+    setError("El número de ruta debe tener exactamente 9 dígitos.");
+    return;
+  }
 
-      Object.entries(formData).forEach(([key, value]) => {
-        formDataPayload.append(key, value);
-      });
+  if (!validateAccountNumber(formData.accountNumber)) {
+    setError("El número de cuenta debe tener entre 5 y 17 dígitos.");
+    return;
+  }
 
-      w2Files.forEach((file) => {
-        formDataPayload.append("w2Files", file);
-      });
+  if (!selectedPlan) {
+    setError("Por favor selecciona un plan antes de continuar.");
+    return;
+  }
 
-      formDataPayload.append("userId", userId);
-      formDataPayload.append("status", "Recibido");
+  if (!userId) {
+    setError("No se puede enviar la solicitud. Por favor, vuelve a iniciar sesión.");
+    return;
+  }
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/requests`, {
-        method: "POST",
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        body: formDataPayload,
-      });
+  if (w2Files.length === 0) {
+    setError("Por favor, sube al menos un archivo W2.");
+    return;
+  }
 
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.removeItem("requests");
-        setConfirmationNumber(data.confirmationNumber);
-        setIsModalOpen(true);
-      } else {
-        if (response.status === 401 || response.status === 403) {
-          navigate("/");
-          return;
-        }
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error al guardar la solicitud.");
+  if (!(w2Files.length > 0 && w2Files.every((file) => file instanceof File))) {
+    setError("Archivos W2 no válidos. Intenta de nuevo.");
+    return;
+  }
+
+  // Si todas las validaciones pasan, comienza la carga
+  setIsLoading(true);
+
+  try {
+    const token = await auth.currentUser.getIdToken();
+    const formDataPayload = new FormData();
+
+    Object.entries(formData).forEach(([key, value]) => {
+      formDataPayload.append(key, value);
+    });
+
+    w2Files.forEach((file) => {
+      formDataPayload.append("w2Files", file);
+    });
+
+    formDataPayload.append("userId", userId);
+    formDataPayload.append("status", "Recibido");
+
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/requests`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formDataPayload,
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      localStorage.removeItem("requests");
+      setConfirmationNumber(data.confirmationNumber);
+      setIsModalOpen(true);
+    } else {
+      if (response.status === 401 || response.status === 403) {
+        navigate("/");
+        return;
       }
-    } catch (error) {
-      console.error("Error al enviar la solicitud:", error);
-      setError(error.message || "Hubo un problema al enviar la solicitud. Intenta de nuevo.");
-    } finally {
-      setIsLoading(false);
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Error al guardar la solicitud.");
     }
-  };
+  } catch (error) {
+    console.error("Error al enviar la solicitud:", error);
+    setError(error.message || "Hubo un problema al enviar la solicitud. Intenta de nuevo.");
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gray-50">
