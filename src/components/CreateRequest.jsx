@@ -542,7 +542,7 @@ const CreateRequest = () => {
                                 ref={fileInputRef} 
                               />
                             </label>
-                            <p className="pl-1">o arrastra y suelta aquí</p>
+                            <p className="pl-1">con los que trabajaremos tu declaración</p>
                           </div>
                           <p className="text-xs text-gray-500">
                             PDF hasta 10MB (Archivos subidos: {w2Files.length}/5)
