@@ -4,7 +4,6 @@ import { useAuth } from "../context/AuthContext";
 import { 
   X, 
   CheckCircle2, 
-  Clock, 
   MessageCircle, 
   DollarSign,
   ShieldCheck
@@ -24,128 +23,87 @@ const PricingModal = ({ onSelect, onClose }) => {
     return null;
   }
 
+  const features = [
+    {
+      icon: <ShieldCheck className="h-5 w-5 text-red-500" />,
+      text: "Declaración de impuestos completa"
+    },
+    {
+      icon: <MessageCircle className="h-5 w-5 text-red-500" />,
+      text: "Soporte por WhatsApp y correo"
+    },
+    {
+      icon: <DollarSign className="h-5 w-5 text-red-500" />,
+      text: "Pagas cuando te depositen los Federales"
+    }
+  ];
+
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-xl max-w-xl w-full mx-auto overflow-hidden animate-fade-in">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-md my-8">
         {/* Header */}
-        <div className="relative bg-gradient-to-r from-red-600 to-red-700 px-8 py-12 text-center">
+        <div className="relative p-6 border-b">
           <button
             onClick={onClose}
-            className="absolute right-4 top-4 text-white/80 hover:text-white transition-colors"
+            className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition-colors"
           >
-            <X className="h-6 w-6" />
+            <X className="h-5 w-5" />
           </button>
-          <div className="flex justify-center mb-4">
-            <ShieldCheck className="h-12 w-12 text-white" />
-          </div>
-          <h2 className="text-3xl font-bold text-white mb-2">
-            Plan de Declaración de Impuestos
+          <h2 className="text-xl font-semibold text-gray-900">
+            Selecciona tu Plan
           </h2>
-          <p className="text-red-100">
-            Gestiona tu declaración de impuestos de forma segura y eficiente
+          <p className="mt-1 text-sm text-gray-500">
+            Gestiona tu declaración de forma segura y eficiente
           </p>
         </div>
 
         {/* Plan Content */}
-        <div className="p-8">
-          <div className="bg-white rounded-xl border-2 border-red-100 overflow-hidden hover:border-red-500 transition-all duration-300">
-            <div className="p-6">
-              {/* Precio */}
-              <div className="text-center mb-8">
-                <div className="flex items-baseline justify-center mb-2">
-                  <span className="text-5xl font-bold text-gray-900">$60</span>
-                  <span className="text-gray-500 ml-2">USD</span>
-                </div>
-                <p className="text-gray-600">Pago único</p>
-              </div>
-
-              {/* Características */}
-              <div className="space-y-4 mb-8">
-                <div className="flex items-start">
-                  <CheckCircle2 className="h-5 w-5 text-green-500 mt-0.5 mr-3 shrink-0" />
-                  <span className="text-gray-600">
-                    Declaración de impuestos completa y profesional
-                  </span>
-                </div>
-                <div className="flex items-start">
-                  <ShieldCheck className="h-5 w-5 text-green-500 mt-0.5 mr-3 shrink-0" />
-                  <span className="text-gray-600">
-                    Proceso seguro y confiable
-                  </span>
-                </div>
-                <div className="flex items-start">
-                  <Clock className="h-5 w-5 text-green-500 mt-0.5 mr-3 shrink-0" />
-                  <span className="text-gray-600">
-                    Procesamiento eficiente de tu declaración
-                  </span>
-                </div>
-                <div className="flex items-start">
-                  <MessageCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 shrink-0" />
-                  <span className="text-gray-600">
-                    Soporte personalizado por WhatsApp y correo electrónico
-                  </span>
-                </div>
-                <div className="flex items-start">
-                  <DollarSign className="h-5 w-5 text-green-500 mt-0.5 mr-3 shrink-0" />
-                  <span className="text-gray-600">
-                    Maximización de tu reembolso
-                  </span>
-                </div>
-              </div>
-
-              <button
-                onClick={() => onSelect("standard", 60)}
-                className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-3 px-4 rounded-lg hover:from-red-700 hover:to-red-800 transition-colors flex items-center justify-center gap-2"
-              >
-                <span>Comenzar Ahora</span>
-                <CheckCircle2 className="w-5 h-5" />
-              </button>
+        <div className="p-6">
+          {/* Precio */}
+          <div className="text-center mb-6">
+            <div className="flex items-baseline justify-center">
+              <span className="text-4xl font-bold text-gray-900">$60</span>
+              <span className="text-gray-500 ml-2">USD</span>
             </div>
+            <p className="text-sm text-gray-500 mt-1">Pago único</p>
           </div>
 
-          <button
-            onClick={onClose}
-            className="mt-6 w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-200 transition-colors"
-          >
-            Cancelar
-          </button>
-
-          {/* Garantía */}
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-500">
-              Tu información está segura y protegida. 
-              Contamos con soporte dedicado para ayudarte en cada paso del proceso.
-            </p>
+          {/* Características */}
+          <div className="space-y-4 mb-6">
+            {features.map((feature, index) => (
+              <div key={index} className="flex items-center gap-3">
+                {feature.icon}
+                <span className="text-sm text-gray-600">{feature.text}</span>
+              </div>
+            ))}
           </div>
+
+          {/* Botones */}
+          <div className="space-y-3">
+            <button
+              onClick={() => onSelect("standard", 60)}
+              className="w-full bg-red-600 text-white py-2.5 px-4 rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
+            >
+              <span>Comenzar Ahora</span>
+              <CheckCircle2 className="w-4 h-4" />
+            </button>
+            
+            <button
+              onClick={onClose}
+              className="w-full bg-gray-100 text-gray-700 py-2.5 px-4 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              Cancelar
+            </button>
+          </div>
+
+          {/* Footer */}
+          <p className="mt-4 text-xs text-center text-gray-500">
+            Tu información está segura y protegida.
+          </p>
         </div>
       </div>
     </div>
   );
 };
-
-// Añadir estilos de animación
-const styles = `
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  .animate-fade-in {
-    animation: fade-in 0.3s ease-out;
-  }
-`;
-
-// Crear y añadir estilos al documento
-if (typeof document !== 'undefined') {
-  const styleSheet = document.createElement('style');
-  styleSheet.textContent = styles;
-  document.head.appendChild(styleSheet);
-}
 
 export default PricingModal;
