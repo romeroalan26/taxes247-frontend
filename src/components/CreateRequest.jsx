@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../firebaseConfig";
 import { ClipLoader } from "react-spinners";
@@ -34,9 +34,11 @@ const statusSteps = [
   "Rechazada",
 ];
 
+
+
 const CreateRequest = () => {
   const navigate = useNavigate();
-
+  const fileInputRef = useRef(null);
   const [formData, setFormData] = useState({
     ssn: "",
     birthDate: "",
@@ -89,12 +91,12 @@ const CreateRequest = () => {
   const handleFileUpload = (e) => {
     const newFiles = Array.from(e.target.files);
     const errors = [];
-
+  
     if (w2Files.length + newFiles.length > 5) {
       setFileErrors(['Solo puedes subir hasta 5 archivos W2.']);
       return;
     }
-
+  
     newFiles.forEach(file => {
       if (file.size > 10 * 1024 * 1024) {
         errors.push(`${file.name} excede el límite de 10MB`);
@@ -103,20 +105,29 @@ const CreateRequest = () => {
         errors.push(`${file.name} debe ser un archivo PDF`);
       }
     });
-
+  
     if (errors.length > 0) {
       setFileErrors(errors);
       return;
     }
-
+  
     setW2Files(prevFiles => [...prevFiles, ...newFiles]);
     setFileErrors([]);
+    
+    // Limpiar el input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
-
+  
+  // Modificar la función removeFile
   const removeFile = (index) => {
     setW2Files(prevFiles => prevFiles.filter((_, i) => i !== index));
-  };
-
+    // Limpiar el input después de eliminar
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }};
+  
   const toggleFieldVisibility = (field) => {
     setShowSensitiveFields((prev) => ({
       ...prev,
@@ -528,6 +539,7 @@ const CreateRequest = () => {
                                 accept=".pdf"
                                 className="sr-only"
                                 onChange={handleFileUpload}
+                                ref={fileInputRef} 
                               />
                             </label>
                             <p className="pl-1">o arrastra y suelta aquí</p>
