@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom"; // Importa Link
 import { auth } from "../firebaseConfig";
 import { ClipLoader } from "react-spinners";
 import PricingModal from "./PricingModal";
+import RoutingNumber from "./RoutingNumber";
 import { 
   Eye, 
   EyeOff, 
@@ -83,11 +84,26 @@ const CreateRequest = () => {
     }
   }, [navigate]);
 
+  const formatSSN = (value) => {
+    // Elimina caracteres que no sean números
+    const onlyNumbers = value.replace(/\D/g, "");
+  
+    // Aplica el formato XXX-XX-XXXX
+    if (onlyNumbers.length <= 3) return onlyNumbers;
+    if (onlyNumbers.length <= 5) return `${onlyNumbers.slice(0, 3)}-${onlyNumbers.slice(3)}`;
+    return `${onlyNumbers.slice(0, 3)}-${onlyNumbers.slice(3, 5)}-${onlyNumbers.slice(5, 9)}`;
+  };
+  
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  
+    // Aplica el formato solo al campo SSN
+    const formattedValue = name === "ssn" ? formatSSN(value) : value;
+  
+    setFormData((prev) => ({ ...prev, [name]: formattedValue }));
   };
-
+  
   const handleFileUpload = (e) => {
     const newFiles = Array.from(e.target.files);
     const errors = [];
@@ -146,7 +162,37 @@ const CreateRequest = () => {
     setShowPricingModal(false);
   };
 
+  const validateSSN = (value) => {
+    const ssnPattern = /^\d{3}-\d{2}-\d{4}$/; // Formato XXX-XX-XXXX
+    return ssnPattern.test(value);
+  };
+  // Validar número de ruta (9 dígitos exactos)
+const validateRoutingNumber = (value) => {
+  return /^\d{9}$/.test(value); // Solo números y exactamente 9 dígitos
+};
+
+// Validar número de cuenta (5 a 17 dígitos)
+const validateAccountNumber = (value) => {
+  return /^\d{5,17}$/.test(value); // Solo números y entre 5 y 17 dígitos
+};
+
+// Restricción mientras el usuario escribe
+const handleNumericInput = (e, maxLength) => {
+  const { name, value } = e.target;
+
+  // Permitir solo números y limitar la longitud
+  if (/^\d*$/.test(value) && value.length <= maxLength) {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  }
+};
+
   const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    if (!validateSSN(formData.ssn)) {
+      setError("Por favor, ingresa un número de Social Security válido (XXX-XX-XXXX).");
+      return;
+    }
     e.preventDefault();
     setIsLoading(true);
     setError("");
@@ -168,7 +214,25 @@ const CreateRequest = () => {
       setIsLoading(false);
       return;
     }
-
+    if (!validateRoutingNumber(formData.routingNumber)) {
+      setError("El número de ruta debe tener exactamente 9 dígitos.");
+      return;
+    }
+  
+    if (!validateAccountNumber(formData.accountNumber)) {
+      setError("El número de cuenta debe tener entre 5 y 17 dígitos.");
+      return;
+    }
+  
+    if (!(w2Files.length > 0 && w2Files.every((file) => file instanceof File))) {
+      setError("Archivos W2 no válidos. Intenta de nuevo.");
+      setIsLoading(false);
+      return;
+    }
+    
+    // Procesa el formulario si pasa todas las validaciones
+    setError(""); // Limpia errores
+    setIsLoading(true);
     try {
       const token = await auth.currentUser.getIdToken();
       const formDataPayload = new FormData();
@@ -427,63 +491,75 @@ const CreateRequest = () => {
                     </div>
                   </div>
 
-                  {/* Número de Cuenta */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Número de Cuenta
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showSensitiveFields.accountNumber ? "text" : "password"}
-                        name="accountNumber"
-                        value={formData.accountNumber}
-                        onChange={handleChange}
-                        className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 pr-10"
-                        placeholder="123456789"
-                        required
-                      />
-                      <button
-                        type="button"
-                        className="absolute inset-y-0 right-0 px-3 flex items-center"
-                        onClick={() => toggleFieldVisibility("accountNumber")}
-                      >
-                        {showSensitiveFields.accountNumber ? (
-                          <EyeOff className="h-5 w-5 text-gray-400" />
-                        ) : (
-                          <Eye className="h-5 w-5 text-gray-400" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
+{/* Número de Cuenta */}
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-1">
+    Número de Cuenta
+  </label>
+  <div className="relative">
+    <input
+      type={showSensitiveFields.accountNumber ? "text" : "password"}
+      name="accountNumber"
+      value={formData.accountNumber}
+      onChange={(e) => handleNumericInput(e, 17)} // Permite máximo 17 dígitos
+      className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 pr-10"
+      placeholder="123456789"
+      required
+    />
+    <button
+      type="button"
+      className="absolute inset-y-0 right-0 px-3 flex items-center"
+      onClick={() => toggleFieldVisibility("accountNumber")}
+    >
+      {showSensitiveFields.accountNumber ? (
+        <EyeOff className="h-5 w-5 text-gray-400" />
+      ) : (
+        <Eye className="h-5 w-5 text-gray-400" />
+      )}
+    </button>
+  </div>
+</div>
 
-                  {/* Número de Ruta */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Número de Ruta
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showSensitiveFields.routingNumber ? "text" : "password"}
-                        name="routingNumber"
-                        value={formData.routingNumber}
-                        onChange={handleChange}
-                        className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 pr-10"
-                        placeholder="987654321"
-                        required
-                      />
-                      <button
-                        type="button"
-                        className="absolute inset-y-0 right-0 px-3 flex items-center"
-                        onClick={() => toggleFieldVisibility("routingNumber")}
-                      >
-                        {showSensitiveFields.routingNumber ? (
-                          <EyeOff className="h-5 w-5 text-gray-400" />
-                        ) : (
-                          <Eye className="h-5 w-5 text-gray-400" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
+
+{/* Número de Ruta */}
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-1">
+    Número de Ruta
+  </label>
+  <div className="relative">
+    <input
+      type={showSensitiveFields.routingNumber ? "text" : "password"}
+      name="routingNumber"
+      value={formData.routingNumber}
+      onChange={(e) => handleNumericInput(e, 9)} // Limita a 9 dígitos numéricos
+      className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 pr-10"
+      placeholder="XXXXXXXXX"
+      required
+    />
+    <button
+      type="button"
+      className="absolute inset-y-0 right-0 px-3 flex items-center"
+      onClick={() => toggleFieldVisibility("routingNumber")}
+    >
+      {showSensitiveFields.routingNumber ? (
+        <EyeOff className="h-5 w-5 text-gray-400" />
+      ) : (
+        <Eye className="h-5 w-5 text-gray-400" />
+      )}
+    </button>
+  </div>
+  <div className="flex items-center justify-between mt-1">
+    <Link
+      to="/routing-number"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-sm text-red-600 hover:text-red-700"
+    >
+      ¿Cómo encontrar este número?
+    </Link>
+  </div>
+</div>
+
                 </div>
               </div>
 
@@ -511,7 +587,7 @@ const CreateRequest = () => {
                         <option value="">Selecciona un método</option>
                         <option value="Zelle">Zelle</option>
                         <option value="PayPal">PayPal</option>
-                        <option value="Tarjeta de Crédito">Tarjeta de Crédito</option>
+                        <option value="Transferencia bancaria">Transferencia (RD o USA)</option>
                       </select>
                     </div>
                   </div>
@@ -619,6 +695,7 @@ const CreateRequest = () => {
                 )}
               </button>
             </form>
+            
           </div>
         )}
 

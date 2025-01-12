@@ -10,6 +10,7 @@ import ActivateAccount from "./components/ActivateAccount";
 import ForgotPassword from "./components/ForgotPassword";
 import ViewRequestDetails from "./components/ViewRequestDetails";
 import Pricing from "./components/Pricing";
+import RoutingNumber from "./components/RoutingNumber";
 
 // Componente mejorado para proteger rutas privadas
 const ProtectedRoute = ({ children }) => {
@@ -134,6 +135,16 @@ function App() {
               </div>
             }
           />
+
+          {/* Ruta para pagina de Routing Number */}
+          <Route
+  path="/routing-number"
+  element={
+    <ProtectedRoute>
+      <RoutingNumber />
+    </ProtectedRoute>
+  }
+/>
         </Routes>
       </BrowserRouter>
     </AuthProvider>
