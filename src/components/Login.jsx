@@ -108,6 +108,47 @@ const Login = () => {
       question: "¿Dónde puedo encontrar más información?",
       answer: "Visita nuestra página de preguntas frecuentes o contáctanos para más detalles.",
     },
+    {
+      icon: <DollarSign className="w-5 h-5 text-red-600" />,
+      question: "¿Qué métodos de pago aceptan?",
+      answer: "Aceptamos transferencias bancarias tanto en bancos de República Dominicana como de Estados Unidos. También puedes realizar pagos mediante Zelle y PayPal. El pago se realiza cuando el IRS deposita tu reembolso Federal.",
+    },
+    {
+      icon: <HelpCircle className="w-5 h-5 text-red-600" />,
+      question: "¿Qué es el reembolso Federal?",
+      answer: "El reembolso Federal es el dinero que el IRS te devuelve si pagaste más impuestos de los que debías durante el año fiscal. Esto incluye retenciones de tu salario o créditos fiscales aplicables.",
+    },
+    {
+      icon: <HelpCircle className="w-5 h-5 text-red-600" />,
+      question: "¿Qué es el reembolso Estatal?",
+      answer: "El reembolso Estatal es similar al reembolso Federal, pero corresponde a los impuestos que pagaste en tu estado de residencia. Solo aplica si tu estado tiene impuestos sobre la renta y realizaste un pago en exceso.",
+    },
+    {
+      icon: <FileSearch className="w-5 h-5 text-red-600" />,
+      question: "¿Cuánto me va a devolver el IRS?",
+      answer: "El monto que el IRS te devolverá depende de tu situación fiscal. Para estudiantes J1, generalmente solo reciben una parte del reembolso Federal, y algunos estados no ofrecen reembolsos estatales. Cada caso es único y se analiza durante el proceso de declaración. El monto total te será notificado a través de WhatsApp una vez finalicemos tu declaración de impuestos.",
+    },
+    {
+      icon: <AlertCircle className="w-5 h-5 text-red-600" />,
+      question: "¿Qué pasa si han pasado más de 21 días desde que la IRS aceptó mi declaración y aún no ponen fecha de depósito?",
+      answer: (
+        <span>
+          En la mayoría de los casos, si han pasado más de 3 semanas, es porque la IRS necesita verificar tu identidad. Generalmente, envían una carta con instrucciones específicas para hacerlo. Puedes encontrar más información en el sitio oficial del IRS haciendo clic en{" "}
+          <a
+            href="https://www.irs.gov/es/identity-theft-fraud-scams/identity-and-tax-return-verification-service"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline hover:text-blue-800"
+          >
+            este enlace.
+          </a>
+          {" "}Una vez que recibas la carta, debes informarnos para que podamos ayudarte con el proceso de verificación. Este se realiza mediante una videollamada con un agente de la IRS, donde solo necesitas responder algunas preguntas personales. Después de completar la verificación, la IRS puede tardar hasta 90 días en asignar una fecha de depósito.
+        </span>
+      ),
+    }
+    
+    
+    
   ];
 
   const filteredFaqs = faqs.filter((faq) => {
@@ -408,7 +449,10 @@ const Login = () => {
 
           <div className="flex-1 w-full lg:w-1/2">
   <div className="bg-white rounded-xl shadow-lg p-8">
-    {/* Barra de búsqueda */}
+        <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+      <HelpCircle className="w-6 h-6 text-red-600" />
+      Preguntas Frecuentes
+    </h3>{/* Barra de búsqueda */}
     <div className="relative mb-6">
       <input
         type="text"
@@ -418,10 +462,7 @@ const Login = () => {
         onChange={(e) => setSearchTerm(e.target.value)}
       />
     </div>
-    <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-      <HelpCircle className="w-6 h-6 text-red-600" />
-      Preguntas Frecuentes
-    </h3>
+
     
     <div className="space-y-4">
       {filteredFaqs.length > 0 ? (
