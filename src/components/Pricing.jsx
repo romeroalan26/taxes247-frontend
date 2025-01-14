@@ -7,7 +7,7 @@ import {
   Shield,
   ChevronRight,
   Clock,
-  PhoneCall
+  PhoneCall,
 } from "lucide-react";
 
 const Pricing = () => {
@@ -32,8 +32,10 @@ const Pricing = () => {
                 Login
               </button>
               <button
-                onClick={() => window.open("https://wa.me/18094039726", "_blank")}
-                className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-white text-red-600 hover:bg-red-50 transition-colors duration-200"
+                onClick={() =>
+                  window.open("https://wa.me/18094039726", "_blank")
+                }
+                className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-white/10 hover:bg-white/20 transition-colors duration-200"
               >
                 <MessageCircle className="w-4 h-4 mr-2" />
                 Contacto
@@ -50,7 +52,8 @@ const Pricing = () => {
             Declaración de Impuestos Simple y Efectiva
           </h1>
           <p className="text-xl text-red-100 max-w-2xl mx-auto">
-            Obtén tu declaración de impuestos de manera rápida, segura y profesional.
+            Obtén tu declaración de impuestos de manera rápida, segura y
+            profesional.
           </p>
         </div>
       </div>
@@ -64,7 +67,9 @@ const Pricing = () => {
                 <div className="p-2 rounded-lg bg-red-100 text-red-600">
                   <Shield className="w-6 h-6" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900">Plan Estándar</h3>
+                <h3 className="text-2xl font-bold text-gray-900">
+                  Plan Estándar
+                </h3>
               </div>
 
               <div className="mb-6">
@@ -75,7 +80,8 @@ const Pricing = () => {
                   </span>
                 </p>
                 <p className="mt-2 text-gray-500">
-                  Declaración de impuestos completa y segura para tus necesidades individuales.
+                  Declaración de impuestos completa y segura para tus
+                  necesidades individuales.
                 </p>
               </div>
 
@@ -83,20 +89,20 @@ const Pricing = () => {
                 {[
                   {
                     icon: <FileText className="w-4 h-4" />,
-                    text: "Declaración de impuestos básica"
+                    text: "Declaración de impuestos básica",
                   },
                   {
                     icon: <Shield className="w-4 h-4" />,
-                    text: "Presentación segura y confidencial"
+                    text: "Presentación segura y confidencial",
                   },
                   {
                     icon: <MessageCircle className="w-4 h-4" />,
-                    text: "Soporte por correo y WhatsApp"
+                    text: "Soporte por correo y WhatsApp",
                   },
                   {
                     icon: <PhoneCall className="w-4 h-4" />,
-                    text: "Atención personalizada"
-                  }
+                    text: "Atención personalizada",
+                  },
                 ].map((feature, i) => (
                   <li key={i} className="flex items-start">
                     <div className="p-1 rounded-full bg-red-100 text-red-600 mr-3 mt-0.5">
@@ -128,23 +134,24 @@ const Pricing = () => {
               {
                 icon: <Clock className="w-8 h-8 text-red-600" />,
                 title: "Proceso Rápido",
-                description: "Obtén tu declaración de impuestos en tiempo récord"
+                description:
+                  "Obtén tu declaración de impuestos en tiempo récord",
               },
               {
                 icon: <Shield className="w-8 h-8 text-red-600" />,
                 title: "100% Seguro",
-                description: "Tu información está protegida con la más alta seguridad"
+                description:
+                  "Tu información está protegida con la más alta seguridad",
               },
               {
                 icon: <MessageCircle className="w-8 h-8 text-red-600" />,
                 title: "Soporte Dedicado",
-                description: "Asistencia personalizada en cada paso del proceso"
-              }
+                description:
+                  "Asistencia personalizada en cada paso del proceso",
+              },
             ].map((benefit, index) => (
               <div key={index} className="text-center">
-                <div className="flex justify-center mb-4">
-                  {benefit.icon}
-                </div>
+                <div className="flex justify-center mb-4">{benefit.icon}</div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
                   {benefit.title}
                 </h3>
