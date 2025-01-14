@@ -4,9 +4,9 @@ import { auth } from "../firebaseConfig";
 import { ClipLoader } from "react-spinners";
 import PricingModal from "./PricingModal";
 import RoutingNumber from "./RoutingNumber";
-import { 
-  Eye, 
-  EyeOff, 
+import {
+  Eye,
+  EyeOff,
   ArrowLeft,
   Upload,
   CheckCircle2,
@@ -21,7 +21,7 @@ import {
   FileText,
   DollarSign,
   X,
-  AlertCircle
+  AlertCircle,
 } from "lucide-react";
 
 const statusSteps = [
@@ -34,8 +34,6 @@ const statusSteps = [
   "Completada",
   "Rechazada",
 ];
-
-
 
 const CreateRequest = () => {
   const navigate = useNavigate();
@@ -87,63 +85,67 @@ const CreateRequest = () => {
   const formatSSN = (value) => {
     // Elimina caracteres que no sean números
     const onlyNumbers = value.replace(/\D/g, "");
-  
+
     // Aplica el formato XXX-XX-XXXX
     if (onlyNumbers.length <= 3) return onlyNumbers;
-    if (onlyNumbers.length <= 5) return `${onlyNumbers.slice(0, 3)}-${onlyNumbers.slice(3)}`;
-    return `${onlyNumbers.slice(0, 3)}-${onlyNumbers.slice(3, 5)}-${onlyNumbers.slice(5, 9)}`;
+    if (onlyNumbers.length <= 5)
+      return `${onlyNumbers.slice(0, 3)}-${onlyNumbers.slice(3)}`;
+    return `${onlyNumbers.slice(0, 3)}-${onlyNumbers.slice(
+      3,
+      5
+    )}-${onlyNumbers.slice(5, 9)}`;
   };
-  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-  
+
     // Aplica el formato solo al campo SSN
     const formattedValue = name === "ssn" ? formatSSN(value) : value;
-  
+
     setFormData((prev) => ({ ...prev, [name]: formattedValue }));
   };
-  
+
   const handleFileUpload = (e) => {
     const newFiles = Array.from(e.target.files);
     const errors = [];
-  
+
     if (w2Files.length + newFiles.length > 5) {
-      setFileErrors(['Solo puedes subir hasta 5 archivos W2.']);
+      setFileErrors(["Solo puedes subir hasta 5 archivos W2."]);
       return;
     }
-  
-    newFiles.forEach(file => {
+
+    newFiles.forEach((file) => {
       if (file.size > 10 * 1024 * 1024) {
         errors.push(`${file.name} excede el límite de 10MB`);
       }
-      if (file.type !== 'application/pdf') {
+      if (file.type !== "application/pdf") {
         errors.push(`${file.name} debe ser un archivo PDF`);
       }
     });
-  
+
     if (errors.length > 0) {
       setFileErrors(errors);
       return;
     }
-  
-    setW2Files(prevFiles => [...prevFiles, ...newFiles]);
+
+    setW2Files((prevFiles) => [...prevFiles, ...newFiles]);
     setFileErrors([]);
-    
+
     // Limpiar el input
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
-  
+
   // Modificar la función removeFile
   const removeFile = (index) => {
-    setW2Files(prevFiles => prevFiles.filter((_, i) => i !== index));
+    setW2Files((prevFiles) => prevFiles.filter((_, i) => i !== index));
     // Limpiar el input después de eliminar
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }};
-  
+      fileInputRef.current.value = "";
+    }
+  };
+
   const toggleFieldVisibility = (field) => {
     setShowSensitiveFields((prev) => ({
       ...prev,
@@ -167,114 +169,122 @@ const CreateRequest = () => {
     return ssnPattern.test(value);
   };
   // Validar número de ruta (9 dígitos exactos)
-const validateRoutingNumber = (value) => {
-  return /^\d{9}$/.test(value); // Solo números y exactamente 9 dígitos
-};
+  const validateRoutingNumber = (value) => {
+    return /^\d{9}$/.test(value); // Solo números y exactamente 9 dígitos
+  };
 
-// Validar número de cuenta (5 a 17 dígitos)
-const validateAccountNumber = (value) => {
-  return /^\d{5,17}$/.test(value); // Solo números y entre 5 y 17 dígitos
-};
+  // Validar número de cuenta (5 a 17 dígitos)
+  const validateAccountNumber = (value) => {
+    return /^\d{5,17}$/.test(value); // Solo números y entre 5 y 17 dígitos
+  };
 
-// Restricción mientras el usuario escribe
-const handleNumericInput = (e, maxLength) => {
-  const { name, value } = e.target;
+  // Restricción mientras el usuario escribe
+  const handleNumericInput = (e, maxLength) => {
+    const { name, value } = e.target;
 
-  // Permitir solo números y limitar la longitud
-  if (/^\d*$/.test(value) && value.length <= maxLength) {
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  }
-};
-
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  // Resetear errores
-  setError("");
-
-  // Validaciones iniciales
-  if (!validateSSN(formData.ssn)) {
-    setError("Por favor, ingresa un número de Social Security válido (XXX-XX-XXXX).");
-    return;
-  }
-
-  if (!validateRoutingNumber(formData.routingNumber)) {
-    setError("El número de ruta debe tener exactamente 9 dígitos.");
-    return;
-  }
-
-  if (!validateAccountNumber(formData.accountNumber)) {
-    setError("El número de cuenta debe tener entre 5 y 17 dígitos.");
-    return;
-  }
-
-  if (!selectedPlan) {
-    setError("Por favor selecciona un plan antes de continuar.");
-    return;
-  }
-
-  if (!userId) {
-    setError("No se puede enviar la solicitud. Por favor, vuelve a iniciar sesión.");
-    return;
-  }
-
-  if (w2Files.length === 0) {
-    setError("Por favor, sube al menos un archivo W2.");
-    return;
-  }
-
-  if (!(w2Files.length > 0 && w2Files.every((file) => file instanceof File))) {
-    setError("Archivos W2 no válidos. Intenta de nuevo.");
-    return;
-  }
-
-  // Si todas las validaciones pasan, comienza la carga
-  setIsLoading(true);
-
-  try {
-    const token = await auth.currentUser.getIdToken();
-    const formDataPayload = new FormData();
-
-    Object.entries(formData).forEach(([key, value]) => {
-      formDataPayload.append(key, value);
-    });
-
-    w2Files.forEach((file) => {
-      formDataPayload.append("w2Files", file);
-    });
-
-    formDataPayload.append("userId", userId);
-    formDataPayload.append("status", "Recibido");
-
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/requests`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: formDataPayload,
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      localStorage.removeItem("requests");
-      setConfirmationNumber(data.confirmationNumber);
-      setIsModalOpen(true);
-    } else {
-      if (response.status === 401 || response.status === 403) {
-        navigate("/");
-        return;
-      }
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Error al guardar la solicitud.");
+    // Permitir solo números y limitar la longitud
+    if (/^\d*$/.test(value) && value.length <= maxLength) {
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
-  } catch (error) {
-    console.error("Error al enviar la solicitud:", error);
-    setError(error.message || "Hubo un problema al enviar la solicitud. Intenta de nuevo.");
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Resetear errores
+    setError("");
+
+    // Validaciones iniciales
+    if (!validateSSN(formData.ssn)) {
+      setError(
+        "Por favor, ingresa un número de Social Security válido (XXX-XX-XXXX)."
+      );
+      return;
+    }
+
+    if (!validateRoutingNumber(formData.routingNumber)) {
+      setError("El número de ruta debe tener exactamente 9 dígitos.");
+      return;
+    }
+
+    if (!validateAccountNumber(formData.accountNumber)) {
+      setError("El número de cuenta debe tener entre 5 y 17 dígitos.");
+      return;
+    }
+
+    if (!selectedPlan) {
+      setError("Por favor selecciona un plan antes de continuar.");
+      return;
+    }
+
+    if (!userId) {
+      setError(
+        "No se puede enviar la solicitud. Por favor, vuelve a iniciar sesión."
+      );
+      return;
+    }
+
+    if (w2Files.length === 0) {
+      setError("Por favor, sube al menos un archivo W2.");
+      return;
+    }
+
+    if (
+      !(w2Files.length > 0 && w2Files.every((file) => file instanceof File))
+    ) {
+      setError("Archivos W2 no válidos. Intenta de nuevo.");
+      return;
+    }
+
+    // Si todas las validaciones pasan, comienza la carga
+    setIsLoading(true);
+
+    try {
+      const token = await auth.currentUser.getIdToken();
+      const formDataPayload = new FormData();
+
+      Object.entries(formData).forEach(([key, value]) => {
+        formDataPayload.append(key, value);
+      });
+
+      w2Files.forEach((file) => {
+        formDataPayload.append("w2Files", file);
+      });
+
+      formDataPayload.append("userId", userId);
+      formDataPayload.append("status", "Recibido");
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/requests`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formDataPayload,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.removeItem("requests");
+        setConfirmationNumber(data.confirmationNumber);
+        setIsModalOpen(true);
+      } else {
+        if (response.status === 401 || response.status === 403) {
+          navigate("/");
+          return;
+        }
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error al guardar la solicitud.");
+      }
+    } catch (error) {
+      console.error("Error al enviar la solicitud:", error);
+      setError(
+        error.message ||
+          "Hubo un problema al enviar la solicitud. Intenta de nuevo."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -288,7 +298,9 @@ const handleSubmit = async (e) => {
               >
                 <ArrowLeft className="h-5 w-5" />
               </button>
-              <h1 className="text-xl font-semibold text-gray-900">Nueva Solicitud</h1>
+              <h1 className="text-xl font-semibold text-gray-900">
+                Nueva Solicitud
+              </h1>
             </div>
             {selectedPlan && (
               <div className="flex items-center gap-2">
@@ -450,8 +462,8 @@ const handleSubmit = async (e) => {
                   Información Bancaria
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
- {/* Nombre del Banco */}
- <div className="md:col-span-2">
+                  {/* Nombre del Banco */}
+                  <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Nombre del Banco
                     </label>
@@ -490,75 +502,81 @@ const handleSubmit = async (e) => {
                     </div>
                   </div>
 
-{/* Número de Cuenta */}
-<div>
-  <label className="block text-sm font-medium text-gray-700 mb-1">
-    Número de Cuenta
-  </label>
-  <div className="relative">
-    <input
-      type={showSensitiveFields.accountNumber ? "text" : "password"}
-      name="accountNumber"
-      value={formData.accountNumber}
-      onChange={(e) => handleNumericInput(e, 17)} // Permite máximo 17 dígitos
-      className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 pr-10"
-      placeholder="123456789"
-      required
-    />
-    <button
-      type="button"
-      className="absolute inset-y-0 right-0 px-3 flex items-center"
-      onClick={() => toggleFieldVisibility("accountNumber")}
-    >
-      {showSensitiveFields.accountNumber ? (
-        <EyeOff className="h-5 w-5 text-gray-400" />
-      ) : (
-        <Eye className="h-5 w-5 text-gray-400" />
-      )}
-    </button>
-  </div>
-</div>
+                  {/* Número de Cuenta */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Número de Cuenta
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={
+                          showSensitiveFields.accountNumber
+                            ? "text"
+                            : "password"
+                        }
+                        name="accountNumber"
+                        value={formData.accountNumber}
+                        onChange={(e) => handleNumericInput(e, 17)} // Permite máximo 17 dígitos
+                        className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 pr-10"
+                        placeholder="123456789"
+                        required
+                      />
+                      <button
+                        type="button"
+                        className="absolute inset-y-0 right-0 px-3 flex items-center"
+                        onClick={() => toggleFieldVisibility("accountNumber")}
+                      >
+                        {showSensitiveFields.accountNumber ? (
+                          <EyeOff className="h-5 w-5 text-gray-400" />
+                        ) : (
+                          <Eye className="h-5 w-5 text-gray-400" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
 
-
-{/* Número de Ruta */}
-<div>
-  <label className="block text-sm font-medium text-gray-700 mb-1">
-    Número de Ruta
-  </label>
-  <div className="relative">
-    <input
-      type={showSensitiveFields.routingNumber ? "text" : "password"}
-      name="routingNumber"
-      value={formData.routingNumber}
-      onChange={(e) => handleNumericInput(e, 9)} // Limita a 9 dígitos numéricos
-      className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 pr-10"
-      placeholder="XXXXXXXXX"
-      required
-    />
-    <button
-      type="button"
-      className="absolute inset-y-0 right-0 px-3 flex items-center"
-      onClick={() => toggleFieldVisibility("routingNumber")}
-    >
-      {showSensitiveFields.routingNumber ? (
-        <EyeOff className="h-5 w-5 text-gray-400" />
-      ) : (
-        <Eye className="h-5 w-5 text-gray-400" />
-      )}
-    </button>
-  </div>
-  <div className="flex items-center justify-between mt-1">
-    <Link
-      to="/routing-number"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-sm text-red-600 hover:text-red-700"
-    >
-      ¿Cómo encontrar este número?
-    </Link>
-  </div>
-</div>
-
+                  {/* Número de Ruta */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Número de Ruta
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={
+                          showSensitiveFields.routingNumber
+                            ? "text"
+                            : "password"
+                        }
+                        name="routingNumber"
+                        value={formData.routingNumber}
+                        onChange={(e) => handleNumericInput(e, 9)} // Limita a 9 dígitos numéricos
+                        className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 pr-10"
+                        placeholder="XXXXXXXXX"
+                        required
+                      />
+                      <button
+                        type="button"
+                        className="absolute inset-y-0 right-0 px-3 flex items-center"
+                        onClick={() => toggleFieldVisibility("routingNumber")}
+                      >
+                        {showSensitiveFields.routingNumber ? (
+                          <EyeOff className="h-5 w-5 text-gray-400" />
+                        ) : (
+                          <Eye className="h-5 w-5 text-gray-400" />
+                        )}
+                      </button>
+                    </div>
+                    <div className="flex items-center justify-between mt-1">
+                      <Link
+                        to="/routing-number"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-red-600 hover:text-red-700"
+                      >
+                        ¿Cómo encontrar este número?
+                      </Link>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -586,7 +604,9 @@ const handleSubmit = async (e) => {
                         <option value="">Selecciona un método</option>
                         <option value="Zelle">Zelle</option>
                         <option value="PayPal">PayPal</option>
-                        <option value="Transferencia bancaria">Transferencia (RD o USA)</option>
+                        <option value="Transferencia bancaria">
+                          Transferencia (RD o USA)
+                        </option>
                       </select>
                     </div>
                   </div>
@@ -601,8 +621,11 @@ const handleSubmit = async (e) => {
                       <div className="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-red-500 transition-colors">
                         <div className="space-y-1 text-center">
                           <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                          <div className="flex text-sm text-gray-600">
-                            <label htmlFor="file-upload" className="relative cursor-pointer">
+                          <div className="flex text-sm text-gray-600 justify-center">
+                            <label
+                              htmlFor="file-upload"
+                              className="relative cursor-pointer"
+                            >
                               <span className="rounded-md font-medium text-red-600 hover:text-red-500">
                                 Seleccionar archivos
                               </span>
@@ -614,13 +637,13 @@ const handleSubmit = async (e) => {
                                 accept=".pdf"
                                 className="sr-only"
                                 onChange={handleFileUpload}
-                                ref={fileInputRef} 
+                                ref={fileInputRef}
                               />
                             </label>
-                            <p className="pl-1">con los que trabajaremos tu declaración</p>
                           </div>
                           <p className="text-xs text-gray-500">
-                            PDF hasta 10MB (Archivos subidos: {w2Files.length}/5)
+                            PDF hasta 10MB (Archivos subidos: {w2Files.length}
+                            /5)
                           </p>
                         </div>
                       </div>
@@ -658,7 +681,10 @@ const handleSubmit = async (e) => {
                       {fileErrors.length > 0 && (
                         <div className="mt-2 space-y-1">
                           {fileErrors.map((error, index) => (
-                            <p key={index} className="text-sm text-red-600 flex items-center">
+                            <p
+                              key={index}
+                              className="text-sm text-red-600 flex items-center"
+                            >
                               <span className="mr-2">•</span>
                               {error}
                             </p>
@@ -694,7 +720,6 @@ const handleSubmit = async (e) => {
                 )}
               </button>
             </form>
-            
           </div>
         )}
 
@@ -710,12 +735,16 @@ const handleSubmit = async (e) => {
                   ¡Solicitud enviada!
                 </h3>
                 <p className="text-gray-600 mb-6">
-                  Tu solicitud se ha enviado correctamente. Hemos enviado un correo
-                  electrónico con tu número de confirmación.
+                  Tu solicitud se ha enviado correctamente. Hemos enviado un
+                  correo electrónico con tu número de confirmación.
                 </p>
                 <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                  <p className="text-sm text-gray-600 mb-1">Número de Confirmación</p>
-                  <p className="text-xl font-bold text-red-600">{confirmationNumber}</p>
+                  <p className="text-sm text-gray-600 mb-1">
+                    Número de Confirmación
+                  </p>
+                  <p className="text-xl font-bold text-red-600">
+                    {confirmationNumber}
+                  </p>
                 </div>
                 <button
                   onClick={() => navigate("/dashboard")}
