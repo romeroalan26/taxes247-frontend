@@ -5,6 +5,7 @@ import { ClipLoader } from "react-spinners";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Dashboard from "./components/Dashboard";
+import AdminDashboard from "./components/AdminDashboard";
 import CreateRequest from "./components/CreateRequest";
 import ActivateAccount from "./components/ActivateAccount";
 import ForgotPassword from "./components/ForgotPassword";
@@ -25,12 +26,34 @@ const ProtectedRoute = ({ children }) => {
   }
 
   if (!user) {
-    // Guardar la ruta intentada para redireccionar después del login
     const currentPath = window.location.pathname;
-    if (currentPath !== '/') {
-      localStorage.setItem('redirectAfterLogin', currentPath);
+    if (currentPath !== "/") {
+      localStorage.setItem("redirectAfterLogin", currentPath);
     }
     return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
+
+// Componente para proteger rutas de admin
+const AdminRoute = ({ children }) => {
+  const { user, loading, isAdmin } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <ClipLoader size={50} color="#DC2626" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+
+  if (!isAdmin) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;
@@ -48,8 +71,12 @@ const PublicRoute = ({ children }) => {
     );
   }
 
-  // Si el usuario está autenticado y trata de acceder a una ruta pública
   if (user) {
+    // Si es admin, redirigir al dashboard de admin
+    if (user.role === "admin") {
+      return <Navigate to="/admin/dashboard" replace />;
+    }
+    // Si no es admin, redirigir al dashboard normal
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -87,7 +114,7 @@ function App() {
             }
           />
 
-          {/* Rutas privadas */}
+          {/* Rutas de usuario normal */}
           <Route
             path="/dashboard"
             element={
@@ -110,6 +137,24 @@ function App() {
               <ProtectedRoute>
                 <ViewRequestDetails />
               </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/routing-number"
+            element={
+              <ProtectedRoute>
+                <RoutingNumber />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Rutas de admin */}
+          <Route
+            path="/admin/dashboard"
+            element={
+              <AdminRoute>
+                <AdminDashboard />
+              </AdminRoute>
             }
           />
 
@@ -135,16 +180,6 @@ function App() {
               </div>
             }
           />
-
-          {/* Ruta para pagina de Routing Number */}
-          <Route
-  path="/routing-number"
-  element={
-    <ProtectedRoute>
-      <RoutingNumber />
-    </ProtectedRoute>
-  }
-/>
         </Routes>
       </BrowserRouter>
     </AuthProvider>
