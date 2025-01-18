@@ -2,22 +2,23 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { auth } from "../firebaseConfig";
-import api from '../utils/api';
+import api from "../utils/api";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import { 
-  FileText, 
-  LogOut, 
-  Menu, 
-  Plus, 
+import {
+  FileText,
+  LogOut,
+  Menu,
+  Plus,
   Activity,
-  ChevronRight, 
+  ChevronRight,
   Clock,
   Calendar,
-  MessageCircle
+  MessageCircle,
 } from "lucide-react";
 
 const statusSteps = [
+  "Recibido", // Nuevo estado
   "Pendiente de pago",
   "Pago recibido",
   "En revisión",
@@ -30,6 +31,8 @@ const statusSteps = [
 
 const getStatusColor = (status) => {
   switch (status) {
+    case "Recibido":
+      return "bg-gray-100 text-gray-800"; // Color para "Recibido"
     case "Pendiente de pago":
       return "bg-yellow-100 text-yellow-800";
     case "Pago recibido":
@@ -78,11 +81,11 @@ const Dashboard = () => {
   const fetchRequests = async (userId) => {
     const fromCreateRequest = localStorage.getItem("fromCreateRequest");
     const cachedRequests = localStorage.getItem("requests");
-  
+
     if (cachedRequests && !fromCreateRequest) {
       const parsedCache = JSON.parse(cachedRequests);
       const now = new Date().getTime();
-  
+
       if (now - parsedCache.timestamp < 30 * 60 * 1000) {
         setRequests(parsedCache.data);
         setLoadingRequests(false);
@@ -90,12 +93,12 @@ const Dashboard = () => {
       }
       localStorage.removeItem("requests");
     }
-  
+
     localStorage.removeItem("fromCreateRequest");
-  
+
     try {
       const token = await auth.currentUser.getIdToken(); // Obtener el token de Firebase Auth
-  
+
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/requests/user/${userId}`,
         {
@@ -106,7 +109,7 @@ const Dashboard = () => {
           },
         }
       );
-  
+
       if (response.ok) {
         const data = await response.json();
         setRequests(data);
@@ -126,7 +129,6 @@ const Dashboard = () => {
       setLoadingRequests(false);
     }
   };
-  
 
   const calculateProgress = (status) => {
     const currentStepIndex = statusSteps.indexOf(status);
@@ -134,7 +136,11 @@ const Dashboard = () => {
   };
 
   if (!user) {
-    return <div className="flex justify-center items-center min-h-screen">Cargando...</div>;
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        Cargando...
+      </div>
+    );
   }
 
   return (
@@ -147,7 +153,7 @@ const Dashboard = () => {
               <FileText className="w-8 h-8" />
               <h1 className="ml-2 text-2xl font-bold">Taxes247</h1>
             </div>
-            
+
             <div className="hidden md:block">
               <button
                 onClick={logout}
@@ -167,7 +173,7 @@ const Dashboard = () => {
               </button>
             </div>
           </div>
-          
+
           {/* Mobile menu */}
           {isMenuOpen && (
             <div className="md:hidden pb-3">
@@ -197,7 +203,9 @@ const Dashboard = () => {
                     `¡Bienvenido, ${userName}!`
                   )}
                 </h2>
-                <p className="text-red-100">Gestiona tus declaraciones de impuestos de forma fácil</p>
+                <p className="text-red-100">
+                  Gestiona tus declaraciones de impuestos de forma fácil
+                </p>
               </div>
               <button
                 onClick={() => navigate("/create-request")}
@@ -235,11 +243,15 @@ const Dashboard = () => {
                       <span className="text-lg font-semibold text-red-600">
                         #{req.confirmationNumber}
                       </span>
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(req.status)}`}>
+                      <span
+                        className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
+                          req.status
+                        )}`}
+                      >
                         {req.status}
                       </span>
                     </div>
-                    
+
                     <div className="space-y-3">
                       <div className="flex items-center text-gray-600">
                         <Calendar className="w-4 h-4 mr-2" />
@@ -247,18 +259,21 @@ const Dashboard = () => {
                           {new Date(req.createdAt).toLocaleDateString()}
                         </span>
                       </div>
-                      
+
                       <div className="space-y-2">
                         <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
                           <div
                             className="h-2 bg-red-600 rounded-full transition-all duration-500"
-                            style={{ width: `${calculateProgress(req.status)}%` }}
+                            style={{
+                              width: `${calculateProgress(req.status)}%`,
+                            }}
                           />
                         </div>
                         <div className="flex items-center text-sm text-gray-500">
                           <Clock className="w-4 h-4 mr-2" />
                           <span>
-                            Paso {statusSteps.indexOf(req.status) + 1} de {statusSteps.length}
+                            Paso {statusSteps.indexOf(req.status) + 1} de{" "}
+                            {statusSteps.length}
                           </span>
                         </div>
                       </div>
