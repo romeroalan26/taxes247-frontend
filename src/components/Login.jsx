@@ -51,7 +51,7 @@ const Login = () => {
       question:
         "¿Cuándo inicia el proceso de declaración de impuestos del 2024?",
       answer:
-        "El proceso de declaración de impuestos para el año fiscal 2023 comienza el 29 de enero de 2024, según el calendario oficial del IRS.",
+        "El proceso de declaración de impuestos para el año fiscal 2024 comienza el 29 de enero de 2025, según el calendario oficial del IRS.",
     },
     {
       icon: <Clock className="w-5 h-5 text-red-600" />,
