@@ -2,14 +2,47 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getAuth } from "firebase/auth";
 import { ClipLoader } from "react-spinners";
-import { Eye, EyeOff, ArrowLeft, Printer, Shield } from "lucide-react";
-import api from '../utils/api'; // Añadir esta importación
+import {
+  ArrowLeft,
+  Printer,
+  Shield,
+  FileText,
+  User,
+  Calendar,
+  DollarSign,
+  Mail,
+  Phone,
+  MapPin,
+} from "lucide-react";
+import api from "../utils/api";
+
+const StatusBadge = ({ status }) => {
+  const getStatusStyle = (status) => {
+    const statusStyles = {
+      "En revisión": "bg-blue-100 text-blue-800",
+      Aprobado: "bg-emerald-100 text-emerald-800",
+      Rechazado: "bg-rose-100 text-rose-800",
+      Pendiente: "bg-amber-100 text-amber-800",
+    };
+    return statusStyles[status] || "bg-gray-100 text-gray-800";
+  };
+
+  return (
+    <span
+      className={`px-4 py-2 rounded-lg text-sm font-medium ${getStatusStyle(
+        status
+      )}`}
+    >
+      {status}
+    </span>
+  );
+};
+
 const ViewRequestDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [request, setRequest] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [visibleFields, setVisibleFields] = useState({});
   const auth = getAuth();
 
   useEffect(() => {
@@ -29,12 +62,10 @@ const ViewRequestDetails = () => {
       }
 
       try {
-        // Usar el servicio API centralizado
         const { ok, data, status } = await api.get(`/requests/${id}`);
 
         if (ok) {
           setRequest(data);
-          // Guardar en caché
           const cache = {
             data,
             timestamp: new Date().getTime(),
@@ -56,27 +87,15 @@ const ViewRequestDetails = () => {
     fetchRequestDetails();
   }, [id, navigate]);
 
-  const maskData = (data) => {
-    return data.replace(/.(?=.{4})/g, "*");
-  };
-
-  const toggleVisibility = (field) => {
-    setVisibleFields((prev) => ({
-      ...prev,
-      [field]: !prev[field],
-    }));
-  };
-
   const handlePrint = () => {
     window.print();
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <ClipLoader size={50} color="#C92020" />
-          
+          <ClipLoader size={50} color="#4B5563" />
         </div>
       </div>
     );
@@ -84,11 +103,11 @@ const ViewRequestDetails = () => {
 
   if (!request) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <p className="text-xl text-gray-600">Solicitud no encontrada.</p>
           <button
-            className="mt-4 inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+            className="mt-4 inline-flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800"
             onClick={() => navigate("/dashboard")}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -99,146 +118,155 @@ const ViewRequestDetails = () => {
     );
   }
 
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString("es-ES", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <header className="bg-white shadow-sm sticky top-0 z-10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            <h1 className="text-2xl font-bold text-red-600">Detalles de Solicitud</h1>
+            <div className="flex items-center">
+              <button
+                className="mr-4 p-2 hover:bg-red-50 rounded-lg"
+                onClick={() => navigate("/dashboard")}
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </button>
+              <h1 className="text-xl font-semibold text-gray-900">
+                Detalles de Solicitud
+              </h1>
+            </div>
             <button
-              className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
-              onClick={() => navigate("/dashboard")}
+              onClick={handlePrint}
+              className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
             >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Volver
+              <Printer className="h-4 w-4 mr-2" />
+              Imprimir
             </button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Tarjeta Principal */}
-        <div className="bg-white rounded-xl shadow-sm border p-8">
-          {/* Código de Confirmación y Estado */}
-          <div className="flex justify-between items-start mb-8 pb-6 border-b">
-            <div>
-              <p className="text-sm font-medium text-gray-500">Código de Confirmación</p>
-              <p className="text-2xl font-bold text-gray-900">{request.confirmationNumber}</p>
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Resumen de la Solicitud */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+          <div className="p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+              <div>
+                <div className="flex items-center gap-2 text-sm text-red-600 mb-1">
+                  <FileText className="h-4 w-4" />
+                  <span className="font-medium">Número de Solicitud</span>
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  {request.confirmationNumber}
+                </h2>
+              </div>
+              <StatusBadge status={request.status} />
             </div>
-            <div className="text-right">
-              <p className="text-sm font-medium text-gray-500">Estado</p>
-              <p className="text-lg font-semibold text-green-600">{request.status}</p>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-6 border-y">
+              <div>
+                <div className="flex items-center gap-2 text-sm text-red-600 mb-1">
+                  <Calendar className="h-4 w-4" />
+                  <span className="font-medium">Fecha de Solicitud</span>
+                </div>
+                <p className="text-gray-900">{formatDate(request.createdAt)}</p>
+              </div>
+              <div>
+                <div className="flex items-center gap-2 text-sm text-red-600 mb-1">
+                  <FileText className="h-4 w-4" />
+                  <span className="font-medium">Tipo de Servicio</span>
+                </div>
+                <p className="text-gray-900">{request.requestType}</p>
+              </div>
+              <div>
+                <div className="flex items-center gap-2 text-sm text-red-600 mb-1">
+                  <DollarSign className="h-4 w-4" />
+                  <span className="font-medium">Precio</span>
+                </div>
+                <p className="text-gray-900">${request.price}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Información Personal */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="p-6">
+              <h3 className="text-lg font-medium text-gray-900 mb-6 flex items-center gap-2">
+                <User className="h-5 w-5 text-red-600" />
+                Información Personal
+              </h3>
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm font-medium text-red-600 mb-1">
+                    Nombre
+                  </p>
+                  <p className="text-gray-900">{request.fullName}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-red-600 mb-1">Email</p>
+                  <p className="text-gray-900">{request.email}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-red-600 mb-1">
+                    Teléfono
+                  </p>
+                  <p className="text-gray-900">{request.phone}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-red-600 mb-1">
+                    Dirección
+                  </p>
+                  <p className="text-gray-900">{request.address}</p>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Información Personal */}
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <p className="text-sm font-medium text-gray-500">Nombre Completo</p>
-                <p className="mt-1 text-gray-900">{request.fullName}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Correo Electrónico</p>
-                <p className="mt-1 text-gray-900">{request.email}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Teléfono</p>
-                <p className="mt-1 text-gray-900">{request.phone}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500">Dirección</p>
-                <p className="mt-1 text-gray-900">{request.address}</p>
-              </div>
-            </div>
-
-            {/* Información Sensible */}
-            <div className="mt-8 pt-6 border-t">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <Shield className="h-5 w-5 mr-2 text-red-600" />
+          {/* Información Sensible */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="p-6">
+              <h3 className="text-lg font-medium text-gray-900 mb-6 flex items-center gap-2">
+                <Shield className="h-5 w-5 text-red-600" />
                 Información Sensible
               </h3>
-              
               <div className="space-y-4">
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-gray-500">
-                      Número de Seguro Social (SSN)
-                    </p>
-                    <button
-                      className="text-red-600 hover:text-red-700"
-                      onClick={() => toggleVisibility("ssn")}
-                    >
-                      {visibleFields.ssn ? (
-                        <EyeOff className="h-5 w-5" />
-                      ) : (
-                        <Eye className="h-5 w-5" />
-                      )}
-                    </button>
-                  </div>
-                  <p className="mt-1 font-mono text-gray-900">
-                    {visibleFields.ssn ? request.ssn : maskData(request.ssn)}
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                  <p className="text-sm font-medium text-red-600 mb-1">
+                    Número de Seguro Social (SSN)
+                  </p>
+                  <p className="font-mono text-gray-900">{request.ssn}</p>
+                </div>
+
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                  <p className="text-sm font-medium text-red-600 mb-1">
+                    Número de Cuenta
+                  </p>
+                  <p className="font-mono text-gray-900">
+                    {request.accountNumber}
                   </p>
                 </div>
 
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-gray-500">
-                      Número de Cuenta
-                    </p>
-                    <button
-                      className="text-red-600 hover:text-red-700"
-                      onClick={() => toggleVisibility("accountNumber")}
-                    >
-                      {visibleFields.accountNumber ? (
-                        <EyeOff className="h-5 w-5" />
-                      ) : (
-                        <Eye className="h-5 w-5" />
-                      )}
-                    </button>
-                  </div>
-                  <p className="mt-1 font-mono text-gray-900">
-                    {visibleFields.accountNumber
-                      ? request.accountNumber
-                      : maskData(request.accountNumber)}
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                  <p className="text-sm font-medium text-red-600 mb-1">
+                    Número de Ruta
                   </p>
-                </div>
-
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-gray-500">
-                      Número de Ruta
-                    </p>
-                    <button
-                      className="text-red-600 hover:text-red-700"
-                      onClick={() => toggleVisibility("routingNumber")}
-                    >
-                      {visibleFields.routingNumber ? (
-                        <EyeOff className="h-5 w-5" />
-                      ) : (
-                        <Eye className="h-5 w-5" />
-                      )}
-                    </button>
-                  </div>
-                  <p className="mt-1 font-mono text-gray-900">
-                    {visibleFields.routingNumber
-                      ? request.routingNumber
-                      : maskData(request.routingNumber)}
+                  <p className="font-mono text-gray-900">
+                    {request.routingNumber}
                   </p>
                 </div>
               </div>
             </div>
           </div>
-
-          {/* Botón de Imprimir */}
-          <button
-            className="mt-8 w-full inline-flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-            onClick={handlePrint}
-          >
-            <Printer className="h-5 w-5 mr-2" />
-            Imprimir Detalles
-          </button>
         </div>
       </main>
     </div>
