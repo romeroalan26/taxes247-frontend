@@ -23,6 +23,7 @@ const StatusUpdateForm = ({
     setError("");
 
     try {
+      // Encontrar el estado seleccionado y su descripción
       const selectedStatusStep = statusSteps.find(
         (step) => step.value === status
       );
@@ -30,28 +31,17 @@ const StatusUpdateForm = ({
         throw new Error(`Estado no válido: ${status}`);
       }
 
-      if (status === "Pago programado" && !paymentDate) {
-        throw new Error("Por favor, selecciona una fecha de pago.");
-      }
-
       const updateData = {
-        status,
-        description: selectedStatusStep.description || description,
+        status: status,
+        comment: description,
+        description: selectedStatusStep.description, // Añadimos la descripción del estado
         ...(status === "Pago programado" && paymentDate ? { paymentDate } : {}),
       };
 
       await onUpdate(updateData);
       onClose();
     } catch (error) {
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
-        setError(error.response.data.message);
-      } else {
-        setError(error.message);
-      }
+      setError(error.message);
     } finally {
       setLoading(false);
     }
