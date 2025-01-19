@@ -196,17 +196,16 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMessage("");
-    setIsEmailLoading(true); // Cambiado de setIsLoading a setIsEmailLoading
+    setIsEmailLoading(true);
 
     try {
-      // Verificar métodos de inicio de sesión
       const methods = await fetchSignInMethodsForEmail(auth, email);
 
       if (methods.includes("google.com")) {
         setErrorMessage(
           "Esta cuenta está registrada con Google. Por favor, usa el botón 'Iniciar sesión con Google'."
         );
-        setIsEmailLoading(false); // Cambiado de setIsLoading a setIsEmailLoading
+        setIsEmailLoading(false);
         return;
       }
 
@@ -218,7 +217,7 @@ const Login = () => {
       );
       const authUser = userCredential.user;
 
-      // Verificar estado de activación
+      // Verificar estado de activación y rol
       const { ok, data } = await api.post("/users/login", {
         email: authUser.email,
         isGoogleLogin: false,
@@ -231,14 +230,37 @@ const Login = () => {
         return;
       }
 
+      // Si es admin, verificar permisos de admin
+      if (data.user.role === "admin") {
+        const token = await authUser.getIdToken();
+        const adminVerifyResponse = await fetch(
+          `${import.meta.env.VITE_API_URL}/admin/verify`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!adminVerifyResponse.ok) {
+          await auth.signOut();
+          setErrorMessage("No autorizado como administrador");
+          return;
+        }
+      }
+
       const updatedUser = {
         uid: authUser.uid,
         email: authUser.email,
         name: data.user.name || "Usuario",
+        role: data.user.role, // Incluimos el rol
       };
+
       setUser(updatedUser);
       localStorage.setItem("authUser", JSON.stringify(updatedUser));
-      navigate("/dashboard");
+
+      // Redirigir según el rol
+      navigate(data.user.role === "admin" ? "/admin/dashboard" : "/dashboard");
     } catch (error) {
       let errorMessage =
         "Error al iniciar sesión. Por favor, inténtalo de nuevo.";
@@ -253,31 +275,72 @@ const Login = () => {
 
       setErrorMessage(errorMessage);
     } finally {
-      setIsEmailLoading(false); // Cambiado de setIsLoading a setIsEmailLoading
+      setIsEmailLoading(false);
     }
   };
 
   const handleGoogleLogin = async () => {
     setErrorMessage("");
-    setIsGoogleLoading(true); // Cambiado de setIsLoading a setIsGoogleLoading
+    setIsGoogleLoading(true);
 
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const authUser = result.user;
+      const token = await authUser.getIdToken();
 
-      // No necesitamos vincular las cuentas aquí ya que eso puede causar problemas
-      // y firebase maneja esto internamente
+      // Verificar con el backend
+      const { ok, data } = await api.post("/users/login", {
+        email: authUser.email,
+        name: authUser.displayName || "Usuario",
+        isGoogleLogin: true,
+        uid: authUser.uid,
+      });
 
-      // Solo establecemos el usuario en el contexto y localStorage
+      if (!ok) {
+        await auth.signOut();
+        setErrorMessage(data.message);
+        return;
+      }
+
+      // Si es admin, verificar permisos
+      if (data.user.role === "admin") {
+        try {
+          const adminVerifyResponse = await fetch(
+            `${import.meta.env.VITE_API_URL}/admin/verify`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          if (!adminVerifyResponse.ok) {
+            await auth.signOut();
+            setErrorMessage("No autorizado como administrador");
+            return;
+          }
+        } catch (verifyError) {
+          console.error("Error en verificación admin:", verifyError);
+          await auth.signOut();
+          setErrorMessage("Error en verificación de permisos de administrador");
+          return;
+        }
+      }
+
       const updatedUser = {
         uid: authUser.uid,
         email: authUser.email,
-        name: authUser.displayName || "Usuario",
+        name: data.user.name || authUser.displayName || "Usuario",
+        role: data.user.role, // Asegurarnos de incluir el rol
       };
+
       setUser(updatedUser);
       localStorage.setItem("authUser", JSON.stringify(updatedUser));
-      navigate("/dashboard");
+
+      // Redirigir según el rol
+      navigate(data.user.role === "admin" ? "/admin/dashboard" : "/dashboard");
     } catch (error) {
+      console.error("Error completo:", error); // Para debugging
       let errorMessage =
         "Error al iniciar sesión con Google. Por favor, inténtalo más tarde.";
 
@@ -292,7 +355,7 @@ const Login = () => {
 
       setErrorMessage(errorMessage);
     } finally {
-      setIsGoogleLoading(false); // Cambiado de setIsLoading a setIsGoogleLoading
+      setIsGoogleLoading(false);
     }
   };
 

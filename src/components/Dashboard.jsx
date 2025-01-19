@@ -2,34 +2,25 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { auth } from "../firebaseConfig";
-import api from '../utils/api';
+import api from "../utils/api";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import { 
-  FileText, 
-  LogOut, 
-  Menu, 
-  Plus, 
+import {
+  FileText,
+  LogOut,
+  Menu,
+  Plus,
   Activity,
-  ChevronRight, 
+  ChevronRight,
   Clock,
   Calendar,
-  MessageCircle
+  MessageCircle,
 } from "lucide-react";
-
-const statusSteps = [
-  "Pendiente de pago",
-  "Pago recibido",
-  "En revisión",
-  "Documentación incompleta",
-  "En proceso con el IRS",
-  "Aprobada",
-  "Completada",
-  "Rechazada",
-];
 
 const getStatusColor = (status) => {
   switch (status) {
+    case "Recibido":
+      return "bg-gray-100 text-gray-800"; // Color para "Recibido"
     case "Pendiente de pago":
       return "bg-yellow-100 text-yellow-800";
     case "Pago recibido":
@@ -56,6 +47,7 @@ const Dashboard = () => {
   const { user, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [requests, setRequests] = useState([]);
+  const [statusSteps, setStatusSteps] = useState([]); // Ensure initialized as empty array
   const [loadingRequests, setLoadingRequests] = useState(true);
   const [loadingName, setLoadingName] = useState(true);
   const [userName, setUserName] = useState(null);
@@ -76,65 +68,114 @@ const Dashboard = () => {
   }, [user, navigate]);
 
   const fetchRequests = async (userId) => {
-    const fromCreateRequest = localStorage.getItem("fromCreateRequest");
-    const cachedRequests = localStorage.getItem("requests");
-  
-    if (cachedRequests && !fromCreateRequest) {
-      const parsedCache = JSON.parse(cachedRequests);
-      const now = new Date().getTime();
-  
-      if (now - parsedCache.timestamp < 30 * 60 * 1000) {
-        setRequests(parsedCache.data);
-        setLoadingRequests(false);
-        return;
-      }
-      localStorage.removeItem("requests");
-    }
-  
-    localStorage.removeItem("fromCreateRequest");
-  
     try {
-      const token = await auth.currentUser.getIdToken(); // Obtener el token de Firebase Auth
-  
+      const token = await auth.currentUser.getIdToken();
+
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/requests/user/${userId}`,
         {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${token}`, // Agregar el token al encabezado
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }
       );
-  
+
       if (response.ok) {
         const data = await response.json();
-        setRequests(data);
-        localStorage.setItem(
-          "requests",
-          JSON.stringify({ data, timestamp: new Date().getTime() })
-        );
-      } else if (response.status === 401 || response.status === 403) {
-        console.warn("No autorizado o token expirado.");
-        navigate("/"); // Redirigir al login si el token no es válido
+
+        // Ensure data is valid
+        if (data && typeof data === "object") {
+          // Use optional chaining and provide fallbacks
+          const requests = Array.isArray(data.requests) ? data.requests : [];
+          const statusSteps = Array.isArray(data.statusSteps)
+            ? data.statusSteps
+            : [];
+
+          setRequests(requests);
+          setStatusSteps(statusSteps);
+        } else {
+          console.error("Invalid data structure received:", data);
+          setRequests([]);
+          setStatusSteps([]);
+        }
       } else {
-        console.error("Error al obtener las solicitudes");
+        // Attempt to get error details
+        const errorText = await response.text();
+        console.error("Error response:", response.status, errorText);
+
+        setRequests([]);
+        setStatusSteps([]);
       }
     } catch (error) {
-      console.error("Error al cargar solicitudes:", error);
+      console.error("Fetch requests error:", error);
+
+      setRequests([]);
+      setStatusSteps([]);
     } finally {
       setLoadingRequests(false);
     }
   };
-  
-
   const calculateProgress = (status) => {
-    const currentStepIndex = statusSteps.indexOf(status);
-    return ((currentStepIndex + 1) / statusSteps.length) * 100;
+    if (!statusSteps || statusSteps.length === 0) return 0;
+
+    const progressSteps = statusSteps.filter((step) => step.countInProgress);
+    const currentStepIndex = statusSteps.findIndex(
+      (step) => step.value === status
+    );
+
+    const progressStepIndex = statusSteps
+      .slice(0, currentStepIndex + 1)
+      .filter((step) => step.countInProgress).length;
+
+    const totalProgressSteps = progressSteps.length;
+
+    return progressStepIndex > 0
+      ? (progressStepIndex / totalProgressSteps) * 100
+      : 0;
   };
 
+  // In the requests mapping section:
+  {
+    requests.map((request) => (
+      <div
+        key={request.confirmationNumber}
+        className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
+      >
+        {/* Other request details */}
+        <div className="flex items-center text-sm text-gray-500">
+          <Clock className="w-4 h-4 mr-2" />
+          <span>
+            {(() => {
+              const progressSteps = statusSteps.filter(
+                (step) => step.countInProgress
+              );
+              const currentStepIndex = statusSteps.findIndex(
+                (step) => step.value === request.status
+              );
+
+              const progressStepIndex = statusSteps
+                .slice(0, currentStepIndex + 1)
+                .filter((step) => step.countInProgress).length;
+
+              return progressStepIndex > 0
+                ? `Paso ${progressStepIndex} de ${progressSteps.length}`
+                : "Estado de solicitud";
+            })()}
+          </span>
+        </div>
+        {/* Rest of the request card */}
+      </div>
+    ));
+  }
+
   if (!user) {
-    return <div className="flex justify-center items-center min-h-screen">Cargando...</div>;
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        Cargando...
+      </div>
+    );
   }
 
   return (
@@ -147,7 +188,7 @@ const Dashboard = () => {
               <FileText className="w-8 h-8" />
               <h1 className="ml-2 text-2xl font-bold">Taxes247</h1>
             </div>
-            
+
             <div className="hidden md:block">
               <button
                 onClick={logout}
@@ -167,7 +208,7 @@ const Dashboard = () => {
               </button>
             </div>
           </div>
-          
+
           {/* Mobile menu */}
           {isMenuOpen && (
             <div className="md:hidden pb-3">
@@ -197,7 +238,9 @@ const Dashboard = () => {
                     `¡Bienvenido, ${userName}!`
                   )}
                 </h2>
-                <p className="text-red-100">Gestiona tus declaraciones de impuestos de forma fácil</p>
+                <p className="text-red-100">
+                  Gestiona tus declaraciones de impuestos de forma fácil
+                </p>
               </div>
               <button
                 onClick={() => navigate("/create-request")}
@@ -225,55 +268,133 @@ const Dashboard = () => {
             </div>
           ) : requests.length > 0 ? (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {requests.map((req) => (
-                <div
-                  key={req.confirmationNumber}
-                  className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
-                >
-                  <div className="p-6">
-                    <div className="flex justify-between items-start mb-4">
-                      <span className="text-lg font-semibold text-red-600">
-                        #{req.confirmationNumber}
-                      </span>
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(req.status)}`}>
-                        {req.status}
-                      </span>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <div className="flex items-center text-gray-600">
-                        <Calendar className="w-4 h-4 mr-2" />
-                        <span className="text-sm">
-                          {new Date(req.createdAt).toLocaleDateString()}
+              {requests.map((request) => {
+                // Safely calculate progress
+                const calculateRequestProgress = () => {
+                  // Ensure statusSteps exists and is an array
+                  if (!statusSteps || !Array.isArray(statusSteps)) {
+                    return {
+                      progressSteps: [],
+                      progressStepIndex: 0,
+                      progressPercent: 0,
+                    };
+                  }
+
+                  // Filter steps that should be counted in progress
+                  const progressSteps = statusSteps.filter(
+                    (step) => step.countInProgress === true
+                  );
+
+                  // Find the index of the current status
+                  const currentStepIndex = statusSteps.findIndex(
+                    (step) => step && step.value === request.status
+                  );
+
+                  // Calculate progress step index
+                  const progressStepIndex =
+                    currentStepIndex >= 0
+                      ? statusSteps
+                          .slice(0, currentStepIndex + 1)
+                          .filter((step) => step.countInProgress === true)
+                          .length
+                      : 0;
+
+                  // Calculate progress percentage
+                  const progressPercent =
+                    progressSteps.length > 0
+                      ? (progressStepIndex / progressSteps.length) * 100
+                      : 0;
+
+                  return { progressSteps, progressStepIndex, progressPercent };
+                };
+
+                const { progressSteps, progressStepIndex, progressPercent } =
+                  calculateRequestProgress();
+
+                // Find the current status step to get its description
+                const currentStatusStep = statusSteps.find(
+                  (step) => step.value === request.status
+                );
+
+                return (
+                  <div
+                    key={request.confirmationNumber}
+                    className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                  >
+                    <div className="p-6">
+                      <div className="flex justify-between items-start mb-4">
+                        <span className="text-lg font-semibold text-red-600">
+                          #{request.confirmationNumber}
+                        </span>
+                        <span
+                          className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
+                            request.status
+                          )}`}
+                        >
+                          {request.status}
                         </span>
                       </div>
-                      
-                      <div className="space-y-2">
-                        <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                          <div
-                            className="h-2 bg-red-600 rounded-full transition-all duration-500"
-                            style={{ width: `${calculateProgress(req.status)}%` }}
-                          />
+
+                      <div className="space-y-3">
+                        {/* Status Description */}
+                        <div className="text-sm text-gray-600">
+                          {currentStatusStep?.description ||
+                            "Estado actual de la solicitud"}
                         </div>
-                        <div className="flex items-center text-sm text-gray-500">
-                          <Clock className="w-4 h-4 mr-2" />
-                          <span>
-                            Paso {statusSteps.indexOf(req.status) + 1} de {statusSteps.length}
+
+                        <div className="flex items-center text-gray-600">
+                          <Calendar className="w-4 h-4 mr-2" />
+                          <span className="text-sm">
+                            Fecha de último estado:{" "}
+                            {new Date(
+                              request.lastStatusUpdate
+                            ).toLocaleDateString()}
                           </span>
                         </div>
-                      </div>
-                    </div>
 
-                    <button
-                      onClick={() => navigate(`/request/${req._id}`)}
-                      className="mt-4 w-full inline-flex items-center justify-center px-4 py-2 border border-red-600 text-sm font-medium rounded-md text-red-600 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200"
-                    >
-                      Ver Detalles
-                      <ChevronRight className="w-4 h-4 ml-2" />
-                    </button>
+                        {/* Payment Date for 'Pago programado' status */}
+                        {request.status === "Pago programado" &&
+                          request.paymentDate && (
+                            <div className="text-sm text-gray-600 flex items-center">
+                              <Calendar className="w-4 h-4 mr-2 text-green-600" />
+                              Fecha de pago:{" "}
+                              {new Date(
+                                request.paymentDate
+                              ).toLocaleDateString()}
+                            </div>
+                          )}
+
+                        <div className="space-y-2">
+                          <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                            <div
+                              className="h-2 bg-red-600 rounded-full transition-all duration-500"
+                              style={{
+                                width: `${progressPercent}%`,
+                              }}
+                            />
+                          </div>
+                          <div className="flex items-center text-sm text-gray-500">
+                            <Clock className="w-4 h-4 mr-2" />
+                            <span>
+                              {progressStepIndex > 0
+                                ? `Paso ${progressStepIndex} de ${progressSteps.length}`
+                                : "Estado de solicitud"}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => navigate(`/request/${request._id}`)}
+                        className="mt-4 w-full inline-flex items-center justify-center px-4 py-2 border border-red-600 text-sm font-medium rounded-md text-red-600 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200"
+                      >
+                        Ver Detalles
+                        <ChevronRight className="w-4 h-4 ml-2" />
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="bg-white rounded-xl shadow-md p-6 text-center text-gray-600">

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Search, Building2, MapPin, Landmark } from 'lucide-react';
+import React, { useState } from "react";
+import { Search, Building2, MapPin, Landmark } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -9,138 +9,138 @@ import {
 
 const bankData = [
   {
-    id: 'bofa',
-    name: 'Bank of America',
+    id: "bofa",
+    name: "Bank of America",
     routingInfo: {
       steps: [
-        'Ingresa a tu cuenta en línea de Bank of America',
+        "Ingresa a tu cuenta en línea de Bank of America",
         'Ve a la sección "Account Details" o "Account Information"',
-        'El número de ruta (Routing Number) aparecerá junto a tu número de cuenta',
-        'También puedes encontrarlo en la parte inferior de tus cheques'
+        "El número de ruta (Routing Number) aparecerá junto a tu número de cuenta",
+        "También puedes encontrarlo en la parte inferior de tus cheques",
       ],
       commonNumbers: [
-        { state: 'California', number: '121000358' },
-        { state: 'Florida', number: '063100277' },
-        { state: 'Texas', number: '111000025' },
-        { state: 'New York', number: '021000322' }
-      ]
-    }
+        { state: "California", number: "121000358" },
+        { state: "Florida", number: "063100277" },
+        { state: "Texas", number: "111000025" },
+        { state: "New York", number: "021000322" },
+      ],
+    },
   },
   {
-    id: 'chase',
-    name: 'Chase Bank',
+    id: "chase",
+    name: "Chase Bank",
     routingInfo: {
       steps: [
-        'Inicia sesión en tu cuenta de Chase',
-        'Selecciona la cuenta para la que necesitas el número de ruta',
+        "Inicia sesión en tu cuenta de Chase",
+        "Selecciona la cuenta para la que necesitas el número de ruta",
         'Haz clic en "Ver detalles completos de la cuenta"',
-        'El número de ruta se mostrará en la información de la cuenta'
+        "El número de ruta se mostrará en la información de la cuenta",
       ],
       commonNumbers: [
-        { state: 'California', number: '322271627' },
-        { state: 'New York', number: '021000021' },
-        { state: 'Illinois', number: '071000013' },
-        { state: 'Texas', number: '111000614' }
-      ]
-    }
+        { state: "California", number: "322271627" },
+        { state: "New York", number: "021000021" },
+        { state: "Illinois", number: "071000013" },
+        { state: "Texas", number: "111000614" },
+      ],
+    },
   },
   {
-    id: 'wells',
-    name: 'Wells Fargo',
+    id: "wells",
+    name: "Wells Fargo",
     routingInfo: {
       steps: [
-        'Accede a tu cuenta de Wells Fargo en línea',
+        "Accede a tu cuenta de Wells Fargo en línea",
         'Ve a "Cuenta" y selecciona la cuenta específica',
         'Busca "Números de cuenta" o "Detalles de cuenta"',
-        'El número de ruta se mostrará en los detalles de la cuenta'
+        "El número de ruta se mostrará en los detalles de la cuenta",
       ],
       commonNumbers: [
-        { state: 'California', number: '121042882' },
-        { state: 'Texas', number: '111900659' },
-        { state: 'Florida', number: '063107513' },
-        { state: 'New York', number: '026012881' }
-      ]
-    }
+        { state: "California", number: "121042882" },
+        { state: "Texas", number: "111900659" },
+        { state: "Florida", number: "063107513" },
+        { state: "New York", number: "026012881" },
+      ],
+    },
   },
   {
-    id: 'citi',
-    name: 'Citibank',
+    id: "citi",
+    name: "Citibank",
     routingInfo: {
       steps: [
-        'Ingresa a tu cuenta de Citibank',
-        'Selecciona la cuenta para ver sus detalles',
+        "Ingresa a tu cuenta de Citibank",
+        "Selecciona la cuenta para ver sus detalles",
         'Busca en la sección "Información de cuenta"',
-        'El número de ruta estará listado junto con otra información bancaria'
+        "El número de ruta estará listado junto con otra información bancaria",
       ],
       commonNumbers: [
-        { state: 'New York', number: '021000089' },
-        { state: 'California', number: '321171184' },
-        { state: 'Florida', number: '266086554' },
-        { state: 'Illinois', number: '271070801' }
-      ]
-    }
+        { state: "New York", number: "021000089" },
+        { state: "California", number: "321171184" },
+        { state: "Florida", number: "266086554" },
+        { state: "Illinois", number: "271070801" },
+      ],
+    },
   },
   {
-    id: 'pnc',
-    name: 'PNC Bank',
+    id: "pnc",
+    name: "PNC Bank",
     routingInfo: {
       steps: [
-        'Inicia sesión en tu cuenta de PNC Bank',
-        'Selecciona la cuenta para ver los detalles',
+        "Inicia sesión en tu cuenta de PNC Bank",
+        "Selecciona la cuenta para ver los detalles",
         'Busca la sección "Routing and Account Numbers"',
-        'El número de ruta estará listado junto con otros detalles'
+        "El número de ruta estará listado junto con otros detalles",
       ],
       commonNumbers: [
-        { state: 'Pennsylvania', number: '031000053' },
-        { state: 'Ohio', number: '042000398' },
-        { state: 'Illinois', number: '071921891' },
-        { state: 'Florida', number: '267084199' }
-      ]
-    }
+        { state: "Pennsylvania", number: "031000053" },
+        { state: "Ohio", number: "042000398" },
+        { state: "Illinois", number: "071921891" },
+        { state: "Florida", number: "267084199" },
+      ],
+    },
   },
   {
-    id: 'usbank',
-    name: 'US Bank',
+    id: "usbank",
+    name: "US Bank",
     routingInfo: {
       steps: [
-        'Ingresa a tu cuenta de US Bank',
-        'Ve a la sección de detalles de la cuenta',
+        "Ingresa a tu cuenta de US Bank",
+        "Ve a la sección de detalles de la cuenta",
         'Busca "Routing Number"',
-        'El número de ruta estará visible en la parte superior de la información de la cuenta'
+        "El número de ruta estará visible en la parte superior de la información de la cuenta",
       ],
       commonNumbers: [
-        { state: 'California', number: '122105155' },
-        { state: 'Minnesota', number: '091000022' },
-        { state: 'Oregon', number: '123000220' },
-        { state: 'Washington', number: '125000105' }
-      ]
-    }
+        { state: "California", number: "122105155" },
+        { state: "Minnesota", number: "091000022" },
+        { state: "Oregon", number: "123000220" },
+        { state: "Washington", number: "125000105" },
+      ],
+    },
   },
   {
-    id: 'capitalone',
-    name: 'Capital One',
+    id: "capitalone",
+    name: "Capital One",
     routingInfo: {
       steps: [
-        'Accede a tu cuenta de Capital One en línea',
+        "Accede a tu cuenta de Capital One en línea",
         'Ve a la sección "Información de la cuenta"',
         'Busca la pestaña de "Routing and Account Details"',
-        'El número de ruta aparecerá en la parte superior'
+        "El número de ruta aparecerá en la parte superior",
       ],
       commonNumbers: [
-        { state: 'Texas', number: '111901014' },
-        { state: 'Virginia', number: '056073502' },
-        { state: 'Louisiana', number: '065000090' },
-        { state: 'New York', number: '051405515' }
-      ]
-    }
-  }
+        { state: "Texas", number: "111901014" },
+        { state: "Virginia", number: "056073502" },
+        { state: "Louisiana", number: "065000090" },
+        { state: "New York", number: "051405515" },
+      ],
+    },
+  },
 ];
 
 const RoutingNumber = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedBank, setSelectedBank] = useState(null);
-  
-  const filteredBanks = bankData.filter(bank =>
+
+  const filteredBanks = bankData.filter((bank) =>
     bank.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -156,7 +156,8 @@ const RoutingNumber = () => {
             Encuentra tu Número de Ruta Bancaria
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Selecciona tu banco y obtén instrucciones detalladas para encontrar tu número de ruta.
+            Selecciona tu banco y obtén instrucciones detalladas para encontrar
+            tu número de ruta.
           </p>
         </div>
 
@@ -178,17 +179,9 @@ const RoutingNumber = () => {
 
         {/* Lista de bancos con diseño moderno */}
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-          <Accordion 
-            type="single" 
-            collapsible 
-            className="divide-y divide-gray-100"
-          >
+          <Accordion type="single" collapsible className="divide-y-1">
             {filteredBanks.map((bank) => (
-              <AccordionItem 
-                key={bank.id} 
-                value={bank.id}
-                className="group"
-              >
+              <AccordionItem key={bank.id} value={bank.id} className="group">
                 <AccordionTrigger className="hover:no-underline px-6 py-4">
                   <div className="flex items-center gap-4 w-full">
                     <div className="flex-shrink-0 w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center">
@@ -210,7 +203,7 @@ const RoutingNumber = () => {
                       </h4>
                       <ol className="space-y-3">
                         {bank.routingInfo.steps.map((step, index) => (
-                          <li 
+                          <li
                             key={index}
                             className="flex items-start gap-3 text-gray-600"
                           >
@@ -231,12 +224,16 @@ const RoutingNumber = () => {
                       </h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {bank.routingInfo.commonNumbers.map((item, index) => (
-                          <div 
+                          <div
                             key={index}
                             className="bg-white rounded-lg border border-gray-200 p-4 hover:border-red-200 hover:shadow-md transition-all duration-200"
                           >
-                            <p className="font-medium text-gray-900 mb-1">{item.state}</p>
-                            <p className="text-red-600 font-mono text-lg">{item.number}</p>
+                            <p className="font-medium text-gray-900 mb-1">
+                              {item.state}
+                            </p>
+                            <p className="text-red-600 font-mono text-lg">
+                              {item.number}
+                            </p>
                           </div>
                         ))}
                       </div>
