@@ -286,6 +286,7 @@ const Login = () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const authUser = result.user;
+      const token = await authUser.getIdToken();
 
       // Verificar con el backend
       const { ok, data } = await api.post("/users/login", {
@@ -303,9 +304,6 @@ const Login = () => {
 
       // Si es admin, verificar permisos
       if (data.user.role === "admin") {
-        const token = await authUser.getIdToken();
-        console.log("Token para verificación admin:", token); // Para debugging
-
         try {
           const adminVerifyResponse = await fetch(
             `${import.meta.env.VITE_API_URL}/admin/verify`,
@@ -321,9 +319,6 @@ const Login = () => {
             setErrorMessage("No autorizado como administrador");
             return;
           }
-
-          const adminData = await adminVerifyResponse.json();
-          console.log("Admin verificado:", adminData); // Para debugging
         } catch (verifyError) {
           console.error("Error en verificación admin:", verifyError);
           await auth.signOut();
@@ -338,8 +333,6 @@ const Login = () => {
         name: data.user.name || authUser.displayName || "Usuario",
         role: data.user.role, // Asegurarnos de incluir el rol
       };
-
-      console.log("Usuario actualizado:", updatedUser); // Para debugging
 
       setUser(updatedUser);
       localStorage.setItem("authUser", JSON.stringify(updatedUser));

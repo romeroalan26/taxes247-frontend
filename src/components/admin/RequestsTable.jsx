@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import RequestDetailsModal from "./RequestDetailsModal";
 
-const RequestsTable = () => {
+const RequestsTable = ({ isDarkMode }) => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -23,7 +23,42 @@ const RequestsTable = () => {
   const [statusSteps, setStatusSteps] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [requestToDelete, setRequestToDelete] = useState(null);
+
+  // Añade estas funciones para manejar la eliminación
+  const handleDeleteClick = (request) => {
+    setRequestToDelete(request);
+    setShowDeleteDialog(true);
+  };
+
+  const handleDeleteConfirmed = async () => {
+    if (!requestToDelete) return;
+
+    try {
+      const token = await auth.currentUser?.getIdToken();
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/admin/requests/${requestToDelete._id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        loadRequests(); // Recargar la lista
+        setShowDeleteDialog(false);
+        setRequestToDelete(null);
+      } else {
+        console.error("Error al eliminar la solicitud");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   // Debounce para la búsqueda
   useEffect(() => {
@@ -89,14 +124,6 @@ const RequestsTable = () => {
   };
 
   const handleUpdateStatus = async (requestId, updateData) => {
-    if (!updateData.status || !updateData.description) {
-      console.error(
-        "Faltan datos necesarios para actualizar el estado:",
-        updateData
-      );
-      return;
-    }
-
     try {
       const token = await auth.currentUser?.getIdToken();
       const response = await fetch(
@@ -112,7 +139,7 @@ const RequestsTable = () => {
       );
 
       if (response.ok) {
-        loadRequests(); // Recargar solicitudes
+        await loadRequests(); // Recargar solicitudes
         handleCloseModal(); // Cerrar el modal
       } else {
         const errorData = await response.json();
@@ -218,49 +245,87 @@ const RequestsTable = () => {
         {Object.entries(stats).map(([status, count]) => (
           <div
             key={status}
-            className={`bg-white rounded-lg shadow p-4 ${
+            className={`rounded-lg shadow p-4 ${
               isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
             }`}
           >
-            <h3 className="font-semibold">{isDarkMode ? status : status}</h3>
-            <p className="text-2xl font-bold text-red-600">{count}</p>
+            <h3 className="font-semibold">{status}</h3>
+            <p
+              className={`text-2xl font-bold ${
+                isDarkMode ? "text-gray-200" : "text-red-600"
+              }`}
+            >
+              {count}
+            </p>
           </div>
         ))}
       </div>
 
       {/* Tabla */}
       <div
-        className={`bg-white shadow rounded-lg overflow-hidden ${
+        className={`shadow rounded-lg overflow-hidden ${
           isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
         }`}
       >
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className={`bg-gray-50 ${isDarkMode ? "bg-gray-700" : ""}`}>
+          <table className="min-w-full d">
+            <thead
+              className={`${
+                isDarkMode
+                  ? "ivide-y-0 divide-gray-600 bg-gray-700"
+                  : "ivide-y-0 divide-gray-200 bg-gray-50 "
+              }`}
+            >
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  className={`px-6 py-3 text-left text-xs font-medium ${
+                    isDarkMode ? "text-gray-100" : "text-gray-500"
+                  }  uppercase tracking-wider`}
+                >
                   Nº Confirmación
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  className={`px-6 py-3 text-left text-xs font-medium ${
+                    isDarkMode ? "text-gray-100" : "text-gray-500"
+                  }  uppercase tracking-wider`}
+                >
                   Cliente
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  className={`px-6 py-3 text-left text-xs font-medium ${
+                    isDarkMode ? "text-gray-100" : "text-gray-500"
+                  }  uppercase tracking-wider`}
+                >
                   Email
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  className={`px-6 py-3 text-left text-xs font-medium ${
+                    isDarkMode ? "text-gray-100" : "text-gray-500"
+                  }  uppercase tracking-wider`}
+                >
                   Estado
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  className={`px-6 py-3 text-left text-xs font-medium ${
+                    isDarkMode ? "text-gray-100" : "text-gray-500"
+                  }  uppercase tracking-wider`}
+                >
                   Última Actualización
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th
+                  className={`px-6 py-3 text-left text-xs font-medium ${
+                    isDarkMode ? "text-gray-100" : "text-gray-500"
+                  }  uppercase tracking-wider`}
+                >
                   Acciones
                 </th>
               </tr>
             </thead>
             <tbody
-              className={`bg-white divide-y divide-gray-200 ${
-                isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
+              className={`  ${
+                isDarkMode
+                  ? "divide-y divide-gray-600 bg-gray-800 text-white"
+                  : "divide-y divide-gray-200 bg-white text-gray-900"
               }`}
             >
               {requests.map((request) => (
@@ -303,13 +368,7 @@ const RequestsTable = () => {
                       <Eye className="h-5 w-5" />
                     </button>
                     <button
-                      className={`text-green-600 hover:text-green-400 ${
-                        isDarkMode ? "text-green-400" : "text-green-600"
-                      }`}
-                    >
-                      <Edit className="h-5 w-5" />
-                    </button>
-                    <button
+                      onClick={() => handleDeleteClick(request)}
                       className={`text-red-600 hover:text-red-400 ${
                         isDarkMode ? "text-red-400" : "text-red-600"
                       }`}
@@ -317,6 +376,19 @@ const RequestsTable = () => {
                       <Trash2 className="h-5 w-5" />
                     </button>
                   </td>
+
+                  {/* Añade el diálogo de eliminación al final del componente */}
+                  {showDeleteDialog && requestToDelete && (
+                    <DeleteConfirmationDialog
+                      requestId={requestToDelete._id}
+                      confirmationNumber={requestToDelete.confirmationNumber}
+                      onDelete={handleDeleteConfirmed}
+                      onClose={() => {
+                        setShowDeleteDialog(false);
+                        setRequestToDelete(null);
+                      }}
+                    />
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -325,7 +397,7 @@ const RequestsTable = () => {
 
         {/* Paginación */}
         <div
-          className={`bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 ${
+          className={` px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 ${
             isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white"
           }`}
         >

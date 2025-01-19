@@ -36,14 +36,12 @@ const AdminDashboard = () => {
 
   return (
     <div
-      className={`min-h-screen ${
-        isDarkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"
-      }`}
+      className={`min-h-screen ${isDarkMode ? "bg-gray-900" : " bg-gray-100 "}`}
     >
       {/* Header */}
       <header
-        className={`bg-white shadow-lg ${
-          isDarkMode ? "bg-gray-800 text-white" : "text-gray-900"
+        className={` shadow-lg ${
+          isDarkMode ? "bg-gray-800 text-white" : "text-white bg-white"
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -55,7 +53,13 @@ const AdminDashboard = () => {
                 }`}
               />
               <div>
-                <h1 className="text-2xl font-bold">Taxes247 Admin</h1>
+                <h1
+                  className={`text-2xl font-bold ${
+                    isDarkMode ? "text-white" : "text-black"
+                  }`}
+                >
+                  Taxes247 Admin
+                </h1>
                 <p
                   className={`text-sm ${
                     isDarkMode ? "text-gray-400" : "text-gray-600"
@@ -67,7 +71,11 @@ const AdminDashboard = () => {
             </div>
 
             <div className="hidden md:flex items-center space-x-4">
-              <span className={`text-sm ${isDarkMode ? "text-gray-400" : ""}`}>
+              <span
+                className={`text-sm ${
+                  isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}
+              >
                 {user?.email}
               </span>
               <button
@@ -180,8 +188,10 @@ const AdminDashboard = () => {
         {/* StatisticsPanel Component */}
         <div className="mb-8">
           <button
-            className={`bg-white rounded-lg shadow-md p-4 w-full flex items-center justify-between hover:bg-gray-100 ${
-              isDarkMode ? "bg-gray-800 text-white hover:bg-gray-700" : ""
+            className={` rounded-lg shadow-md p-4 w-full flex items-center justify-between hover:bg-gray-100 ${
+              isDarkMode
+                ? "bg-gray-800 text-white hover:bg-gray-700"
+                : "bg-white"
             }`}
             onClick={() => setIsStatisticsExpanded(!isStatisticsExpanded)}
           >

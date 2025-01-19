@@ -603,7 +603,7 @@ const CreateRequest = () => {
                       >
                         <option value="">Selecciona un método</option>
                         <option value="Zelle">Zelle</option>
-                        <option value="PayPal">PayPal</option>
+                        {/* <option value="PayPal">PayPal</option> */}
                         <option value="Transferencia bancaria">
                           Transferencia (RD o USA)
                         </option>

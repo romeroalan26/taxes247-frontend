@@ -28,7 +28,7 @@ const generateSampleData = () => {
       Rechazada: 12,
       Cancelada: 8,
     },
-    totalRevenue: 125000,
+    totalRevenue: 1000,
     completedRequests: 80,
     pendingRequests: 45,
   };
@@ -45,7 +45,7 @@ const initializeSampleData = () => {
   });
 };
 
-const StatisticsPanel = () => {
+const StatisticsPanel = ({ isDarkMode }) => {
   const [requestStatistics, setRequestStatistics] = useState({
     statusCounts: {},
     totalRevenue: 0,
@@ -83,10 +83,19 @@ const StatisticsPanel = () => {
           "#E53E3E", // Rechazada
           "#A0AEC0", // Cancelada
         ],
-        borderColor: "#fff",
-        borderWidth: 2,
+        borderColor: ` ${isDarkMode ? "#FFF" : "#FFFFFF"}`,
+        borderWidth: 1,
       },
     ],
+  };
+  const options = {
+    plugins: {
+      legend: {
+        labels: {
+          color: ` ${isDarkMode ? "white" : "gray"}`,
+        },
+      },
+    },
   };
 
   // Prepare data for the Bar Chart
@@ -107,24 +116,34 @@ const StatisticsPanel = () => {
       title: {
         display: true,
         text: "Solicitudes Completadas vs. Pendientes",
+        color: ` ${isDarkMode ? "white" : "gray"}`,
+      },
+      legend: {
+        labels: {
+          color: ` ${isDarkMode ? "white" : "gray"}`,
+        },
       },
     },
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-bold mb-6">Estadísticas Clave</h2>
+    <div className=" rounded-lg shadow-md p-6">
+      <h2 className="text-2xl font-bold mb-6 ">Estadísticas Clave</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <h3 className="text-lg font-medium mb-4">
+          <h3 className="text-lg font-medium mb-4 ">
             Progreso de Solicitudes por Estado
           </h3>
-          <Pie data={pieChartData} />
+          <Pie data={pieChartData} options={options} />
         </div>
 
         <div>
-          <h3 className="text-lg font-medium mb-4">
+          <h3
+            className={`text-lg font-medium mb-4 ${
+              isDarkMode ? "text-gray-200" : "text-gray-600"
+            }`}
+          >
             Solicitudes Completadas vs. Pendientes
           </h3>
           <Bar data={barChartData} options={barChartOptions} />
@@ -133,7 +152,7 @@ const StatisticsPanel = () => {
 
       <div className="mt-6">
         <h3 className="text-lg font-medium mb-2">Ingresos Totales</h3>
-        <p className="text-4xl font-bold text-red-500">
+        <p className="text-4xl font-bold text-green-600">
           {totalRevenue.toLocaleString("es-ES", {
             style: "currency",
             currency: "USD",
