@@ -23,13 +23,21 @@ const StatusUpdateForm = ({
     setError("");
 
     try {
+      // Encontrar el estado seleccionado y su descripción
+      const selectedStatusStep = statusSteps.find(
+        (step) => step.value === status
+      );
+      if (!selectedStatusStep) {
+        throw new Error(`Estado no válido: ${status}`);
+      }
+
       const updateData = {
         status: status,
         comment: description,
+        description: selectedStatusStep.description, // Añadimos la descripción del estado
         ...(status === "Pago programado" && paymentDate ? { paymentDate } : {}),
       };
 
-      // En lugar de hacer la llamada fetch aquí, pasamos los datos al padre
       await onUpdate(updateData);
       onClose();
     } catch (error) {
@@ -69,7 +77,7 @@ const StatusUpdateForm = ({
         >
           {availableStatuses.map((statusOption) => (
             <option key={statusOption.value} value={statusOption.value}>
-              {statusOption.description || statusOption.value}
+              {statusOption.value}
             </option>
           ))}
         </select>

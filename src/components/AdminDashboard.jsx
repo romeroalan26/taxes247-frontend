@@ -13,7 +13,7 @@ const AdminDashboard = () => {
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isStatisticsExpanded, setIsStatisticsExpanded] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
 
   const handleLogout = async () => {
     try {

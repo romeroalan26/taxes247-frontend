@@ -10,6 +10,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import RequestDetailsModal from "./RequestDetailsModal";
+import DeleteConfirmationDialog from "./modals/DeleteConfirmationDialog";
 
 const RequestsTable = ({ isDarkMode }) => {
   const [requests, setRequests] = useState([]);
@@ -376,19 +377,6 @@ const RequestsTable = ({ isDarkMode }) => {
                       <Trash2 className="h-5 w-5" />
                     </button>
                   </td>
-
-                  {/* Añade el diálogo de eliminación al final del componente */}
-                  {showDeleteDialog && requestToDelete && (
-                    <DeleteConfirmationDialog
-                      requestId={requestToDelete._id}
-                      confirmationNumber={requestToDelete.confirmationNumber}
-                      onDelete={handleDeleteConfirmed}
-                      onClose={() => {
-                        setShowDeleteDialog(false);
-                        setRequestToDelete(null);
-                      }}
-                    />
-                  )}
                 </tr>
               ))}
             </tbody>
@@ -450,6 +438,19 @@ const RequestsTable = ({ isDarkMode }) => {
             handleUpdateStatus(selectedRequest._id, updateData)
           }
           statusSteps={statusSteps}
+          isDarkMode={isDarkMode}
+        />
+      )}
+      {/* Añade el diálogo de eliminación al final del componente */}
+      {showDeleteDialog && requestToDelete && (
+        <DeleteConfirmationDialog
+          requestId={requestToDelete._id}
+          confirmationNumber={requestToDelete.confirmationNumber}
+          onDelete={handleDeleteConfirmed}
+          onClose={() => {
+            setShowDeleteDialog(false);
+            setRequestToDelete(null);
+          }}
           isDarkMode={isDarkMode}
         />
       )}
