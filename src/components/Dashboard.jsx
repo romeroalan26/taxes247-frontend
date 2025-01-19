@@ -243,7 +243,7 @@ const Dashboard = () => {
                   {loadingName || !userName ? (
                     <Skeleton width={200} />
                   ) : (
-                    `¡Bienvenido, ${userName}!`
+                    `¡Hola, ${userName}!`
                   )}
                 </h2>
                 <p className="text-red-100">
