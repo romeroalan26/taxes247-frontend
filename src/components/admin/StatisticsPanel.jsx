@@ -12,38 +12,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js/auto";
-
-// Function to generate sample data
-const generateSampleData = () => {
-  return {
-    statusCounts: {
-      "En revisión": 50,
-      "Documentación incompleta": 20,
-      "En proceso con el IRS": 30,
-      Aprobada: 40,
-      "Pago programado": 25,
-      Completada: 60,
-      "Pendiente de pago": 18,
-      "Pago recibido": 35,
-      Rechazada: 12,
-      Cancelada: 8,
-    },
-    totalRevenue: 1000,
-    completedRequests: 80,
-    pendingRequests: 45,
-  };
-};
-
-// Function to initialize sample data
-const initializeSampleData = () => {
-  // Simulate an API call
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const sampleData = generateSampleData();
-      resolve(sampleData);
-    }, 1000); // 1 second delay to simulate an API call
-  });
-};
+import api from "@/utils/api";
 
 const StatisticsPanel = ({ isDarkMode }) => {
   const [requestStatistics, setRequestStatistics] = useState({
@@ -52,14 +21,30 @@ const StatisticsPanel = ({ isDarkMode }) => {
     completedRequests: 0,
     pendingRequests: 0,
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Initialize sample data
-    const initializeData = async () => {
-      const sampleData = await initializeSampleData();
-      setRequestStatistics(sampleData);
+    const fetchStatistics = async () => {
+      try {
+        setLoading(true);
+        const response = await api.get("/admin/statistics");
+
+        setRequestStatistics({
+          statusCounts: response.data.statusCounts,
+          totalRevenue: response.data.totalRevenue,
+          completedRequests: response.data.completedRequests,
+          pendingRequests: response.data.pendingRequests,
+        });
+      } catch (err) {
+        console.error("Error fetching statistics:", err);
+        setError("No se pudieron cargar las estadísticas");
+      } finally {
+        setLoading(false);
+      }
     };
-    initializeData();
+
+    fetchStatistics();
   }, []);
 
   const { statusCounts, totalRevenue, completedRequests, pendingRequests } =
@@ -125,6 +110,22 @@ const StatisticsPanel = ({ isDarkMode }) => {
       },
     },
   };
+
+  if (loading) {
+    return (
+      <div className="rounded-lg shadow-md p-6">
+        <p>Cargando estadísticas...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-lg shadow-md p-6 text-red-500">
+        <p>{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className=" rounded-lg shadow-md p-6">
