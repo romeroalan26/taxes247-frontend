@@ -19,11 +19,11 @@ import {
 
 const getStatusColor = (status) => {
   switch (status) {
+    case "Pendiente":
+      return "bg-gray-100 text-gray-800";
     case "Recibido":
-      return "bg-gray-100 text-gray-800"; // Color para "Recibido"
-    case "Pendiente de pago":
-      return "bg-yellow-100 text-yellow-800";
-    case "Pago recibido":
+      return "bg-gray-100 text-gray-800";
+    case "Pago programado":
       return "bg-blue-100 text-blue-800";
     case "En revisión":
       return "bg-purple-100 text-purple-800";
@@ -31,12 +31,20 @@ const getStatusColor = (status) => {
       return "bg-orange-100 text-orange-800";
     case "En proceso con el IRS":
       return "bg-cyan-100 text-cyan-800";
+    case "Requiere verificación de la IRS":
+      return "bg-orange-200 text-orange-900";
     case "Aprobada":
       return "bg-green-100 text-green-800";
+    case "Pago recibido":
+      return "bg-blue-100 text-blue-800";
+    case "Deposito enviado":
+      return "bg-green-200 text-green-900";
     case "Completada":
       return "bg-green-200 text-green-900";
     case "Rechazada":
       return "bg-red-100 text-red-800";
+    case "Cancelada":
+      return "bg-red-200 text-red-900";
     default:
       return "bg-gray-100 text-gray-800";
   }
