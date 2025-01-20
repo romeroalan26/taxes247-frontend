@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate, Link } from "react-router-dom"; // Importa Link
+import { useNavigate, Link } from "react-router-dom";
 import { auth } from "../firebaseConfig";
 import { ClipLoader } from "react-spinners";
 import PricingModal from "./PricingModal";
@@ -83,10 +83,8 @@ const CreateRequest = () => {
   }, [navigate]);
 
   const formatSSN = (value) => {
-    // Elimina caracteres que no sean números
     const onlyNumbers = value.replace(/\D/g, "");
 
-    // Aplica el formato XXX-XX-XXXX
     if (onlyNumbers.length <= 3) return onlyNumbers;
     if (onlyNumbers.length <= 5)
       return `${onlyNumbers.slice(0, 3)}-${onlyNumbers.slice(3)}`;
@@ -98,10 +96,7 @@ const CreateRequest = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    // Aplica el formato solo al campo SSN
     const formattedValue = name === "ssn" ? formatSSN(value) : value;
-
     setFormData((prev) => ({ ...prev, [name]: formattedValue }));
   };
 
@@ -131,16 +126,13 @@ const CreateRequest = () => {
     setW2Files((prevFiles) => [...prevFiles, ...newFiles]);
     setFileErrors([]);
 
-    // Limpiar el input
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
 
-  // Modificar la función removeFile
   const removeFile = (index) => {
     setW2Files((prevFiles) => prevFiles.filter((_, i) => i !== index));
-    // Limpiar el input después de eliminar
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -165,24 +157,21 @@ const CreateRequest = () => {
   };
 
   const validateSSN = (value) => {
-    const ssnPattern = /^\d{3}-\d{2}-\d{4}$/; // Formato XXX-XX-XXXX
+    const ssnPattern = /^\d{3}-\d{2}-\d{4}$/;
     return ssnPattern.test(value);
   };
-  // Validar número de ruta (9 dígitos exactos)
+
   const validateRoutingNumber = (value) => {
-    return /^\d{9}$/.test(value); // Solo números y exactamente 9 dígitos
+    return /^\d{9,12}$/.test(value); // Modificado para aceptar entre 9 y 12 dígitos
   };
 
-  // Validar número de cuenta (5 a 17 dígitos)
   const validateAccountNumber = (value) => {
-    return /^\d{5,17}$/.test(value); // Solo números y entre 5 y 17 dígitos
+    return /^\d{5,17}$/.test(value);
   };
 
-  // Restricción mientras el usuario escribe
   const handleNumericInput = (e, maxLength) => {
     const { name, value } = e.target;
 
-    // Permitir solo números y limitar la longitud
     if (/^\d*$/.test(value) && value.length <= maxLength) {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
@@ -190,11 +179,8 @@ const CreateRequest = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Resetear errores
     setError("");
 
-    // Validaciones iniciales
     if (!validateSSN(formData.ssn)) {
       setError(
         "Por favor, ingresa un número de Social Security válido (XXX-XX-XXXX)."
@@ -203,7 +189,7 @@ const CreateRequest = () => {
     }
 
     if (!validateRoutingNumber(formData.routingNumber)) {
-      setError("El número de ruta debe tener exactamente 9 dígitos.");
+      setError("El número de ruta debe tener entre 9 y 12 dígitos."); // Mensaje actualizado
       return;
     }
 
@@ -236,7 +222,6 @@ const CreateRequest = () => {
       return;
     }
 
-    // Si todas las validaciones pasan, comienza la carga
     setIsLoading(true);
 
     try {
@@ -516,7 +501,7 @@ const CreateRequest = () => {
                         }
                         name="accountNumber"
                         value={formData.accountNumber}
-                        onChange={(e) => handleNumericInput(e, 17)} // Permite máximo 17 dígitos
+                        onChange={(e) => handleNumericInput(e, 17)}
                         className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 pr-10"
                         placeholder="123456789"
                         required
@@ -549,9 +534,9 @@ const CreateRequest = () => {
                         }
                         name="routingNumber"
                         value={formData.routingNumber}
-                        onChange={(e) => handleNumericInput(e, 9)} // Limita a 9 dígitos numéricos
+                        onChange={(e) => handleNumericInput(e, 12)} // Modificado para permitir hasta 12 dígitos
                         className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 pr-10"
-                        placeholder="XXXXXXXXX"
+                        placeholder="123456789"
                         required
                       />
                       <button
@@ -603,7 +588,6 @@ const CreateRequest = () => {
                       >
                         <option value="">Selecciona un método</option>
                         <option value="Zelle">Zelle</option>
-                        {/* <option value="PayPal">PayPal</option> */}
                         <option value="Transferencia bancaria">
                           Transferencia (RD o USA)
                         </option>
