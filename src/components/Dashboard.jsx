@@ -200,7 +200,7 @@ const Dashboard = () => {
             <div className="hidden md:block">
               <button
                 onClick={logout}
-                className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-700 focus:ring-white transition-colors duration-200"
+                className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium text-white bg-white/10 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-700 focus:ring-white transition-colors duration-200"
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 Cerrar Sesión

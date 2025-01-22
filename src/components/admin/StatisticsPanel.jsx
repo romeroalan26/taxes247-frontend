@@ -50,29 +50,39 @@ const StatisticsPanel = ({ isDarkMode }) => {
   const { statusCounts, totalRevenue, completedRequests, pendingRequests } =
     requestStatistics;
 
-  // Prepare data for the Pie Chart
+  // Primero definimos un mapeo fijo de estados a colores
+  const statusColors = {
+    "Documentación incompleta": "#FFEDD5",
+    Pendiente: "#CCCCCC",
+    Recibido: "#F3F4F6",
+    "En revisión": "#F3E8FF",
+    "En proceso con el IRS": "#CFFAFE",
+    Aprobada: "#DCFCE7",
+    "Requiere verificación de la IRS": "#FED7AA",
+    "Pago programado": "#DBEAFE",
+    "Deposito enviado": "#BBF7D0",
+    "Pago recibido": "#DBEAFE",
+    Completada: "#BBF7D0",
+    Rechazada: "#FEE2E2",
+    Cancelada: "#FECACA",
+  };
+
+  // Luego usamos este mapeo para generar el pieChartData
   const pieChartData = {
     labels: Object.keys(statusCounts),
     datasets: [
       {
         data: Object.values(statusCounts),
-        backgroundColor: [
-          "#4C51BF", // En revisión
-          "#F56565", // Documentación incompleta
-          "#805AD5", // En proceso con el IRS
-          "#48BB78", // Aprobada
-          "#4299E1", // Pago programado
-          "#38B2AC", // Completada
-          "#F6AD55", // Pendiente de pago
-          "#38B2AC", // Pago recibido
-          "#E53E3E", // Rechazada
-          "#A0AEC0", // Cancelada
-        ],
-        borderColor: ` ${isDarkMode ? "#FFF" : "#FFFFFF"}`,
+        // Generamos el array de colores basado en las etiquetas actuales
+        backgroundColor: Object.keys(statusCounts).map(
+          (status) => statusColors[status]
+        ),
+        borderColor: `${isDarkMode ? "#FFF" : "#FFFFFF"}`,
         borderWidth: 1,
       },
     ],
   };
+
   const options = {
     plugins: {
       legend: {
