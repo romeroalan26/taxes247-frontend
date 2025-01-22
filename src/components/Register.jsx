@@ -15,7 +15,7 @@ import {
   CheckCircle2,
   ArrowRight,
   Shield,
-  UserPlus
+  UserPlus,
 } from "lucide-react";
 
 const Register = () => {
@@ -23,7 +23,7 @@ const Register = () => {
     email: "",
     password: "",
     name: "",
-    phone: ""
+    phone: "",
   });
   const [errorMessage, setErrorMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
@@ -32,7 +32,7 @@ const Register = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleRegister = async (e) => {
@@ -57,7 +57,7 @@ const Register = () => {
             name: formData.name,
             email: formData.email,
             phone: formData.phone,
-            uid: firebaseUser.uid
+            uid: firebaseUser.uid,
           }),
         }
       );
@@ -71,16 +71,18 @@ const Register = () => {
       setIsSuccess(true);
     } catch (error) {
       console.error("Error en el registro:", error);
-      let errorMsg = "Ocurrió un error al registrar el usuario. Inténtalo de nuevo.";
-      
+      let errorMsg =
+        "Ocurrió un error al registrar el usuario. Inténtalo de nuevo.";
+
       if (error.code === "auth/email-already-in-use") {
         errorMsg = "El correo electrónico ya está en uso. Intenta con otro.";
       } else if (error.code === "auth/weak-password") {
-        errorMsg = "La contraseña es demasiado débil. Debe tener al menos 6 caracteres.";
+        errorMsg =
+          "La contraseña es demasiado débil. Debe tener al menos 6 caracteres.";
       } else if (error.code === "auth/invalid-email") {
         errorMsg = "El correo electrónico no es válido.";
       }
-      
+
       setErrorMessage(errorMsg);
     } finally {
       setIsLoading(false);
@@ -106,8 +108,10 @@ const Register = () => {
                 Login
               </button>
               <button
-                onClick={() => window.open("https://wa.me/18094039726", "_blank")}
-                className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-white text-red-600 hover:bg-red-50 transition-colors duration-200"
+                onClick={() =>
+                  window.open("https://wa.me/18094039726", "_blank")
+                }
+                className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-white/10 hover:bg-white/20 transition-colors duration-200"
               >
                 <MessageCircle className="w-4 h-4 mr-2" />
                 Contacto
@@ -130,7 +134,8 @@ const Register = () => {
                   <h2 className="text-2xl font-bold">Crear Cuenta</h2>
                 </div>
                 <p className="text-red-100">
-                  Únete a nosotros y comienza a gestionar tus declaraciones de impuestos de manera segura y eficiente.
+                  Únete a nosotros y comienza a gestionar tus declaraciones de
+                  impuestos de manera segura y eficiente.
                 </p>
               </div>
 
@@ -260,36 +265,35 @@ const Register = () => {
               <h3 className="text-xl font-bold text-gray-900 mb-6">
                 Beneficios de registrarte
               </h3>
-              
+
               <div className="space-y-6">
                 {[
                   {
                     icon: <Shield className="w-6 h-6 text-red-600" />,
                     title: "Seguridad Garantizada",
-                    description: "Tu información está protegida con los más altos estándares de seguridad."
+                    description:
+                      "Tu información está protegida con los más altos estándares de seguridad.",
                   },
                   {
                     icon: <CheckCircle2 className="w-6 h-6 text-red-600" />,
                     title: "Proceso Simplificado",
-                    description: "Gestiona tus declaraciones de impuestos de manera fácil y eficiente."
+                    description:
+                      "Gestiona tus declaraciones de impuestos de manera fácil y eficiente.",
                   },
                   {
                     icon: <MessageCircle className="w-6 h-6 text-red-600" />,
                     title: "Soporte Personalizado",
-                    description: "Acceso a asistencia dedicada por WhatsApp y correo electrónico."
-                  }
+                    description:
+                      "Acceso a asistencia dedicada por WhatsApp y correo electrónico.",
+                  },
                 ].map((benefit, index) => (
                   <div key={index} className="flex items-start space-x-4">
-                    <div className="flex-shrink-0">
-                      {benefit.icon}
-                    </div>
+                    <div className="flex-shrink-0">{benefit.icon}</div>
                     <div>
                       <h4 className="text-lg font-medium text-gray-900">
                         {benefit.title}
                       </h4>
-                      <p className="text-gray-600">
-                        {benefit.description}
-                      </p>
+                      <p className="text-gray-600">{benefit.description}</p>
                     </div>
                   </div>
                 ))}
@@ -317,8 +321,8 @@ const Register = () => {
                 correo electrónico con un enlace para activar tu cuenta.
               </p>
               <p className="text-sm text-gray-500 mb-6">
-                Por favor, revisa tu bandeja de entrada y sigue las instrucciones
-                del correo para completar la activación.
+                Por favor, revisa tu bandeja de entrada y sigue las
+                instrucciones del correo para completar la activación.
               </p>
               <button
                 onClick={() => {
