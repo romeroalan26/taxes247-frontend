@@ -112,7 +112,7 @@ const AdminDashboard = () => {
                 className={`p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                   isDarkMode
                     ? "hover:bg-gray-700 focus:ring-offset-gray-800 focus:ring-gray-600"
-                    : "hover:bg-gray-200 focus:ring-offset-red-700 focus:ring-red-600"
+                    : "hover:bg-gray-200 focus:ring-offset-red-700 focus:ring-red-600 text-red-600"
                 }`}
               >
                 <Menu className="h-6 w-6" />
@@ -141,7 +141,7 @@ const AdminDashboard = () => {
                   className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium ${
                     isDarkMode
                       ? "text-white hover:bg-gray-700"
-                      : "text-white hover:bg-red-700"
+                      : "text-black hover:bg-red-700 "
                   }`}
                 >
                   <LogOut className="h-4 w-4 inline mr-2" />
@@ -151,8 +151,8 @@ const AdminDashboard = () => {
                   onClick={toggleDarkMode}
                   className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium ${
                     isDarkMode
-                      ? "text-white hover:bg-gray-700"
-                      : "text-white hover:bg-red-700"
+                      ? "text-white hover:bg-gray-700 "
+                      : "text-black hover:bg-red-700 "
                   }`}
                 >
                   {isDarkMode ? (
