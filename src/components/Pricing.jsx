@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+
 import { useNavigate } from "react-router-dom";
 import {
   FileText,
@@ -8,10 +9,12 @@ import {
   ChevronRight,
   Clock,
   PhoneCall,
+  Menu,
 } from "lucide-react";
 
 const Pricing = () => {
   const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -23,7 +26,9 @@ const Pricing = () => {
               <FileText className="w-8 h-8" />
               <h1 className="text-2xl font-bold">Taxes247</h1>
             </div>
-            <div className="flex space-x-4">
+
+            {/* Botones para pantallas medianas y grandes */}
+            <div className="hidden md:flex space-x-4">
               <button
                 onClick={() => navigate("/")}
                 className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-white/10 hover:bg-white/20 transition-colors duration-200"
@@ -41,7 +46,43 @@ const Pricing = () => {
                 Contacto
               </button>
             </div>
+
+            {/* Botón hamburguesa para móvil */}
+            <div className="md:hidden">
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="p-2 rounded-md hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-700 focus:ring-white"
+              >
+                <Menu className="w-6 h-6" />
+              </button>
+            </div>
           </div>
+
+          {/* Menú móvil */}
+          {isMenuOpen && (
+            <div className="md:hidden pb-3 space-y-1">
+              <button
+                onClick={() => {
+                  navigate("/");
+                  setIsMenuOpen(false);
+                }}
+                className="block w-full px-3 py-2 rounded-md text-base font-medium text-white hover:bg-red-800 text-left"
+              >
+                <LogIn className="w-4 h-4 inline mr-2" />
+                Login
+              </button>
+              <button
+                onClick={() => {
+                  window.open("https://wa.me/18094039726", "_blank");
+                  setIsMenuOpen(false);
+                }}
+                className="block w-full px-3 py-2 rounded-md text-base font-medium text-white hover:bg-red-800 text-left"
+              >
+                <MessageCircle className="w-4 h-4 inline mr-2" />
+                Contacto
+              </button>
+            </div>
+          )}
         </div>
       </header>
 
