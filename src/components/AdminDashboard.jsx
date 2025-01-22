@@ -141,7 +141,7 @@ const AdminDashboard = () => {
                   className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium ${
                     isDarkMode
                       ? "text-white hover:bg-gray-700"
-                      : "text-black hover:bg-red-700 "
+                      : "text-black hover:bg-red-700 hover:text-white"
                   }`}
                 >
                   <LogOut className="h-4 w-4 inline mr-2" />
@@ -152,7 +152,7 @@ const AdminDashboard = () => {
                   className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium ${
                     isDarkMode
                       ? "text-white hover:bg-gray-700 "
-                      : "text-black hover:bg-red-700 "
+                      : "text-black hover:bg-red-700 hover:text-white "
                   }`}
                 >
                   {isDarkMode ? (
