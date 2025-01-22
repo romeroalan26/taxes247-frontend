@@ -1,12 +1,12 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { 
-  X, 
-  CheckCircle2, 
-  MessageCircle, 
+import {
+  X,
+  CheckCircle2,
+  MessageCircle,
   DollarSign,
-  ShieldCheck
+  ShieldCheck,
 } from "lucide-react";
 
 const PricingModal = ({ onSelect, onClose }) => {
@@ -15,7 +15,7 @@ const PricingModal = ({ onSelect, onClose }) => {
 
   useEffect(() => {
     if (!loading && !user) {
-      navigate('/', { replace: true });
+      navigate("/", { replace: true });
     }
   }, [user, loading, navigate]);
 
@@ -26,16 +26,16 @@ const PricingModal = ({ onSelect, onClose }) => {
   const features = [
     {
       icon: <ShieldCheck className="h-5 w-5 text-red-500" />,
-      text: "Declaración de impuestos completa"
+      text: "Declaración de impuestos completa",
     },
     {
       icon: <MessageCircle className="h-5 w-5 text-red-500" />,
-      text: "Soporte por WhatsApp y correo"
+      text: "Soporte por WhatsApp y correo",
     },
     {
       icon: <DollarSign className="h-5 w-5 text-red-500" />,
-      text: "Pagas cuando te depositen los Federales"
-    }
+      text: "Pagas cuando te depositen los Federales",
+    },
   ];
 
   return (
@@ -87,7 +87,7 @@ const PricingModal = ({ onSelect, onClose }) => {
               <span>Comenzar Ahora</span>
               <CheckCircle2 className="w-4 h-4" />
             </button>
-            
+
             <button
               onClick={onClose}
               className="w-full bg-gray-100 text-gray-700 py-2.5 px-4 rounded-lg hover:bg-gray-200 transition-colors"
