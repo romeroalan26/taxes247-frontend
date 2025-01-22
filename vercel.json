@@ -5,7 +5,7 @@
     { "source": "/forgot-password/:path*", "destination": "/" },
     { "source": "/create-request/:path*", "destination": "/" },
     { "source": "/request/:path*", "destination": "/" },
-    { "source": "/routing-number/:path*", "destination": "/" }, 
-    { "source": "/:path*", "destination": "/" } 
+    { "source": "/routing-number/:path*", "destination": "/" },
+    { "source": "/:path*", "destination": "/" }
   ]
 }

@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, sendPasswordResetEmail } from "../firebaseConfig";
-import { 
-  ArrowLeft, 
-  Mail, 
-  MessageCircle, 
+import {
+  ArrowLeft,
+  Mail,
+  MessageCircle,
   Send,
   AlertCircle,
-  CheckCircle2
+  CheckCircle2,
 } from "lucide-react";
 
 const ForgotPassword = () => {
@@ -74,7 +74,8 @@ const ForgotPassword = () => {
               Recuperar Contraseña
             </h2>
             <p className="text-gray-600 mt-2">
-              Ingresa tu correo electrónico y te enviaremos las instrucciones para restablecer tu contraseña
+              Ingresa tu correo electrónico y te enviaremos las instrucciones
+              para restablecer tu contraseña
             </p>
           </div>
 
@@ -118,11 +119,11 @@ const ForgotPassword = () => {
               type="submit"
               disabled={isLoading}
               className={`w-full flex items-center justify-center px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors ${
-                isLoading ? 'opacity-75 cursor-not-allowed' : ''
+                isLoading ? "opacity-75 cursor-not-allowed" : ""
               }`}
             >
               <Send className="h-5 w-5 mr-2" />
-              {isLoading ? 'Enviando...' : 'Enviar Instrucciones'}
+              {isLoading ? "Enviando..." : "Enviar Instrucciones"}
             </button>
 
             <div className="text-center">

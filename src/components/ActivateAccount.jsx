@@ -9,7 +9,7 @@ import {
   ArrowRight,
   Shield,
   Mail,
-  LogIn
+  LogIn,
 } from "lucide-react";
 
 const ActivateAccount = () => {
@@ -41,7 +41,9 @@ const ActivateAccount = () => {
       } catch (error) {
         console.error("Error al activar la cuenta:", error);
         setStatus("error");
-        setMessage("Ocurrió un error inesperado. Inténtalo de nuevo más tarde.");
+        setMessage(
+          "Ocurrió un error inesperado. Inténtalo de nuevo más tarde."
+        );
       }
     };
 
@@ -67,28 +69,28 @@ const ActivateAccount = () => {
           icon: <Shield className="w-12 h-12 text-blue-600 animate-pulse" />,
           title: "Verificando cuenta",
           message: "Procesando tu solicitud...",
-          color: "blue"
+          color: "blue",
         };
       case "success":
         return {
           icon: <CheckCircle2 className="w-12 h-12 text-green-600" />,
           title: "¡Cuenta activada!",
           message: message,
-          color: "green"
+          color: "green",
         };
       case "error":
         return {
           icon: <XCircle className="w-12 h-12 text-red-600" />,
           title: "Error de activación",
           message: message,
-          color: "red"
+          color: "red",
         };
       default:
         return {
           icon: <AlertCircle className="w-12 h-12 text-gray-600" />,
           title: "Estado desconocido",
           message: "Algo salió mal",
-          color: "gray"
+          color: "gray",
         };
     }
   };
@@ -110,10 +112,15 @@ const ActivateAccount = () => {
       <main className="max-w-lg mx-auto px-4 py-12">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           {/* Icon Banner */}
-          <div className={`p-8 flex flex-col items-center justify-center bg-gradient-to-r
-            ${status === 'success' ? 'from-green-500 to-green-600' : 
-              status === 'error' ? 'from-red-500 to-red-600' : 
-              'from-blue-500 to-blue-600'} 
+          <div
+            className={`p-8 flex flex-col items-center justify-center bg-gradient-to-r
+            ${
+              status === "success"
+                ? "from-green-500 to-green-600"
+                : status === "error"
+                ? "from-red-500 to-red-600"
+                : "from-blue-500 to-blue-600"
+            } 
             text-white`}
           >
             <div className="bg-white rounded-full p-3 mb-4">
@@ -144,7 +151,10 @@ const ActivateAccount = () => {
                       <div className="bg-gray-50 rounded-lg p-4">
                         <p className="text-sm text-gray-600">
                           Redirigiendo al login en{" "}
-                          <span className="font-bold text-red-600">{countdown}</span> segundos
+                          <span className="font-bold text-red-600">
+                            {countdown}
+                          </span>{" "}
+                          segundos
                         </p>
                       </div>
                       <button
@@ -173,7 +183,7 @@ const ActivateAccount = () => {
         {/* Additional Info */}
         <div className="mt-8 text-center">
           <p className="text-sm text-gray-500">
-            ¿Necesitas ayuda? {" "}
+            ¿Necesitas ayuda?{" "}
             <a
               href="https://wa.me/18094039726"
               target="_blank"

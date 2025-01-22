@@ -9,7 +9,7 @@ import {
   EmailAuthProvider,
   fetchSignInMethodsForEmail,
   linkWithCredential,
-  createUserWithEmailAndPassword
+  createUserWithEmailAndPassword,
 } from "firebase/auth";
 
 // Configuración de Firebase (reemplaza con tus datos)
@@ -38,5 +38,5 @@ export {
   EmailAuthProvider,
   fetchSignInMethodsForEmail,
   linkWithCredential,
-  createUserWithEmailAndPassword
+  createUserWithEmailAndPassword,
 };
