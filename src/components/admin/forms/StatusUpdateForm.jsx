@@ -115,8 +115,8 @@ const StatusUpdateForm = ({
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className={`w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 ${
-            isDarkMode ? "bg-gray-600 text-gray-100" : "bg-white text-white"
+          className={`w-full p-1 rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 ${
+            isDarkMode ? "bg-gray-600 text-gray-100" : "bg-white text-gray-900"
           }`}
           rows="3"
           required
