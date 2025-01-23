@@ -52,19 +52,19 @@ const StatisticsPanel = ({ isDarkMode }) => {
 
   // Primero definimos un mapeo fijo de estados a colores
   const statusColors = {
-    "Documentación incompleta": "#FFEDD5",
-    Pendiente: "#CCCCCC",
-    Recibido: "#F3F4F6",
-    "En revisión": "#F3E8FF",
-    "En proceso con el IRS": "#CFFAFE",
-    Aprobada: "#DCFCE7",
-    "Requiere verificación de la IRS": "#FED7AA",
-    "Pago programado": "#DBEAFE",
-    "Deposito enviado": "#BBF7D0",
-    "Pago recibido": "#DBEAFE",
-    Completada: "#BBF7D0",
-    Rechazada: "#FEE2E2",
-    Cancelada: "#FECACA",
+    "Documentación incompleta": "#9A3412", // text-orange-800
+    Pendiente: "#1F2937", // text-gray-800
+    Recibido: "#1F2937", // text-gray-800
+    "En revisión": "#5B21B6", // text-purple-800
+    "En proceso con el IRS": "#164E63", // text-cyan-800
+    Aprobada: "#166534", // text-green-800
+    "Requiere verificación de la IRS": "#7C2D12", // text-orange-900
+    "Pago programado": "#1E40AF", // text-blue-800
+    "Deposito enviado": "#14532D", // text-green-900
+    "Pago recibido": "#1E40AF", // text-blue-800
+    Completada: "#14532D", // text-green-900
+    Rechazada: "#991B1B", // text-red-800
+    Cancelada: "#7F1D1D", // text-red-900
   };
 
   // Luego usamos este mapeo para generar el pieChartData
