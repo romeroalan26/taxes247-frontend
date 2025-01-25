@@ -280,7 +280,7 @@ const CreateRequest = () => {
             <div className="flex items-center">
               <button
                 onClick={() => navigate("/dashboard")}
-                className="mr-4 p-2 inline-flex items-center px-4 py-2 rounded-md text-sm font-medium text-white bg-white/10 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-700 focus:ring-white transition-colors duration-200"
+                className="mr-4 p-2 inline-flex items-center px-4 py-2 rounded-md text-sm font-medium text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-700 focus:ring-white transition-colors duration-200"
               >
                 <ArrowLeft className="h-5 w-5" />
               </button>
