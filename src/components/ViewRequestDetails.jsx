@@ -61,11 +61,22 @@ const InfoCard = ({ icon: Icon, label, value }) => (
 const StatusBadge = ({ status }) => {
   const getStatusStyle = () => {
     const styles = {
-      Recibido: "bg-blue-100 text-blue-800",
-      "En revisión": "bg-yellow-100 text-yellow-800",
-      Aprobada: "bg-green-100 text-green-800",
-      Completada: "bg-green-200 text-green-900",
-      Rechazada: "bg-red-100 text-red-800",
+      Pendiente: "bg-gray-100 text-gray-800 border border-gray-200",
+      Recibido: "bg-gray-100 text-gray-800 border border-gray-200",
+      "En revisión": "bg-purple-100 text-purple-800 border border-purple-200",
+      "Documentación incompleta":
+        "bg-orange-100 text-orange-800 border border-orange-200",
+      "En proceso con el IRS":
+        "bg-cyan-100 text-cyan-800 border border-cyan-200",
+      Aprobada: "bg-green-100 text-green-800 border border-green-200",
+      "Requiere verificación de la IRS":
+        "bg-orange-200 text-orange-900 border border-orange-300",
+      "Pago programado": "bg-blue-100 text-blue-800 border border-blue-200",
+      "Deposito enviado": "bg-green-200 text-green-900 border border-green-300",
+      "Pago recibido": "bg-blue-100 text-blue-800 border border-blue-200",
+      Completada: "bg-green-200 text-green-900 border border-green-300",
+      Rechazada: "bg-red-100 text-red-800 border border-red-200",
+      Cancelada: "bg-red-200 text-red-900 border border-red-300",
     };
     return styles[status] || "bg-gray-100 text-gray-800";
   };
