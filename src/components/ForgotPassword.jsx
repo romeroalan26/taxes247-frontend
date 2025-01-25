@@ -9,6 +9,7 @@ import {
   AlertCircle,
   CheckCircle2,
   Menu,
+  BellRing,
   FileText,
 } from "lucide-react";
 
@@ -207,25 +208,24 @@ const ForgotPassword = () => {
             </div>
 
             {/* Ayuda Adicional */}
-            <div className="mt-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
+            <div className="mt-8 p-4 bg-red-50 rounded-lg">
               <div className="flex items-start gap-3">
-                <div className="bg-white p-2 rounded-lg">
-                  <MessageCircle className="w-5 h-5 text-red-600" />
-                </div>
+                <BellRing className="w-6 h-6 text-red-600 flex-shrink-0 mt-1" />
                 <div>
-                  <h4 className="font-medium text-gray-900">
-                    ¿Necesitas ayuda?
+                  <h4 className="font-medium text-red-900">
+                    ¿Necesitas más ayuda?
                   </h4>
-                  <p className="mt-1 text-sm text-gray-600">
-                    Nuestro equipo está disponible 24/7 para asistirte
-                    <button
-                      onClick={() =>
-                        window.open("https://wa.me/18094039726", "_blank")
-                      }
+                  <p className="mt-1 text-sm text-red-700">
+                    Nuestro equipo está disponible para responder todas tus
+                    preguntas.
+                    <a
+                      href="https://wa.me/18094039726"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="block mt-2 text-red-600 hover:text-red-700 font-medium"
                     >
                       Contactar soporte →
-                    </button>
+                    </a>
                   </p>
                 </div>
               </div>

@@ -12,6 +12,7 @@ import ForgotPassword from "./components/ForgotPassword";
 import ViewRequestDetails from "./components/ViewRequestDetails";
 import Pricing from "./components/Pricing";
 import RoutingNumber from "./components/RoutingNumber";
+import FAQ from "./components/FAQ";
 
 // Componente mejorado para proteger rutas privadas
 const ProtectedRoute = ({ children }) => {
@@ -113,6 +114,7 @@ function App() {
               </PublicRoute>
             }
           />
+          <Route path="/faq" element={<FAQ />} />
 
           {/* Rutas de usuario normal */}
           <Route

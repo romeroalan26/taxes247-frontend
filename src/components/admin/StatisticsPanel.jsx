@@ -30,9 +30,16 @@ const StatisticsPanel = ({ isDarkMode }) => {
         setLoading(true);
         const response = await api.get("/admin/statistics");
 
+        const totalActiveRequests = Object.entries(response.data.statusCounts)
+          .filter(
+            ([status]) => status !== "Cancelada" || status !== "Rechazada"
+          )
+          .reduce((sum, [_, count]) => sum + count, 0);
+
         setRequestStatistics({
           statusCounts: response.data.statusCounts,
           totalRevenue: response.data.totalRevenue,
+          expectedRevenue: totalActiveRequests * 60,
           completedRequests: response.data.completedRequests,
           pendingRequests: response.data.pendingRequests,
         });
@@ -47,8 +54,13 @@ const StatisticsPanel = ({ isDarkMode }) => {
     fetchStatistics();
   }, []);
 
-  const { statusCounts, totalRevenue, completedRequests, pendingRequests } =
-    requestStatistics;
+  const {
+    statusCounts,
+    totalRevenue,
+    completedRequests,
+    pendingRequests,
+    expectedRevenue,
+  } = requestStatistics;
 
   // Primero definimos un mapeo fijo de estados a colores
   const statusColors = {
@@ -161,14 +173,25 @@ const StatisticsPanel = ({ isDarkMode }) => {
         </div>
       </div>
 
-      <div className="mt-6">
-        <h3 className="text-lg font-medium mb-2">Ingresos Totales</h3>
-        <p className="text-4xl font-bold text-green-600">
-          {totalRevenue.toLocaleString("es-ES", {
-            style: "currency",
-            currency: "USD",
-          })}
-        </p>
+      <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <h3 className="text-lg font-medium mb-2">Ingresos Totales</h3>
+          <p className="text-4xl font-bold text-green-600">
+            {totalRevenue.toLocaleString("es-ES", {
+              style: "currency",
+              currency: "USD",
+            })}
+          </p>
+        </div>
+        <div>
+          <h3 className="text-lg font-medium mb-2">Ingreso Esperado</h3>
+          <p className="text-4xl font-bold text-blue-600">
+            {requestStatistics.expectedRevenue.toLocaleString("es-ES", {
+              style: "currency",
+              currency: "USD",
+            })}
+          </p>
+        </div>
       </div>
     </div>
   );
