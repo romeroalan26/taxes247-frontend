@@ -31,7 +31,7 @@ const FAQ = () => {
     {
       icon: <Calendar className="w-5 h-5 text-red-600" />,
       question:
-        "¿Cuándo inicia el proceso de declaración de impuestos del 2024?",
+        "¿Cuándo inicia el proceso de declaración de impuestos del 2025?",
       answer:
         "El proceso de declaración de impuestos para el año fiscal 2024 comienza el 29 de enero de 2025, según el calendario oficial del IRS.",
     },
@@ -40,7 +40,7 @@ const FAQ = () => {
       question:
         "¿Cuál es la fecha límite para presentar mi declaración de impuestos?",
       answer:
-        "La fecha límite para presentar tu declaración de impuestos en 2024 es el 15 de abril. Asegúrate de enviarla antes para evitar penalidades.",
+        "La fecha límite para presentar tu declaración de impuestos en 2025 es el 15 de abril. Asegúrate de enviarla antes para evitar penalidades.",
     },
     {
       icon: <DollarSign className="w-5 h-5 text-red-600" />,
@@ -52,7 +52,7 @@ const FAQ = () => {
       icon: <HelpCircle className="w-5 h-5 text-red-600" />,
       question: "¿Qué documentos necesito para mi declaración de impuestos?",
       answer:
-        "Debes reunir formularios W-2, 1099, identificación personal, información bancaria y cualquier otra documentación relacionada con ingresos y deducciones.",
+        "Debes reunir formularios W-2, identificación personal, información bancaria y cualquier otra documentación relacionada con ingresos y deducciones.",
     },
     {
       icon: <BellRing className="w-5 h-5 text-red-600" />,
@@ -61,18 +61,7 @@ const FAQ = () => {
       answer:
         "Si presentas tu declaración después del 15 de abril sin haber solicitado una extensión, podrías enfrentar multas e intereses sobre los impuestos no pagados.",
     },
-    {
-      icon: <Calendar className="w-5 h-5 text-red-600" />,
-      question: "¿Cuáles son las fechas límite para presentar mis impuestos?",
-      answer:
-        "Generalmente, la fecha límite para presentar tus impuestos es el 15 de abril de cada año. Si cae en un fin de semana o feriado, se extiende al siguiente día hábil.",
-    },
-    {
-      icon: <DollarSign className="w-5 h-5 text-red-600" />,
-      question: "¿Qué debo hacer si no puedo pagar mis impuestos?",
-      answer:
-        "Si no puedes pagar tus impuestos, presenta tu declaración a tiempo para evitar multas adicionales y solicita un plan de pagos al IRS.",
-    },
+
     {
       icon: <Clock className="w-5 h-5 text-red-600" />,
       question: "¿Qué sucede si presento mis impuestos tarde?",
@@ -92,22 +81,10 @@ const FAQ = () => {
         "Tu cuenta puede ser identificada como Checking (Corriente) o Savings (Ahorros) en los detalles de tu cuenta bancaria en línea o en tus estados de cuenta.",
     },
     {
-      icon: <CreditCard className="w-5 h-5 text-red-600" />,
-      question: "¿Puedo usar tarjetas de crédito para el pago?",
-      answer:
-        "Sí, aceptamos pagos mediante tarjetas de crédito. Selecciona la opción al momento de realizar el pago.",
-    },
-    {
       icon: <PhoneCall className="w-5 h-5 text-red-600" />,
       question: "¿Qué hacer si tengo problemas al iniciar sesión?",
       answer:
-        "Contáctanos a través de nuestro soporte telefónico o correo electrónico para ayudarte.",
-    },
-    {
-      icon: <HelpCircle className="w-5 h-5 text-red-600" />,
-      question: "¿Dónde puedo encontrar más información?",
-      answer:
-        "Visita nuestra página de preguntas frecuentes o contáctanos para más detalles.",
+        "Contáctanos a través de WhatsApp al 809-403-9726 o correo electrónico taxes247.help@gmail.com para ayudarte.",
     },
     {
       icon: <DollarSign className="w-5 h-5 text-red-600" />,
@@ -131,7 +108,7 @@ const FAQ = () => {
       icon: <FileSearch className="w-5 h-5 text-red-600" />,
       question: "¿Cuánto me va a devolver el IRS?",
       answer:
-        "El monto que el IRS te devolverá depende de tu situación fiscal. Para estudiantes J1, generalmente solo reciben una parte del reembolso Federal, y algunos estados no ofrecen reembolsos estatales. Cada caso es único y se analiza durante el proceso de declaración. El monto total te será notificado a través de WhatsApp una vez finalicemos tu declaración de impuestos.",
+        "El monto que el IRS te devolverá depende de tu situación fiscal. Para estudiantes J1, generalmente solo reciben una parte del reembolso Federal, dejando fuera el Social Security y el Medicare, por ejemplo. Algunos estados no ofrecen reembolsos estatales. Cada caso es único y se analiza durante el proceso de declaración. El monto total te será notificado a través de WhatsApp una vez finalicemos tu declaración de impuestos.",
     },
     {
       icon: <AlertCircle className="w-5 h-5 text-red-600" />,
@@ -158,6 +135,12 @@ const FAQ = () => {
           IRS puede tardar hasta 90 días en asignar una fecha de depósito.
         </span>
       ),
+    },
+    {
+      icon: <HelpCircle className="w-5 h-5 text-red-600" />,
+      question: "¿Cómo funciona el proceso de verificación de identidad?",
+      answer:
+        "El proceso de verificación de identidad asegura que seas quien dices ser antes de acceder a servicios o procesar declaraciones de impuestos. Se requiere una identificación oficial y, en algunos casos, completar pasos adicionales como una selfie o una videollamada.",
     },
   ];
 
