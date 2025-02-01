@@ -192,7 +192,12 @@ const RequestDetailsModal = ({
                         isDarkMode ? "text-gray-100" : "text-gray-900"
                       }`}
                     >
-                      {new Date(request.birthDate).toLocaleDateString()}
+                      {request.birthDate
+                        ? new Date(request.birthDate).toLocaleDateString(
+                            "en-EN",
+                            { timeZone: "UTC" }
+                          )
+                        : "Fecha no disponible"}
                     </dd>
                   </div>
                   <div>

@@ -366,9 +366,10 @@ const Dashboard = () => {
                             <div className="text-sm text-gray-600 flex items-center">
                               <Calendar className="w-4 h-4 mr-2 text-green-600" />
                               Fecha de pago:{" "}
-                              {new Date(
-                                request.paymentDate
-                              ).toLocaleDateString()}
+                              {new Date(request.paymentDate).toLocaleDateString(
+                                "es-ES",
+                                { timeZone: "UTC" }
+                              )}
                             </div>
                           )}
 
