@@ -154,18 +154,20 @@ const FAQ = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header */}
-      <header className="bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg">
+      <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-2">
-              <FileText className="w-8 h-8" />
-              <h1 className="text-2xl font-bold">Taxes247</h1>
+            <div className="flex items-center space-x-3">
+              <FileText className="w-8 h-8 text-red-600" />
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent">
+                Taxes247
+              </h1>
             </div>
             <button
               onClick={() => navigate("/")}
-              className="px-4 py-2 bg-white/10 rounded-md hover:bg-white/20 transition-colors"
+              className="px-4 py-2 rounded-full text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 transition-all duration-200"
             >
               Login
             </button>
@@ -173,17 +175,17 @@ const FAQ = () => {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-white rounded-xl shadow-lg p-8">
-          <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <HelpCircle className="w-6 h-6 text-red-600" />
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
+        <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
+          <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 flex items-center gap-2">
+            <HelpCircle className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
             Preguntas Frecuentes
           </h3>
           {/* Barra de búsqueda */}
-          <div className="relative mb-6">
+          <div className="relative mb-4 sm:mb-6">
             <input
               type="text"
-              className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+              className="w-full px-4 py-2.5 sm:py-3 pl-10 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
               placeholder="Buscar preguntas..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -192,34 +194,36 @@ const FAQ = () => {
           </div>
 
           {/* Lista de FAQs */}
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {filteredFaqs.length > 0 ? (
               filteredFaqs.map((faq, index) => (
                 <details
                   key={index}
-                  className="group bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+                  className="group bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200"
                 >
                   <summary className="flex items-center gap-3 p-4 font-medium cursor-pointer list-none">
                     {faq.icon}
-                    {faq.question}
+                    <span className="text-sm sm:text-base">{faq.question}</span>
                     <ChevronRight className="w-5 h-5 ml-auto transition-transform group-open:rotate-90" />
                   </summary>
-                  <div className="px-4 pb-4 text-gray-600">{faq.answer}</div>
+                  <div className="px-4 pb-4 text-sm sm:text-base text-gray-600">
+                    {faq.answer}
+                  </div>
                 </details>
               ))
             ) : (
-              <p className="text-center text-gray-500">
+              <p className="text-center text-gray-500 text-sm sm:text-base">
                 No se encontraron preguntas relacionadas.
               </p>
             )}
           </div>
 
           {/* Banner de contacto */}
-          <div className="mt-8 p-4 bg-red-50 rounded-lg">
+          <div className="mt-6 sm:mt-8 p-4 sm:p-6 bg-red-50 rounded-xl">
             <div className="flex items-start gap-3">
-              <BellRing className="w-6 h-6 text-red-600 flex-shrink-0 mt-1" />
+              <BellRing className="w-5 h-5 sm:w-6 sm:h-6 text-red-600 flex-shrink-0 mt-1" />
               <div>
-                <h4 className="font-medium text-red-900">
+                <h4 className="font-medium text-red-900 text-sm sm:text-base">
                   ¿Necesitas más ayuda?
                 </h4>
                 <p className="mt-1 text-sm text-red-700">
@@ -229,7 +233,7 @@ const FAQ = () => {
                     href="https://wa.me/18094039726"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block mt-2 text-red-600 hover:text-red-700 font-medium"
+                    className="block mt-2 text-red-600 hover:text-red-700 font-medium transition-colors duration-200"
                   >
                     Contactar soporte →
                   </a>

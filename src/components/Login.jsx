@@ -221,28 +221,30 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header Mejorado */}
-      <header className="bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg">
+      <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-2">
-              <FileText className="w-8 h-8" />
-              <h1 className="text-2xl font-bold">Taxes247</h1>
+            <div className="flex items-center space-x-3">
+              <FileText className="w-8 h-8 text-red-600" />
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent">
+                Taxes247
+              </h1>
             </div>
 
             {/* Botones para pantallas medianas y grandes */}
             <div className="hidden md:flex space-x-4">
               <button
                 onClick={() => navigate("/pricing")}
-                className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-white/10 hover:bg-white/20 transition-colors duration-200"
+                className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 transition-all duration-200"
               >
                 <DollarSign className="w-4 h-4 mr-2" />
                 Precios
               </button>
               <button
                 onClick={() => navigate("/faq")}
-                className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-white/10 hover:bg-white/20 transition-colors duration-200"
+                className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 transition-all duration-200"
               >
                 <HelpCircle className="w-4 h-4 mr-2" />
                 FAQ
@@ -251,7 +253,7 @@ const Login = () => {
                 onClick={() =>
                   window.open("https://wa.me/18094039726", "_blank")
                 }
-                className="inline-flex items-center px-4 py-2 rounded-md text-sm font-medium bg-white/10 hover:bg-white/20 transition-colors duration-200"
+                className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 transition-all duration-200"
               >
                 <MessageCircle className="w-4 h-4 mr-2" />
                 Contacto
@@ -262,9 +264,9 @@ const Login = () => {
             <div className="md:hidden">
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-2 rounded-md hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-700 focus:ring-white"
+                className="p-2 rounded-full hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-200 transition-all duration-200"
               >
-                <Menu className="w-6 h-6" />
+                <Menu className="w-6 h-6 text-gray-700" />
               </button>
             </div>
           </div>
@@ -277,7 +279,7 @@ const Login = () => {
                   navigate("/pricing");
                   setIsMenuOpen(false);
                 }}
-                className="block w-full px-3 py-2 rounded-md text-base font-medium text-white hover:bg-red-800 text-left"
+                className="block w-full px-3 py-2 rounded-lg text-base font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 text-left transition-all duration-200"
               >
                 <DollarSign className="w-4 h-4 inline mr-2" />
                 Precios
@@ -287,7 +289,7 @@ const Login = () => {
                   navigate("/faq");
                   setIsMenuOpen(false);
                 }}
-                className="block w-full px-3 py-2 rounded-md text-base font-medium text-white hover:bg-red-800 text-left"
+                className="block w-full px-3 py-2 rounded-lg text-base font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 text-left transition-all duration-200"
               >
                 <HelpCircle className="w-4 h-4 inline mr-2" />
                 FAQ
@@ -297,7 +299,7 @@ const Login = () => {
                   window.open("https://wa.me/18094039726", "_blank");
                   setIsMenuOpen(false);
                 }}
-                className="block w-full px-3 py-2 rounded-md text-base font-medium text-white hover:bg-red-800 text-left"
+                className="block w-full px-3 py-2 rounded-lg text-base font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 text-left transition-all duration-200"
               >
                 <MessageCircle className="w-4 h-4 inline mr-2" />
                 Contacto
@@ -307,36 +309,35 @@ const Login = () => {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex flex-col lg:flex-row gap-12 items-start">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
           {/* Sección de Login */}
           <div className="flex-1 w-full max-w-md mx-auto">
             {/* Banner de Bienvenida */}
-            <div className="bg-gradient-to-r from-red-600 to-red-700 rounded-t-xl p-8 text-white">
-              <h2 className="text-3xl font-bold mb-4">
+            <div className="bg-gradient-to-br from-red-600 to-red-700 rounded-2xl p-6 sm:p-8 text-white shadow-xl">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-2 sm:mb-4">
                 ¡Bienvenido a Taxes247!
               </h2>
-              <p className="text-red-100">
+              <p className="text-red-100 text-base sm:text-lg">
                 Simplifica y asegura tu proceso de declaración de impuestos con
-                nuestra plataforma. Gestiona tus solicitudes de manera fácil y
-                eficiente.
+                nuestra plataforma.
               </p>
             </div>
 
             {/* Formulario */}
-            <div className="bg-white rounded-b-xl shadow-lg p-8">
-              <form onSubmit={handleLogin} className="space-y-6">
+            <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 -mt-4 relative z-10">
+              <form onSubmit={handleLogin} className="space-y-4 sm:space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
                     Correo Electrónico
                   </label>
-                  <div className="relative">
+                  <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Mail className="h-5 w-5 text-gray-400" />
+                      <Mail className="h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors duration-200" />
                     </div>
                     <input
                       type="email"
-                      className="block w-full pl-10 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      className="block w-full pl-10 px-4 py-2.5 sm:py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
                       placeholder="correo@ejemplo.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -346,16 +347,16 @@ const Login = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
                     Contraseña
                   </label>
-                  <div className="relative">
+                  <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Lock className="h-5 w-5 text-gray-400" />
+                      <Lock className="h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors duration-200" />
                     </div>
                     <input
                       type="password"
-                      className="block w-full pl-10 px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                      className="block w-full pl-10 px-4 py-2.5 sm:py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
                       placeholder="********"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -365,18 +366,18 @@ const Login = () => {
                 </div>
 
                 {errorMessage && (
-                  <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-lg">
-                    <AlertCircle className="w-5 h-5" />
+                  <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 sm:p-4 rounded-xl border border-red-100">
+                    <AlertCircle className="w-5 h-5 flex-shrink-0" />
                     <p className="text-sm">{errorMessage}</p>
                   </div>
                 )}
 
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-3 px-4 rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-200 flex items-center justify-center gap-2"
-                  disabled={isEmailLoading} // Cambiado de isLoading a isEmailLoading
+                  className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-2.5 sm:py-3 px-4 rounded-xl hover:from-red-700 hover:to-red-800 transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+                  disabled={isEmailLoading}
                 >
-                  {isEmailLoading ? ( // Cambiado de isLoading a isEmailLoading
+                  {isEmailLoading ? (
                     <ClipLoader size={20} color="#ffffff" />
                   ) : (
                     <>
@@ -386,7 +387,7 @@ const Login = () => {
                   )}
                 </button>
 
-                <div className="relative my-6">
+                <div className="relative my-4 sm:my-6">
                   <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-gray-200"></div>
                   </div>
@@ -400,10 +401,10 @@ const Login = () => {
                 <button
                   type="button"
                   onClick={handleGoogleLogin}
-                  className="w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors duration-200 flex items-center justify-center gap-2"
-                  disabled={isGoogleLoading} // Cambiado de isLoading a isGoogleLoading
+                  className="w-full bg-white border border-gray-200 text-gray-700 py-2.5 sm:py-3 px-4 rounded-xl hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:shadow-md"
+                  disabled={isGoogleLoading}
                 >
-                  {isGoogleLoading ? ( // Cambiado de isLoading a isGoogleLoading
+                  {isGoogleLoading ? (
                     <ClipLoader size={20} color="#000000" />
                   ) : (
                     <>
@@ -431,21 +432,21 @@ const Login = () => {
                   )}
                 </button>
 
-                <div className="space-y-4 text-center">
+                <div className="space-y-3 sm:space-y-4 text-center">
                   <button
                     type="button"
                     onClick={() => navigate("/forgot-password")}
-                    className="text-sm text-red-600 hover:text-red-700"
+                    className="text-sm text-red-600 hover:text-red-700 font-medium transition-colors duration-200"
                   >
                     ¿Olvidaste tu contraseña?
                   </button>
 
-                  <div className="text-sm">
+                  <div className="text-sm text-gray-600">
                     ¿No tienes una cuenta?{" "}
                     <button
                       type="button"
                       onClick={() => navigate("/register")}
-                      className="font-medium text-red-600 hover:text-red-700"
+                      className="font-medium text-red-600 hover:text-red-700 transition-colors duration-200"
                     >
                       Regístrate aquí
                     </button>

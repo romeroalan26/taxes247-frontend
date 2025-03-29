@@ -23,6 +23,7 @@ import {
   X,
   AlertCircle,
   AlertTriangle,
+  ArrowRight,
 } from "lucide-react";
 
 const statusSteps = [
@@ -46,6 +47,7 @@ const CreateRequest = () => {
     email: "",
     phone: "",
     accountNumber: "",
+    confirmAccountNumber: "",
     bankName: "",
     accountType: "",
     routingNumber: "",
@@ -199,6 +201,13 @@ const CreateRequest = () => {
       return;
     }
 
+    if (formData.accountNumber !== formData.confirmAccountNumber) {
+      setError(
+        "Los números de cuenta no coinciden. Por favor, verifica que sean iguales."
+      );
+      return;
+    }
+
     if (!selectedPlan) {
       setError("Por favor selecciona un plan antes de continuar.");
       return;
@@ -280,16 +289,16 @@ const CreateRequest = () => {
             <div className="flex items-center">
               <button
                 onClick={() => navigate("/dashboard")}
-                className="mr-4 p-2 inline-flex items-center px-4 py-2 rounded-md text-sm font-medium text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-700 focus:ring-white transition-colors duration-200"
+                className="mr-4 p-2 inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-700 focus:ring-white transition-all duration-200"
               >
                 <ArrowLeft className="h-5 w-5" />
               </button>
-              <h1 className="text-xl font-semibold text-white">
-                Nueva Solicitud
-              </h1>
+              <div className="flex flex-col">
+                <h1 className="text-xl font-semibold text-white">Atras</h1>
+              </div>
             </div>
             {selectedPlan && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-xl backdrop-blur-sm">
                 <DollarSign className="h-5 w-5 text-white" />
                 <span className="text-sm font-medium text-white">
                   Plan {selectedPlan.serviceLevel} - ${selectedPlan.price}
@@ -312,14 +321,19 @@ const CreateRequest = () => {
           <div className="space-y-8">
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Información Personal */}
-              <div className="bg-white rounded-xl shadow-sm p-6 border">
-                <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
-                  <User className="h-5 w-5 text-red-600 mr-2" />
-                  Información Personal
-                </h2>
+              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-all duration-200">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                    <div className="w-8 h-8 flex items-center justify-center bg-red-50 rounded-lg mr-3">
+                      <User className="h-5 w-5 text-red-600" />
+                    </div>
+                    Información Personal
+                  </h2>
+                  <div className="text-xs text-gray-500">Paso 1 de 3</div>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* SSN */}
-                  <div>
+                  <div className="group">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Número de Social Security
                     </label>
@@ -329,55 +343,55 @@ const CreateRequest = () => {
                         name="ssn"
                         value={formData.ssn}
                         onChange={handleChange}
-                        className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 pr-10"
+                        className="block w-full px-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 pr-10 transition-all duration-200 group-hover:border-red-300"
                         placeholder="123-45-6789"
                         required
                       />
                       <button
                         type="button"
-                        className="absolute inset-y-0 right-0 px-3 flex items-center"
+                        className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 group-hover:text-gray-600 transition-colors"
                         onClick={() => toggleFieldVisibility("ssn")}
                       >
                         {showSensitiveFields.ssn ? (
-                          <EyeOff className="h-5 w-5 text-gray-400" />
+                          <EyeOff className="h-5 w-5" />
                         ) : (
-                          <Eye className="h-5 w-5 text-gray-400" />
+                          <Eye className="h-5 w-5" />
                         )}
                       </button>
                     </div>
                   </div>
 
                   {/* Fecha de Nacimiento */}
-                  <div>
+                  <div className="group">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Fecha de Nacimiento
                     </label>
                     <div className="relative">
-                      <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                      <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
                       <input
                         type="date"
                         name="birthDate"
                         value={formData.birthDate}
                         onChange={handleChange}
-                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                        className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 group-hover:border-red-300"
                         required
                       />
                     </div>
                   </div>
 
                   {/* Nombre Completo */}
-                  <div className="md:col-span-2">
+                  <div className="md:col-span-2 group">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Nombre Completo
                     </label>
                     <div className="relative">
-                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
                       <input
                         type="text"
                         name="fullName"
                         value={formData.fullName}
                         onChange={handleChange}
-                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                        className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 group-hover:border-red-300"
                         placeholder="Juan Pérez"
                         required
                       />
@@ -385,7 +399,7 @@ const CreateRequest = () => {
                   </div>
 
                   {/* Email */}
-                  <div>
+                  <div className="group">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Correo Electrónico
                     </label>
@@ -395,25 +409,25 @@ const CreateRequest = () => {
                         type="email"
                         name="email"
                         value={formData.email}
-                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-gray-50"
+                        className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl bg-gray-50"
                         readOnly
                       />
                     </div>
                   </div>
 
                   {/* Teléfono */}
-                  <div>
+                  <div className="group">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Teléfono
                     </label>
                     <div className="relative">
-                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
                       <input
                         type="tel"
                         name="phone"
                         value={formData.phone}
                         onChange={handleChange}
-                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                        className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 group-hover:border-red-300"
                         placeholder="809-555-1234"
                         required
                       />
@@ -421,24 +435,24 @@ const CreateRequest = () => {
                   </div>
 
                   {/* Dirección */}
-                  <div className="md:col-span-2">
+                  <div className="md:col-span-2 group">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Dirección en USA
                     </label>
                     <div className="space-y-2">
                       <div className="relative">
-                        <Home className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                        <Home className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
                         <input
                           type="text"
                           name="address"
                           value={formData.address}
                           onChange={handleChange}
-                          className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                          className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 group-hover:border-red-300"
                           placeholder="123 Main St, Anytown, CA"
                           required
                         />
                       </div>
-                      <div className="flex items-start space-x-2 bg-red-50 p-4 rounded-lg border-l-4 border-red-500">
+                      <div className="flex items-start space-x-2 bg-red-50 p-4 rounded-xl border-l-4 border-red-500">
                         <AlertCircle className="h-6 w-6 text-red-500 flex-shrink-0 mt-0.5" />
                         <div className="flex flex-col space-y-1">
                           <p className="font-medium text-red-800">
@@ -446,22 +460,20 @@ const CreateRequest = () => {
                             reembolso
                           </p>
                           <p className="text-sm text-red-700">
-                            Debes proporcionar una dirección confiable en
-                            Estados Unidos donde puedas recibir correspondencia
-                            del IRS. Si el IRS envía alguna carta y no puede ser
-                            recibida, esto podría resultar en la pérdida de tu
-                            reembolso de impuestos.
+                            El IRS podría enviar correspondencia importante a
+                            esta dirección. Si no puede ser recibida, podrías
+                            perder tu reembolso.
                           </p>
                           <ul className="text-sm text-red-700 mt-2 space-y-1">
                             <li className="flex items-center">
                               <CheckCircle2 className="h-4 w-4 mr-2 text-red-500" />
-                              Asegúrate que sea la dirección de un familiar o
-                              persona de confianza
+                              Usa una dirección de un familiar o persona de
+                              confianza
                             </li>
                             <li className="flex items-center">
                               <CheckCircle2 className="h-4 w-4 mr-2 text-red-500" />
-                              Confirma que esa persona podrá recibir y enviarte
-                              cualquier correspondencia
+                              Asegúrate que puedan recibir y enviarte la
+                              correspondencia
                             </li>
                           </ul>
                         </div>
@@ -472,25 +484,30 @@ const CreateRequest = () => {
               </div>
 
               {/* Información Bancaria */}
-              <div className="bg-white rounded-xl shadow-sm p-6 border">
-                <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
-                  <Building className="h-5 w-5 text-red-600 mr-2" />
-                  Información Bancaria
-                </h2>
+              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-all duration-200">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                    <div className="w-8 h-8 flex items-center justify-center bg-red-50 rounded-lg mr-3">
+                      <Building className="h-5 w-5 text-red-600" />
+                    </div>
+                    Información Bancaria
+                  </h2>
+                  <div className="text-xs text-gray-500">Paso 2 de 3</div>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Nombre del Banco */}
-                  <div className="md:col-span-2">
+                  <div className="md:col-span-2 group">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Nombre del Banco
                     </label>
                     <div className="relative">
-                      <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                      <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
                       <input
                         type="text"
                         name="bankName"
                         value={formData.bankName}
                         onChange={handleChange}
-                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                        className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 group-hover:border-red-300"
                         placeholder="Bank of America"
                         required
                       />
@@ -498,17 +515,17 @@ const CreateRequest = () => {
                   </div>
 
                   {/* Tipo de Cuenta */}
-                  <div>
+                  <div className="group">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Tipo de Cuenta
                     </label>
                     <div className="relative">
-                      <Wallet className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                      <Wallet className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
                       <select
                         name="accountType"
                         value={formData.accountType}
                         onChange={handleChange}
-                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 appearance-none"
+                        className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 appearance-none transition-all duration-200 group-hover:border-red-300"
                         required
                       >
                         <option value="">Selecciona un tipo</option>
@@ -519,7 +536,7 @@ const CreateRequest = () => {
                   </div>
 
                   {/* Número de Cuenta */}
-                  <div>
+                  <div className="group">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Número de Cuenta
                     </label>
@@ -533,26 +550,51 @@ const CreateRequest = () => {
                         name="accountNumber"
                         value={formData.accountNumber}
                         onChange={(e) => handleNumericInput(e, 17)}
-                        className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 pr-10"
+                        className="block w-full px-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 pr-10 transition-all duration-200 group-hover:border-red-300"
                         placeholder="123456789"
                         required
                       />
                       <button
                         type="button"
-                        className="absolute inset-y-0 right-0 px-3 flex items-center"
+                        className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 group-hover:text-gray-600 transition-colors"
                         onClick={() => toggleFieldVisibility("accountNumber")}
                       >
                         {showSensitiveFields.accountNumber ? (
-                          <EyeOff className="h-5 w-5 text-gray-400" />
+                          <EyeOff className="h-5 w-5" />
                         ) : (
-                          <Eye className="h-5 w-5 text-gray-400" />
+                          <Eye className="h-5 w-5" />
                         )}
                       </button>
                     </div>
                   </div>
 
+                  {/* Confirmar Número de Cuenta */}
+                  <div className="group">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Confirmar Número de Cuenta
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={
+                          showSensitiveFields.accountNumber
+                            ? "text"
+                            : "password"
+                        }
+                        name="confirmAccountNumber"
+                        value={formData.confirmAccountNumber}
+                        onChange={(e) => handleNumericInput(e, 17)}
+                        className="block w-full px-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 pr-10 transition-all duration-200 group-hover:border-red-300"
+                        placeholder="123456789"
+                        required
+                      />
+                    </div>
+                    <p className="mt-1 text-sm text-gray-500">
+                      Ingresa el número de cuenta nuevamente para confirmar
+                    </p>
+                  </div>
+
                   {/* Número de Ruta */}
-                  <div>
+                  <div className="group">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Número de Ruta
                     </label>
@@ -565,20 +607,20 @@ const CreateRequest = () => {
                         }
                         name="routingNumber"
                         value={formData.routingNumber}
-                        onChange={(e) => handleNumericInput(e, 12)} // Modificado para permitir hasta 12 dígitos
-                        className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 pr-10"
+                        onChange={(e) => handleNumericInput(e, 12)}
+                        className="block w-full px-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 pr-10 transition-all duration-200 group-hover:border-red-300"
                         placeholder="123456789"
                         required
                       />
                       <button
                         type="button"
-                        className="absolute inset-y-0 right-0 px-3 flex items-center"
+                        className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 group-hover:text-gray-600 transition-colors"
                         onClick={() => toggleFieldVisibility("routingNumber")}
                       >
                         {showSensitiveFields.routingNumber ? (
-                          <EyeOff className="h-5 w-5 text-gray-400" />
+                          <EyeOff className="h-5 w-5" />
                         ) : (
-                          <Eye className="h-5 w-5 text-gray-400" />
+                          <Eye className="h-5 w-5" />
                         )}
                       </button>
                     </div>
@@ -587,9 +629,10 @@ const CreateRequest = () => {
                         to="/routing-number"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-red-600 hover:text-red-700"
+                        className="text-sm text-red-600 hover:text-red-700 flex items-center gap-1"
                       >
-                        ¿Cómo encontrar este número?
+                        <span>¿Cómo encontrar este número?</span>
+                        <ArrowRight className="h-3 w-3" />
                       </Link>
                     </div>
                   </div>
@@ -597,24 +640,29 @@ const CreateRequest = () => {
               </div>
 
               {/* Documentos y Pago */}
-              <div className="bg-white rounded-xl shadow-sm p-6 border">
-                <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
-                  <FileText className="h-5 w-5 text-red-600 mr-2" />
-                  Documentos y Método de Pago
-                </h2>
+              <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-all duration-200">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                    <div className="w-8 h-8 flex items-center justify-center bg-red-50 rounded-lg mr-3">
+                      <FileText className="h-5 w-5 text-red-600" />
+                    </div>
+                    Documentos y Método de Pago
+                  </h2>
+                  <div className="text-xs text-gray-500">Paso 3 de 3</div>
+                </div>
                 <div className="space-y-6">
                   {/* Método de Pago */}
-                  <div>
+                  <div className="group">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Método de Pago
                     </label>
                     <div className="relative">
-                      <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                      <CreditCard className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors" />
                       <select
                         name="paymentMethod"
                         value={formData.paymentMethod}
                         onChange={handleChange}
-                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 appearance-none"
+                        className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 appearance-none transition-all duration-200 group-hover:border-red-300"
                         required
                       >
                         <option value="">Selecciona un método</option>
@@ -633,15 +681,15 @@ const CreateRequest = () => {
                     </label>
                     <div className="mt-1 flex flex-col space-y-4">
                       {/* Área de drop y selección */}
-                      <div className="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-red-500 transition-colors">
+                      <div className="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-red-500 transition-all duration-200 group">
                         <div className="space-y-1 text-center">
-                          <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                          <Upload className="mx-auto h-12 w-12 text-gray-400 group-hover:text-red-500 transition-colors" />
                           <div className="flex text-sm text-gray-600 justify-center">
                             <label
                               htmlFor="file-upload"
                               className="relative cursor-pointer"
                             >
-                              <span className="rounded-md font-medium text-red-600 hover:text-red-500">
+                              <span className="rounded-xl font-medium text-red-600 hover:text-red-500">
                                 Seleccionar archivos
                               </span>
                               <input
@@ -669,21 +717,26 @@ const CreateRequest = () => {
                           {w2Files.map((file, index) => (
                             <div
                               key={index}
-                              className="flex items-center justify-between bg-gray-50 p-3 rounded-lg border border-gray-200"
+                              className="flex items-center justify-between bg-gray-50 p-3 rounded-xl border border-gray-200 hover:border-red-300 transition-all duration-200"
                             >
-                              <div className="flex items-center space-x-3">
-                                <FileText className="h-5 w-5 text-gray-400" />
-                                <span className="text-sm text-gray-600 truncate max-w-xs">
-                                  {file.name}
-                                </span>
-                                <span className="text-xs text-gray-400">
-                                  ({(file.size / (1024 * 1024)).toFixed(2)} MB)
-                                </span>
+                              <div className="flex items-center space-x-3 min-w-0 flex-1">
+                                <FileText className="h-5 w-5 text-gray-400 flex-shrink-0" />
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center space-x-2">
+                                    <span className="text-sm text-gray-600 truncate">
+                                      {file.name}
+                                    </span>
+                                    <span className="text-xs text-gray-400 whitespace-nowrap">
+                                      ({(file.size / (1024 * 1024)).toFixed(2)}{" "}
+                                      MB)
+                                    </span>
+                                  </div>
+                                </div>
                               </div>
                               <button
                                 type="button"
                                 onClick={() => removeFile(index)}
-                                className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition-colors"
+                                className="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition-all duration-200 ml-3 flex-shrink-0"
                               >
                                 <X className="h-5 w-5" />
                               </button>
@@ -713,7 +766,7 @@ const CreateRequest = () => {
 
               {/* Mensaje de Error General */}
               {error && (
-                <div className="bg-red-50 text-red-600 p-4 rounded-lg text-sm flex items-center">
+                <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm flex items-center">
                   <AlertCircle className="h-5 w-5 mr-2" />
                   {error}
                 </div>
@@ -722,7 +775,7 @@ const CreateRequest = () => {
               {/* Botón de Enviar */}
               <button
                 type="submit"
-                className="w-full flex items-center justify-center px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+                className="w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -741,10 +794,12 @@ const CreateRequest = () => {
         {/* Modal de Confirmación */}
         {isModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl shadow-xl p-8 max-w-md w-full m-4">
+            <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full m-4 transform transition-all">
               <div className="text-center">
                 <div className="flex justify-center mb-4">
-                  <CheckCircle2 className="h-12 w-12 text-green-500" />
+                  <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center">
+                    <CheckCircle2 className="h-8 w-8 text-green-500" />
+                  </div>
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-4">
                   ¡Solicitud enviada!
@@ -753,7 +808,7 @@ const CreateRequest = () => {
                   Tu solicitud se ha enviado correctamente. Hemos enviado un
                   correo electrónico con tu número de confirmación.
                 </p>
-                <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                <div className="bg-gray-50 rounded-xl p-4 mb-6">
                   <p className="text-sm text-gray-600 mb-1">
                     Número de Confirmación
                   </p>
@@ -763,7 +818,7 @@ const CreateRequest = () => {
                 </div>
                 <button
                   onClick={() => navigate("/dashboard")}
-                  className="w-full inline-flex justify-center items-center px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+                  className="w-full inline-flex justify-center items-center px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                 >
                   Ir al Dashboard
                 </button>

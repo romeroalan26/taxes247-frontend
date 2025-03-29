@@ -2,7 +2,16 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { LogOut, Menu, List, Clock, FileText, Moon, Sun } from "lucide-react";
+import {
+  LogOut,
+  Menu,
+  List,
+  Clock,
+  FileText,
+  Moon,
+  Sun,
+  ChevronRight,
+} from "lucide-react";
 import RequestsTable from "./admin/RequestsTable";
 import StatisticsPanel from "./admin/StatisticsPanel";
 
@@ -14,6 +23,7 @@ const AdminDashboard = () => {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isStatisticsExpanded, setIsStatisticsExpanded] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [totalRequests, setTotalRequests] = useState(0);
 
   const handleLogout = async () => {
     try {
@@ -39,128 +49,154 @@ const AdminDashboard = () => {
       className={`min-h-screen ${isDarkMode ? "bg-gray-900" : " bg-gray-100 "}`}
     >
       {/* Header */}
-      <header
-        className={` shadow-lg ${
-          isDarkMode ? "bg-gray-800 text-white" : "text-white bg-white"
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <FileText
-                className={`h-8 w-8 ${
-                  isDarkMode ? "text-white" : "text-red-600"
-                }`}
-              />
-              <div>
-                <h1
-                  className={`text-2xl font-bold ${
-                    isDarkMode ? "text-white" : "text-black"
-                  }`}
-                >
-                  Taxes247 Admin
-                </h1>
-                <p
-                  className={`text-sm ${
-                    isDarkMode ? "text-gray-400" : "text-gray-600"
-                  }`}
-                >
-                  Panel de Administración
-                </p>
+      <header className={`${isDarkMode ? "bg-gray-800" : "bg-white"}`}>
+        <div className="max-w-7xl mx-auto">
+          <div
+            className={`relative z-10 border-b ${
+              isDarkMode ? "border-gray-700" : "border-gray-100"
+            } border-opacity-50`}
+          >
+            <div className="px-4 sm:px-6 lg:px-8">
+              <div className="flex h-16 items-center justify-between gap-4">
+                {/* Logo y Título */}
+                <div className="flex items-center gap-4">
+                  <div
+                    className={`flex items-center justify-center h-10 w-10 rounded-xl ${
+                      isDarkMode ? "bg-gray-700" : "bg-red-50"
+                    }`}
+                  >
+                    <FileText
+                      className={`h-5 w-5 ${
+                        isDarkMode ? "text-red-400" : "text-red-600"
+                      }`}
+                    />
+                  </div>
+                  <div>
+                    <h1
+                      className={`text-xl font-semibold ${
+                        isDarkMode ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      Taxes247 Admin
+                    </h1>
+                    <p
+                      className={`text-sm ${
+                        isDarkMode ? "text-gray-400" : "text-gray-600"
+                      }`}
+                    >
+                      Panel de Administración
+                    </p>
+                  </div>
+                </div>
+
+                {/* Acciones - Desktop */}
+                <div className="hidden md:flex items-center gap-3">
+                  <div
+                    className={`flex items-center px-3 py-1.5 rounded-lg ${
+                      isDarkMode
+                        ? "bg-gray-700 text-gray-300"
+                        : "bg-gray-100 text-gray-600"
+                    }`}
+                  >
+                    <span className="text-sm">{user?.email}</span>
+                  </div>
+
+                  <button
+                    onClick={toggleDarkMode}
+                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all duration-200 ${
+                      isDarkMode
+                        ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    }`}
+                  >
+                    {isDarkMode ? (
+                      <Sun className="h-4 w-4" />
+                    ) : (
+                      <Moon className="h-4 w-4" />
+                    )}
+                    <span className="text-sm">
+                      {isDarkMode ? "Modo Claro" : "Modo Oscuro"}
+                    </span>
+                  </button>
+
+                  <button
+                    onClick={handleLogout}
+                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all duration-200 ${
+                      isDarkMode
+                        ? "bg-red-500/10 text-red-400 hover:bg-red-500/20"
+                        : "bg-red-50 text-red-600 hover:bg-red-100"
+                    }`}
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span className="text-sm">Cerrar Sesión</span>
+                  </button>
+                </div>
+
+                {/* Menú móvil */}
+                <div className="md:hidden">
+                  <button
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    className={`p-2 rounded-lg transition-all duration-200 ${
+                      isDarkMode
+                        ? "hover:bg-gray-700 text-gray-400"
+                        : "hover:bg-gray-100 text-gray-600"
+                    }`}
+                  >
+                    <Menu className="h-5 w-5" />
+                  </button>
+                </div>
               </div>
-            </div>
-
-            <div className="hidden md:flex items-center space-x-4">
-              <span
-                className={`text-sm ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
-              >
-                {user?.email}
-              </span>
-              <button
-                onClick={handleLogout}
-                className={`inline-flex items-center px-4 py-2 border border-transparent rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                  isDarkMode
-                    ? "text-white bg-gray-700 hover:bg-gray-600 focus:ring-offset-gray-800 focus:ring-gray-600"
-                    : "text-white bg-red-600 hover:bg-red-700 focus:ring-offset-red-700 focus:ring-red-600"
-                }`}
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Cerrar Sesión
-              </button>
-              <button
-                onClick={toggleDarkMode}
-                className={`inline-flex items-center px-4 py-2 border border-transparent rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                  isDarkMode
-                    ? "text-white bg-gray-700 hover:bg-gray-600 focus:ring-offset-gray-800 focus:ring-gray-600"
-                    : "text-white bg-red-600 hover:bg-red-700 focus:ring-offset-red-700 focus:ring-red-600"
-                }`}
-              >
-                {isDarkMode ? (
-                  <Sun className="h-4 w-4 mr-2" />
-                ) : (
-                  <Moon className="h-4 w-4 mr-2" />
-                )}
-                {isDarkMode ? "Modo Claro" : "Modo Oscuro"}
-              </button>
-            </div>
-
-            <div className="md:hidden">
-              <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className={`p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                  isDarkMode
-                    ? "hover:bg-gray-700 focus:ring-offset-gray-800 focus:ring-gray-600"
-                    : "hover:bg-gray-200 focus:ring-offset-red-700 focus:ring-red-600 text-red-600"
-                }`}
-              >
-                <Menu className="h-6 w-6" />
-              </button>
             </div>
           </div>
 
+          {/* Menú móvil expandido */}
           {isMenuOpen && (
             <div
-              className={`md:hidden border-t py-3 ${
+              className={`md:hidden border-b ${
                 isDarkMode
-                  ? "border-gray-700 bg-gray-800 text-white"
-                  : "border-gray-200 bg-white"
+                  ? "border-gray-700 bg-gray-800"
+                  : "border-gray-100 bg-white"
               }`}
             >
-              <div className="px-2 space-y-1">
-                <span
-                  className={`block px-3 py-2 text-sm ${
-                    isDarkMode ? "text-gray-400" : "text-gray-600"
-                  }`}
-                >
-                  {user?.email}
-                </span>
-                <button
-                  onClick={handleLogout}
-                  className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium ${
+              <div className="px-4 py-3 space-y-2">
+                <div
+                  className={`flex items-center px-3 py-2 rounded-lg ${
                     isDarkMode
-                      ? "text-white hover:bg-gray-700"
-                      : "text-black hover:bg-red-700 hover:text-white"
+                      ? "bg-gray-700 text-gray-300"
+                      : "bg-gray-100 text-gray-600"
                   }`}
                 >
-                  <LogOut className="h-4 w-4 inline mr-2" />
-                  Cerrar Sesión
-                </button>
+                  <span className="text-sm">{user?.email}</span>
+                </div>
+
                 <button
                   onClick={toggleDarkMode}
-                  className={`block w-full text-left px-3 py-2 rounded-md text-base font-medium ${
+                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${
                     isDarkMode
-                      ? "text-white hover:bg-gray-700 "
-                      : "text-black hover:bg-red-700 hover:text-white "
+                      ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}
                 >
                   {isDarkMode ? (
-                    <Sun className="h-4 w-4 inline mr-2" />
+                    <Sun className="h-4 w-4" />
                   ) : (
-                    <Moon className="h-4 w-4 inline mr-2" />
+                    <Moon className="h-4 w-4" />
                   )}
-                  {isDarkMode ? "Modo Claro" : "Modo Oscuro"}
+                  <span className="text-sm">
+                    {isDarkMode ? "Modo Claro" : "Modo Oscuro"}
+                  </span>
+                </button>
+
+                <button
+                  onClick={handleLogout}
+                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${
+                    isDarkMode
+                      ? "bg-red-500/10 text-red-400 hover:bg-red-500/20"
+                      : "bg-red-50 text-red-600 hover:bg-red-100"
+                  }`}
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span className="text-sm">Cerrar Sesión</span>
                 </button>
               </div>
             </div>
@@ -188,29 +224,105 @@ const AdminDashboard = () => {
         {/* StatisticsPanel Component */}
         <div className="mb-8">
           <button
-            className={` rounded-lg shadow-md p-4 w-full flex items-center justify-between hover:bg-gray-100 ${
+            className={`group relative w-full rounded-xl border transition-all duration-300 overflow-hidden ${
               isDarkMode
-                ? "bg-gray-800 text-white hover:bg-gray-700"
-                : "bg-white"
+                ? "bg-gray-800/50 border-gray-700 hover:bg-gray-700/50"
+                : "bg-white border-gray-100 hover:bg-gray-50"
             }`}
             onClick={() => setIsStatisticsExpanded(!isStatisticsExpanded)}
           >
-            <h3 className="text-lg font-medium">Estadísticas Clave</h3>
-            <span
-              className={`transform transition-transform duration-300 ${
-                isStatisticsExpanded ? "rotate-180" : ""
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-3">
+              <div className="flex items-center gap-3">
+                <div
+                  className={`rounded-lg p-2 transition-colors duration-300 ${
+                    isDarkMode
+                      ? "bg-gray-700 group-hover:bg-gray-600"
+                      : "bg-gray-100 group-hover:bg-gray-200"
+                  }`}
+                >
+                  <FileText
+                    className={`h-5 w-5 ${
+                      isDarkMode ? "text-gray-300" : "text-gray-600"
+                    }`}
+                  />
+                </div>
+                <div className="flex flex-col items-start">
+                  <h3
+                    className={`text-lg font-medium ${
+                      isDarkMode ? "text-white" : "text-gray-900"
+                    }`}
+                  >
+                    Estadísticas Clave
+                  </h3>
+                  <p
+                    className={`text-sm ${
+                      isDarkMode ? "text-gray-400" : "text-gray-500"
+                    }`}
+                  >
+                    {isStatisticsExpanded
+                      ? "Click para ocultar"
+                      : "Click para ver métricas importantes"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-3">
+                <div
+                  className={`px-3 py-1 rounded-full text-xs font-medium transition-colors duration-300 ${
+                    isDarkMode
+                      ? "bg-gray-700 text-gray-300 group-hover:bg-gray-600"
+                      : "bg-gray-100 text-gray-600 group-hover:bg-gray-200"
+                  }`}
+                >
+                  {totalRequests} solicitudes totales
+                </div>
+                <div
+                  className={`transform transition-transform duration-300 ${
+                    isStatisticsExpanded ? "rotate-180" : ""
+                  }`}
+                >
+                  <ChevronRight
+                    className={`h-5 w-5 ${
+                      isDarkMode ? "text-gray-400" : "text-gray-500"
+                    }`}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div
+              className={`absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-red-500 via-purple-500 to-blue-500 transform origin-left transition-transform duration-300 ${
+                isStatisticsExpanded ? "scale-x-100" : "scale-x-0"
+              }`}
+            />
+          </button>
+
+          <div
+            className={`overflow-hidden transition-all duration-300 ease-in-out ${
+              isStatisticsExpanded
+                ? "max-h-[2000px] opacity-100 mt-3"
+                : "max-h-0 opacity-0"
+            }`}
+          >
+            <div
+              className={`rounded-xl border p-4 ${
+                isDarkMode
+                  ? "bg-gray-800/50 border-gray-700"
+                  : "bg-white border-gray-100"
               }`}
             >
-              <List className="h-6 w-6" />
-            </span>
-          </button>
-          {isStatisticsExpanded && <StatisticsPanel isDarkMode={isDarkMode} />}
+              <StatisticsPanel isDarkMode={isDarkMode} />
+            </div>
+          </div>
         </div>
 
         {/* RequestsTable Component */}
         <RequestsTable
           onViewDetails={handleViewDetails}
           isDarkMode={isDarkMode}
+          onStatsUpdate={(stats) =>
+            setTotalRequests(Object.values(stats).reduce((a, b) => a + b, 0))
+          }
         />
       </main>
     </div>
