@@ -313,19 +313,19 @@ const Login = () => {
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
           {/* Sección de Login */}
           <div className="flex-1 w-full max-w-md mx-auto">
-            {/* Banner de Bienvenida */}
-            <div className="bg-gradient-to-br from-red-600 to-red-700 rounded-2xl p-6 sm:p-8 text-white shadow-xl">
-              <h2 className="text-2xl sm:text-3xl font-bold mb-2 sm:mb-4">
-                ¡Bienvenido a Taxes247!
-              </h2>
-              <p className="text-red-100 text-base sm:text-lg">
-                Simplifica y asegura tu proceso de declaración de impuestos con
-                nuestra plataforma.
-              </p>
-            </div>
-
             {/* Formulario */}
-            <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 -mt-4 relative z-10">
+            <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
+              {/* Banner de Bienvenida Integrado */}
+              <div className="bg-gradient-to-br from-red-600 to-red-700 rounded-xl p-4 sm:p-6 text-white mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold mb-2">
+                  ¡Bienvenido a Taxes247!
+                </h2>
+                <p className="text-red-100 text-sm sm:text-base">
+                  Simplifica y asegura tu proceso de declaración de impuestos
+                  con nuestra plataforma.
+                </p>
+              </div>
+
               <form onSubmit={handleLogin} className="space-y-4 sm:space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
