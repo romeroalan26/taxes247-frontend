@@ -1,5 +1,5 @@
 // src/components/AdminDashboard.jsx
-import React, { useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -25,24 +25,46 @@ const AdminDashboard = () => {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [totalRequests, setTotalRequests] = useState(0);
 
-  const handleLogout = async () => {
+  const handleViewDetails = useCallback((request) => {
+    setSelectedRequest(request);
+    setIsDetailModalOpen(true);
+  }, []);
+
+  const handleStatsUpdate = useCallback((stats) => {
+    setTotalRequests(Object.values(stats).reduce((a, b) => a + b, 0));
+  }, []);
+
+  const toggleDarkMode = useCallback(() => {
+    setIsDarkMode((prev) => !prev);
+    document.body.classList.toggle("dark", !isDarkMode);
+  }, [isDarkMode]);
+
+  const toggleMenu = useCallback(() => {
+    setIsMenuOpen((prev) => !prev);
+  }, []);
+
+  const toggleStatistics = useCallback(() => {
+    setIsStatisticsExpanded((prev) => !prev);
+  }, []);
+
+  const handleLogout = useCallback(async () => {
     try {
       await logout();
       navigate("/");
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
     }
-  };
+  }, [logout, navigate]);
 
-  const handleViewDetails = (request) => {
-    setSelectedRequest(request);
-    setIsDetailModalOpen(true);
-  };
-
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-    document.body.classList.toggle("dark", !isDarkMode);
-  };
+  // Memoize the table props
+  const tableProps = useMemo(
+    () => ({
+      onViewDetails: handleViewDetails,
+      isDarkMode,
+      onStatsUpdate: handleStatsUpdate,
+    }),
+    [handleViewDetails, isDarkMode, handleStatsUpdate]
+  );
 
   return (
     <div
@@ -135,7 +157,7 @@ const AdminDashboard = () => {
                 {/* Menú móvil */}
                 <div className="md:hidden">
                   <button
-                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    onClick={toggleMenu}
                     className={`p-2 rounded-lg transition-all duration-200 ${
                       isDarkMode
                         ? "hover:bg-gray-700 text-gray-400"
@@ -229,7 +251,7 @@ const AdminDashboard = () => {
                 ? "bg-gray-800/50 border-gray-700 hover:bg-gray-700/50"
                 : "bg-white border-gray-100 hover:bg-gray-50"
             }`}
-            onClick={() => setIsStatisticsExpanded(!isStatisticsExpanded)}
+            onClick={toggleStatistics}
           >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-3">
               <div className="flex items-center gap-3">
@@ -317,13 +339,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* RequestsTable Component */}
-        <RequestsTable
-          onViewDetails={handleViewDetails}
-          isDarkMode={isDarkMode}
-          onStatsUpdate={(stats) =>
-            setTotalRequests(Object.values(stats).reduce((a, b) => a + b, 0))
-          }
-        />
+        <RequestsTable {...tableProps} />
       </main>
     </div>
   );

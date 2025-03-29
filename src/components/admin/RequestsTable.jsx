@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, memo } from "react";
 import { auth } from "../../firebaseConfig";
 import { ClipLoader } from "react-spinners";
 import {
@@ -37,7 +37,7 @@ const sortStatuses = (statuses) => {
   });
 };
 
-const RequestsTable = ({ onViewDetails, isDarkMode, onStatsUpdate }) => {
+const RequestsTable = memo(({ onViewDetails, isDarkMode, onStatsUpdate }) => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -562,6 +562,6 @@ const RequestsTable = ({ onViewDetails, isDarkMode, onStatsUpdate }) => {
       )}
     </div>
   );
-};
+});
 
 export default RequestsTable;
