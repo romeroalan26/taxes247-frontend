@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { auth } from "../../../firebaseConfig";
 import { ClipLoader } from "react-spinners";
-import { AlertTriangle, AlertCircle } from "lucide-react";
+import { AlertTriangle, AlertCircle, X } from "lucide-react";
 
 const DeleteConfirmationDialog = ({
   requestId,
@@ -49,84 +49,104 @@ const DeleteConfirmationDialog = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
-      {/* Overlay con fondo oscuro semitransparente */}
-      <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"></div>
+    <div
+      className="fixed inset-0 z-50 overflow-y-auto"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+    >
+      {/* Overlay */}
+      <div
+        className="fixed inset-0 bg-black/50 transition-opacity"
+        onClick={onClose}
+        aria-hidden="true"
+      />
 
-      {/* Contenedor para centrado */}
-      <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
-        {/* Modal */}
+      {/* Modal container */}
+      <div className="flex min-h-screen items-center justify-center p-4 text-center">
         <div
-          className={`relative rounded-lg max-w-lg w-full mx-auto shadow-xl p-6 transform transition-all ${
-            isDarkMode ? "bg-gray-600" : "bg-gray-100"
+          className={`relative w-full max-w-lg transform overflow-hidden rounded-xl p-6 text-left shadow-2xl transition-all ${
+            isDarkMode ? "bg-gray-800" : "bg-white"
           }`}
         >
+          {/* Close button */}
+          <button
+            onClick={onClose}
+            className="absolute right-4 top-4 rounded-full p-1 hover:bg-gray-100 dark:hover:bg-gray-700"
+            aria-label="Cerrar"
+          >
+            <X className="h-5 w-5" />
+          </button>
+
           <div className="flex flex-col items-center">
-            {/* Ícono de advertencia */}
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
-              <AlertTriangle className="h-6 w-6 text-red-600" />
+            {/* Warning icon */}
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
+              <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
             </div>
 
-            {/* Título */}
+            {/* Title */}
             <h3
-              className={`text-lg font-medium  mb-2 ${
-                isDarkMode ? "text-gray-200" : "text-gray-900"
+              id="modal-title"
+              className={`mt-4 text-lg font-semibold ${
+                isDarkMode ? "text-gray-100" : "text-gray-900"
               }`}
             >
               ¿Estás seguro de que deseas eliminar esta solicitud?
             </h3>
 
-            {/* Mensaje */}
+            {/* Message */}
             <p
-              className={`text-sm  mb-4 ${
+              className={`mt-2 text-sm ${
                 isDarkMode ? "text-gray-300" : "text-gray-500"
               }`}
             >
               Esta acción no se puede deshacer. Por favor, ingresa el número de
-              confirmación
+              confirmación{" "}
               <span
                 className={`font-bold ${
                   isDarkMode ? "text-gray-100" : "text-gray-900"
                 }`}
               >
-                {" "}
-                {confirmationNumber}{" "}
-              </span>
+                {confirmationNumber}
+              </span>{" "}
               para confirmar.
             </p>
 
-            {/* Mensaje de error si existe */}
+            {/* Error message */}
             {error && (
-              <div className="flex items-center gap-2 p-3 mb-4 text-red-600 bg-red-50 rounded-md w-full">
+              <div
+                className="mt-4 flex w-full items-center gap-2 rounded-lg bg-red-50 p-3 text-red-600 dark:bg-red-900/30 dark:text-red-400"
+                role="alert"
+              >
                 <AlertCircle className="h-5 w-5" />
                 <span>{error}</span>
               </div>
             )}
 
-            {/* Campo de confirmación */}
+            {/* Confirmation input */}
             <input
               type="text"
               value={confirmationInput}
               onChange={(e) => setConfirmationInput(e.target.value)}
               placeholder="Ingresa el número de confirmación"
-              className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-red-500 focus:border-red-500 mb-4 ${
-                isDarkMode ? "text-red-500 " : "text-black"
-              }`}
+              className={`mt-4 w-full rounded-lg border border-gray-300 px-4 py-2.5 shadow-sm transition-colors focus:border-red-500 focus:outline-none focus:ring-1 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400`}
+              aria-label="Número de confirmación"
             />
 
-            {/* Botones */}
-            <div className="flex justify-end gap-3 w-full">
+            {/* Action buttons */}
+            <div className="mt-6 flex w-full justify-end gap-3">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                className="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleDelete}
                 disabled={loading || confirmationInput !== confirmationNumber}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-red-500 dark:hover:bg-red-600"
+                aria-label="Eliminar solicitud"
               >
                 {loading ? (
                   <ClipLoader size={20} color="#ffffff" />

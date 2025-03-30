@@ -268,7 +268,6 @@ const RequestsTable = memo(({ onViewDetails, isDarkMode, onStatsUpdate }) => {
               }`}
             >
               <Search className="h-4 w-4" />
-              <div className="h-3 w-px bg-gray-300" />
             </div>
             <input
               type="text"
