@@ -132,7 +132,41 @@ const CreateRequest = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    const formattedValue = name === "ssn" ? formatSSN(value) : value;
+    let formattedValue = value;
+
+    // Aplicar límites de caracteres según el campo
+    switch (name) {
+      case "ssn":
+        formattedValue = formatSSN(value);
+        break;
+      case "fullName":
+        formattedValue = value.slice(0, 100); // Máximo 100 caracteres
+        break;
+      case "phone":
+        formattedValue = value.slice(0, 20); // Máximo 20 caracteres
+        break;
+      case "address":
+        formattedValue = value.slice(0, 200); // Máximo 200 caracteres
+        break;
+      case "bankName":
+        formattedValue = value.slice(0, 100); // Máximo 100 caracteres
+        break;
+      case "accountNumber":
+        formattedValue = value.slice(0, 17); // Máximo 17 dígitos
+        break;
+      case "confirmAccountNumber":
+        formattedValue = value.slice(0, 17); // Máximo 17 dígitos
+        break;
+      case "routingNumber":
+        formattedValue = value.slice(0, 12); // Máximo 12 dígitos
+        break;
+      case "confirmRoutingNumber":
+        formattedValue = value.slice(0, 12); // Máximo 12 dígitos
+        break;
+      default:
+        formattedValue = value;
+    }
+
     setFormData((prev) => ({ ...prev, [name]: formattedValue }));
   };
 
@@ -678,6 +712,7 @@ const CreateRequest = () => {
                     name="fullName"
                     value={formData.fullName}
                     onChange={handleChange}
+                    maxLength={100}
                     className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 group-hover:border-red-300"
                     placeholder="Juan Pérez"
                     required
@@ -714,6 +749,7 @@ const CreateRequest = () => {
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
+                    maxLength={20}
                     className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 group-hover:border-red-300"
                     placeholder="809-555-1234"
                     required
@@ -734,6 +770,7 @@ const CreateRequest = () => {
                       name="address"
                       value={formData.address}
                       onChange={handleChange}
+                      maxLength={200}
                       className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 group-hover:border-red-300"
                       placeholder="123 Main St, Anytown, CA"
                       required
@@ -809,6 +846,7 @@ const CreateRequest = () => {
                     name="bankName"
                     value={formData.bankName}
                     onChange={handleChange}
+                    maxLength={100}
                     className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 group-hover:border-red-300"
                     placeholder="Bank of America"
                     required
@@ -919,9 +957,6 @@ const CreateRequest = () => {
                       {validationErrors.confirmAccountNumber}
                     </p>
                   )}
-                  <p className="mt-1 text-sm text-gray-500">
-                    Ingresa el número de cuenta nuevamente para confirmar
-                  </p>
                 </div>
               </div>
 
@@ -1018,9 +1053,6 @@ const CreateRequest = () => {
                       {validationErrors.confirmRoutingNumber}
                     </p>
                   )}
-                  <p className="mt-1 text-sm text-gray-500">
-                    Ingresa el número de ruta nuevamente para confirmar
-                  </p>
                 </div>
               </div>
             </div>
