@@ -58,6 +58,12 @@ const steps = [
     description: "Sube tus W2 y método de pago",
     icon: FileText,
   },
+  {
+    id: 4,
+    title: "Confirmación",
+    description: "Revisa tus datos",
+    icon: CheckCircle2,
+  },
 ];
 
 const CreateRequest = () => {
@@ -611,6 +617,8 @@ const CreateRequest = () => {
         return (
           formData.paymentMethod && w2Files.length > 0 && !fileErrors.length
         );
+      case 4:
+        return true; // Assuming validation for step 4 is handled in the renderStepContent function
       default:
         return false;
     }
@@ -628,7 +636,7 @@ const CreateRequest = () => {
                 </div>
                 Información Personal
               </h2>
-              <div className="text-xs text-gray-500">Paso 1 de 3</div>
+              <div className="text-xs text-gray-500">Paso 1 de 4</div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* SSN */}
@@ -831,7 +839,7 @@ const CreateRequest = () => {
                 </div>
                 Información Bancaria
               </h2>
-              <div className="text-xs text-gray-500">Paso 2 de 3</div>
+              <div className="text-xs text-gray-500">Paso 2 de 4</div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Nombre del Banco */}
@@ -1091,7 +1099,7 @@ const CreateRequest = () => {
                 </div>
                 Documentos y Método de Pago
               </h2>
-              <div className="text-xs text-gray-500">Paso 3 de 3</div>
+              <div className="text-xs text-gray-500">Paso 3 de 4</div>
             </div>
             <div className="space-y-6">
               {/* Método de Pago */}
@@ -1214,21 +1222,216 @@ const CreateRequest = () => {
                 Anterior
               </button>
               <button
-                type="submit"
-                onClick={handleSubmit}
-                disabled={!isStepValid() || isLoading}
+                type="button"
+                onClick={handleNext}
+                disabled={!isStepValid()}
                 className={`inline-flex items-center px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 ${
                   isStepValid()
                     ? "bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 focus:ring-red-500"
                     : "bg-gray-100 text-gray-400 cursor-not-allowed"
                 }`}
               >
+                Siguiente
+                <ChevronRight className="ml-2 h-5 w-5" />
+              </button>
+            </div>
+          </div>
+        );
+      case 4:
+        return (
+          <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 hover:shadow-md transition-all duration-200">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                <div className="w-8 h-8 flex items-center justify-center bg-red-50 rounded-lg mr-3">
+                  <CheckCircle2 className="h-5 w-5 text-red-600" />
+                </div>
+                Confirmación de Datos
+              </h2>
+              <div className="text-xs text-gray-500">Paso 4 de 4</div>
+            </div>
+
+            <div className="space-y-6">
+              {/* Información Personal */}
+              <div className="bg-gray-50 rounded-xl p-4">
+                <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
+                  <User className="h-4 w-4 mr-2 text-gray-500" />
+                  Información Personal
+                </h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Nombre Completo:</span>
+                    <span className="font-medium">{formData.fullName}</span>
+                  </div>
+                  <div className="flex justify-between text-sm items-center">
+                    <span className="text-gray-500">SSN:</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">
+                        {showSensitiveFields.ssn
+                          ? formData.ssn
+                          : `•••-••-${formData.ssn.slice(-4)}`}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => toggleFieldVisibility("ssn")}
+                        className="text-gray-400 hover:text-gray-600 transition-colors"
+                      >
+                        {showSensitiveFields.ssn ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Fecha de Nacimiento:</span>
+                    <span className="font-medium">{formData.birthDate}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Teléfono:</span>
+                    <span className="font-medium">{formData.phone}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Email:</span>
+                    <span className="font-medium">{formData.email}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Dirección:</span>
+                    <span className="font-medium">{formData.address}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Información Bancaria */}
+              <div className="bg-gray-50 rounded-xl p-4">
+                <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
+                  <Building className="h-4 w-4 mr-2 text-gray-500" />
+                  Información Bancaria
+                </h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Banco:</span>
+                    <span className="font-medium">{formData.bankName}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Tipo de Cuenta:</span>
+                    <span className="font-medium">{formData.accountType}</span>
+                  </div>
+                  <div className="flex justify-between text-sm items-center">
+                    <span className="text-gray-500">Número de Cuenta:</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">
+                        {showSensitiveFields.accountNumber
+                          ? formData.accountNumber
+                          : `••••••••${formData.accountNumber.slice(-4)}`}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => toggleFieldVisibility("accountNumber")}
+                        className="text-gray-400 hover:text-gray-600 transition-colors"
+                      >
+                        {showSensitiveFields.accountNumber ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex justify-between text-sm items-center">
+                    <span className="text-gray-500">Número de Ruta:</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">
+                        {showSensitiveFields.routingNumber
+                          ? formData.routingNumber
+                          : `••••••${formData.routingNumber.slice(-4)}`}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => toggleFieldVisibility("routingNumber")}
+                        className="text-gray-400 hover:text-gray-600 transition-colors"
+                      >
+                        {showSensitiveFields.routingNumber ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Documentos y Pago */}
+              <div className="bg-gray-50 rounded-xl p-4">
+                <h3 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
+                  <FileText className="h-4 w-4 mr-2 text-gray-500" />
+                  Documentos y Pago
+                </h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Método de Pago:</span>
+                    <span className="font-medium">
+                      {formData.paymentMethod}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Archivos W2:</span>
+                    <span className="font-medium">
+                      {w2Files.length} archivo(s)
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Plan Seleccionado:</span>
+                    <span className="font-medium">
+                      {selectedPlan?.serviceLevel} - ${selectedPlan?.price}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Aviso de Confirmación */}
+              <div className="bg-red-50 p-4 rounded-xl border-l-4 border-red-500">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <AlertTriangle className="h-5 w-5 text-red-500" />
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-red-800">
+                      Por favor, verifica que toda la información sea correcta
+                    </h3>
+                    <div className="mt-2 text-sm text-red-700">
+                      <p>
+                        Al confirmar, estás de acuerdo con que la información
+                        proporcionada es precisa y completa. Cualquier error
+                        podría afectar el procesamiento de tu solicitud.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-between">
+              <button
+                type="button"
+                onClick={handleBack}
+                className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200"
+              >
+                <ChevronLeft className="mr-2 h-5 w-5" />
+                Anterior
+              </button>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200"
+              >
                 {isLoading ? (
                   <ClipLoader size={24} color="#ffffff" />
                 ) : (
                   <>
                     <CheckCircle2 className="mr-2 h-5 w-5" />
-                    Enviar Solicitud
+                    Confirmar y Enviar
                   </>
                 )}
               </button>
@@ -1279,7 +1482,7 @@ const CreateRequest = () => {
         {!showPricingModal && (
           <div className="space-y-8">
             {/* Progress Bar */}
-            <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+            <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6 border border-gray-100">
               <div className="relative">
                 {/* Progress Line */}
                 <div className="absolute top-0 left-0 h-1 bg-gray-200 w-full rounded-full">
@@ -1293,70 +1496,75 @@ const CreateRequest = () => {
                   />
                 </div>
 
-                {/* Steps */}
-                <div className="relative flex justify-between">
-                  {steps.map((step, index) => (
-                    <div
-                      key={step.id}
-                      className={`flex flex-col items-center ${
-                        index === steps.length - 1 ? "" : "flex-1"
-                      }`}
-                    >
-                      <div
-                        className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center mb-2 transition-all duration-200 ${
-                          currentStep >= step.id
-                            ? "bg-gradient-to-r from-red-600 to-red-700 text-white"
-                            : "bg-gray-100 text-gray-400"
-                        }`}
-                      >
-                        <step.icon className="h-4 w-4 sm:h-5 sm:w-5" />
-                      </div>
-                      <div className="text-center px-1 sm:px-2">
+                {/* Steps Container */}
+                <div className="relative">
+                  <div className="flex items-center justify-between">
+                    {steps.map((step, index) => (
+                      <div key={step.id} className="flex flex-col items-center">
+                        {/* Step Circle */}
                         <div
-                          className={`text-xs sm:text-sm font-medium whitespace-nowrap ${
+                          className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center mb-2 transition-all duration-200 ${
                             currentStep >= step.id
-                              ? "text-gray-900"
-                              : "text-gray-400"
+                              ? "bg-gradient-to-r from-red-600 to-red-700 text-white"
+                              : "bg-gray-100 text-gray-400"
                           }`}
                         >
-                          {step.title}
+                          <step.icon className="h-4 w-4 sm:h-5 sm:w-5" />
                         </div>
-                        <div
-                          className={`hidden sm:block text-xs ${
-                            currentStep >= step.id
-                              ? "text-gray-500"
-                              : "text-gray-400"
-                          }`}
-                        >
-                          {step.description}
-                        </div>
-                        <div
-                          className={`sm:hidden text-[10px] ${
-                            currentStep >= step.id
-                              ? "text-gray-500"
-                              : "text-gray-400"
-                          }`}
-                        >
-                          {step.description}
+                        {/* Desktop Text */}
+                        <div className="hidden md:block text-center">
+                          <div
+                            className={`text-sm font-medium whitespace-nowrap ${
+                              currentStep >= step.id
+                                ? "text-gray-900"
+                                : "text-gray-400"
+                            }`}
+                          >
+                            {step.title}
+                          </div>
+                          <div
+                            className={`text-xs ${
+                              currentStep >= step.id
+                                ? "text-gray-500"
+                                : "text-gray-400"
+                            }`}
+                          >
+                            {step.description}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+                </div>
+
+                {/* Mobile Step Indicator */}
+                <div className="md:hidden mt-4 text-center">
+                  <div className="inline-flex items-center bg-red-50 px-4 py-2 rounded-xl">
+                    <div className="w-2 h-2 bg-red-600 rounded-full mr-2 animate-pulse"></div>
+                    <span className="text-sm font-medium text-gray-900">
+                      {steps[currentStep - 1].title}
+                    </span>
+                  </div>
+                  <div className="mt-1 text-xs text-gray-500">
+                    {steps[currentStep - 1].description}
+                  </div>
                 </div>
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-8">
-              {renderStepContent()}
+            {currentStep === 4 ? (
+              <form onSubmit={handleSubmit}>{renderStepContent()}</form>
+            ) : (
+              renderStepContent()
+            )}
 
-              {/* Mensaje de Error General */}
-              {error && (
-                <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm flex items-center">
-                  <AlertCircle className="h-5 w-5 mr-2" />
-                  {error}
-                </div>
-              )}
-            </form>
+            {/* Mensaje de Error General */}
+            {error && (
+              <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm flex items-center">
+                <AlertCircle className="h-5 w-5 mr-2" />
+                {error}
+              </div>
+            )}
           </div>
         )}
 
