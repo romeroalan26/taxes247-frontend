@@ -306,7 +306,7 @@ const Register = () => {
                         whileTap={{ scale: 0.9 }}
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                        className="absolute right-3 top-0 bottom-0 flex items-center justify-center p-1.5 rounded-lg text-gray-400 hover:text-gray-600 transition-colors duration-200"
                       >
                         {showPassword ? (
                           <EyeOff className="h-4 w-4" />
