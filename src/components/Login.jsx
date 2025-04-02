@@ -285,12 +285,21 @@ const Login = () => {
           <AnimatePresence>
             {isMenuOpen && (
               <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
+                initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                transition={{
+                  duration: 0.2,
+                  ease: [0.4, 0, 0.2, 1],
+                  opacity: { duration: 0.15 },
+                }}
                 className="md:hidden pb-3 space-y-1"
               >
                 <motion.button
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  transition={{ duration: 0.15, delay: 0.05 }}
                   whileHover={{ x: 5 }}
                   onClick={() => {
                     navigate("/pricing");
@@ -302,6 +311,10 @@ const Login = () => {
                   Precios
                 </motion.button>
                 <motion.button
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  transition={{ duration: 0.15, delay: 0.1 }}
                   whileHover={{ x: 5 }}
                   onClick={() => {
                     navigate("/faq");
@@ -313,6 +326,10 @@ const Login = () => {
                   FAQ
                 </motion.button>
                 <motion.button
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  transition={{ duration: 0.15, delay: 0.15 }}
                   whileHover={{ x: 5 }}
                   onClick={() => {
                     window.open("https://wa.me/18094039726", "_blank");
