@@ -5,6 +5,7 @@ import { auth } from "../firebaseConfig";
 import api from "../utils/api";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   FileText,
   LogOut,
@@ -56,13 +57,21 @@ const getStatusColor = (status) => {
 const StepsModal = ({ isOpen, onClose, statusSteps }) => {
   if (!isOpen) return null;
 
+  const progressSteps = statusSteps.filter((step) => step.countInProgress);
+
   return (
-    <div
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto"
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 overflow-y-auto"
       onClick={onClose}
     >
-      <div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all my-8 relative"
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all my-8"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="sticky top-0 bg-white rounded-t-2xl border-b border-gray-100 p-4">
@@ -72,28 +81,29 @@ const StepsModal = ({ isOpen, onClose, statusSteps }) => {
                 Proceso de Declaración
               </h2>
               <p className="text-sm text-gray-500">
-                Conoce los pasos de tu declaración de impuestos
+                Pasos que cuentan para el progreso de tu declaración
               </p>
             </div>
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={onClose}
               className="p-2 rounded-full hover:bg-gray-100 transition-colors"
             >
               <X className="h-5 w-5 text-gray-500" />
-            </button>
+            </motion.button>
           </div>
         </div>
 
-        <div className="p-4 max-h-[calc(100vh-200px)] overflow-y-auto">
+        <div className="p-4 pb-8 max-h-[calc(100vh-200px)] overflow-y-auto">
           <div className="space-y-3">
-            {statusSteps.map((step, index) => (
-              <div
+            {progressSteps.map((step, index) => (
+              <motion.div
                 key={step.value}
-                className={`flex items-start gap-3 p-3 rounded-lg transition-all duration-200 ${
-                  step.countInProgress
-                    ? "bg-red-50 border border-red-100"
-                    : "bg-gray-50 border border-gray-100"
-                }`}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="flex items-start gap-3 p-3 rounded-lg bg-red-50 border border-red-100 transition-all duration-200"
               >
                 <div className="flex-shrink-0 w-7 h-7 rounded-full bg-white border-2 border-red-200 flex items-center justify-center">
                   <span className="text-sm font-semibold text-red-600">
@@ -101,24 +111,17 @@ const StepsModal = ({ isOpen, onClose, statusSteps }) => {
                   </span>
                 </div>
                 <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-medium text-gray-900">{step.value}</h3>
-                    {step.countInProgress && (
-                      <span className="text-xs font-medium text-red-600 bg-red-100 px-2 py-0.5 rounded-full">
-                        Cuenta para el progreso
-                      </span>
-                    )}
-                  </div>
+                  <h3 className="font-medium text-gray-900">{step.value}</h3>
                   <p className="text-sm text-gray-600 mt-0.5">
                     {step.description}
                   </p>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 
@@ -236,58 +239,83 @@ const Dashboard = () => {
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-3">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center space-x-3"
+            >
               <FileText className="w-8 h-8 text-red-600" />
               <h1 className="text-2xl font-bold bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent">
                 Taxes247
               </h1>
-            </div>
+            </motion.div>
 
             <div className="hidden md:block">
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={logout}
                 className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 transition-all duration-200"
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 Cerrar Sesión
-              </button>
+              </motion.button>
             </div>
 
             <div className="md:hidden">
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className="p-2 rounded-full hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-200 transition-all duration-200"
               >
                 <Menu className="w-6 h-6 text-gray-700" />
-              </button>
+              </motion.button>
             </div>
           </div>
 
           {/* Mobile menu */}
-          {isMenuOpen && (
-            <div className="md:hidden pb-3 space-y-1">
-              <button
-                onClick={() => {
-                  logout();
-                  setIsMenuOpen(false);
-                }}
-                className="block w-full px-3 py-2 rounded-lg text-base font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 text-left transition-all duration-200"
+          <AnimatePresence>
+            {isMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="md:hidden pb-3 space-y-1"
               >
-                <LogOut className="w-4 h-4 inline mr-2" />
-                Cerrar Sesión
-              </button>
-            </div>
-          )}
+                <motion.button
+                  whileHover={{ x: 5 }}
+                  onClick={() => {
+                    logout();
+                    setIsMenuOpen(false);
+                  }}
+                  className="block w-full px-3 py-2 rounded-lg text-base font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 text-left transition-all duration-200"
+                >
+                  <LogOut className="w-4 h-4 inline mr-2" />
+                  Cerrar Sesión
+                </motion.button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Welcome Section */}
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6 sm:mb-8">
-          <div className="p-6 sm:p-8 bg-gradient-to-r from-red-600 to-red-700">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6 sm:mb-8"
+        >
+          <div className="bg-gradient-to-r from-red-600 to-red-700 p-6 sm:p-8">
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-              <div className="text-white">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+                className="text-white"
+              >
                 <h2 className="text-xl sm:text-2xl font-bold mb-2">
                   {loadingName || !userName ? (
                     <Skeleton width={200} />
@@ -298,20 +326,27 @@ const Dashboard = () => {
                 <p className="text-red-100 text-sm sm:text-base">
                   Gestiona tus declaraciones de impuestos de forma fácil
                 </p>
-              </div>
-              <button
+              </motion.div>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => navigate("/create-request")}
                 className="inline-flex items-center px-4 sm:px-6 py-2.5 sm:py-3 border border-transparent text-sm sm:text-base font-medium rounded-xl text-red-600 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 shadow-md hover:shadow-lg"
               >
                 <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                 Nueva Solicitud
-              </button>
+              </motion.button>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Requests Section */}
-        <div className="mb-6 sm:mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mb-6 sm:mb-8"
+        >
           <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-4 sm:mb-6 flex items-center">
             <Activity className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-red-600" />
             Tus Solicitudes
@@ -325,7 +360,7 @@ const Dashboard = () => {
             </div>
           ) : requests.length > 0 ? (
             <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {requests.map((request) => {
+              {requests.map((request, index) => {
                 const progressPercent = calculateProgress(request.status);
                 const progressSteps = statusSteps.filter(
                   (step) => step.countInProgress
@@ -342,8 +377,11 @@ const Dashboard = () => {
                 );
 
                 return (
-                  <div
+                  <motion.div
                     key={request.confirmationNumber}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 + index * 0.1 }}
                     className="bg-white rounded-xl shadow-[0_2px_8px_-2px_rgba(0,0,0,0.1)] hover:shadow-[0_4px_12px_-2px_rgba(0,0,0,0.15)] transition-all duration-200 border border-gray-200/80 hover:border-gray-300"
                   >
                     <div className="p-4">
@@ -374,7 +412,7 @@ const Dashboard = () => {
                       {/* Content */}
                       <div className="space-y-3">
                         {/* Status Description */}
-                        <div className="text-sm text-gray-600 bg-gray-50/80 p-3 rounded-lg border border-gray-100">
+                        <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100">
                           {currentStatusStep?.description ||
                             "Estado actual de la solicitud"}
                         </div>
@@ -410,11 +448,11 @@ const Dashboard = () => {
                         {/* Progress */}
                         <div className="space-y-2">
                           <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden shadow-inner">
-                            <div
-                              className="h-2 bg-gradient-to-r from-red-500 to-red-600 rounded-full transition-all duration-500"
-                              style={{
-                                width: `${progressPercent}%`,
-                              }}
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${progressPercent}%` }}
+                              transition={{ duration: 0.5 }}
+                              className="h-2 bg-gradient-to-r from-red-500 to-red-600 rounded-full"
                             />
                           </div>
                           <div className="flex items-center justify-between text-xs text-gray-500">
@@ -426,47 +464,61 @@ const Dashboard = () => {
                                   : "Estado de solicitud"}
                               </span>
                             </div>
-                            <button
+                            <motion.button
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
                               onClick={() => setIsStepsModalOpen(true)}
                               className="inline-flex items-center text-red-600 hover:text-red-700 transition-colors duration-200"
                             >
                               <Info className="w-3.5 h-3.5 mr-1" />
                               Ver pasos
-                            </button>
+                            </motion.button>
                           </div>
                         </div>
                       </div>
 
                       {/* Footer */}
                       <div className="mt-4 pt-4 border-t border-gray-100">
-                        <button
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
                           onClick={() => navigate(`/request/${request._id}`)}
                           className="w-full inline-flex items-center justify-center px-4 py-2 border border-red-100 text-sm font-medium rounded-lg text-red-600 bg-gradient-to-br from-red-50 to-red-100 hover:from-red-100 hover:to-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 shadow-sm hover:shadow-md"
                         >
                           Ver Detalles
                           <ChevronRight className="w-4 h-4 ml-2" />
-                        </button>
+                        </motion.button>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 );
               })}
             </div>
           ) : (
-            <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 text-center text-sm sm:text-base text-gray-600">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-xl shadow-md p-4 sm:p-6 text-center text-sm sm:text-base text-gray-600"
+            >
               <p>No tienes solicitudes registradas.</p>
-            </div>
+            </motion.div>
           )}
-        </div>
+        </motion.div>
 
         {/* Help Section */}
-        <div className="text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="text-center"
+        >
           <div className="inline-flex items-center gap-3 sm:gap-4 bg-white rounded-xl shadow-md px-4 sm:px-6 py-3 sm:py-4">
             <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" />
             <span className="text-sm sm:text-base text-gray-700">
               ¿Necesitas ayuda?
             </span>
-            <a
+            <motion.a
+              whileHover={{ x: 5 }}
               href="https://wa.me/18094039726"
               target="_blank"
               rel="noopener noreferrer"
@@ -474,16 +526,18 @@ const Dashboard = () => {
             >
               Contáctame
               <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            </a>
+            </motion.a>
           </div>
-        </div>
+        </motion.div>
       </main>
 
-      <StepsModal
-        isOpen={isStepsModalOpen}
-        onClose={handleCloseModal}
-        statusSteps={statusSteps}
-      />
+      <AnimatePresence>
+        <StepsModal
+          isOpen={isStepsModalOpen}
+          onClose={handleCloseModal}
+          statusSteps={statusSteps}
+        />
+      </AnimatePresence>
     </div>
   );
 };

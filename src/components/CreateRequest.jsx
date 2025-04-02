@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { auth } from "../firebaseConfig";
 import { ClipLoader } from "react-spinners";
+import { motion, AnimatePresence } from "framer-motion";
 import PricingModal from "./PricingModal";
 import RoutingNumber from "./RoutingNumber";
 import {
@@ -1448,24 +1449,36 @@ const CreateRequest = () => {
       <header className="bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center">
-              <button
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center"
+            >
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => navigate("/dashboard")}
                 className="mr-4 p-2 inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-red-700 focus:ring-white transition-all duration-200"
               >
                 <ArrowLeft className="h-5 w-5" />
-              </button>
-              <div className="flex flex-col">
-                <h1 className="text-xl font-semibold text-white">Atras</h1>
-              </div>
-            </div>
+                <div className="flex flex-col">
+                  <h1 className="text-xl font-semibold text-white">
+                    Dashboard
+                  </h1>
+                </div>
+              </motion.button>
+            </motion.div>
             {selectedPlan && (
-              <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-xl backdrop-blur-sm">
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-xl"
+              >
                 <DollarSign className="h-5 w-5 text-white" />
                 <span className="text-sm font-medium text-white">
                   Plan {selectedPlan.serviceLevel} - ${selectedPlan.price}
                 </span>
-              </div>
+              </motion.div>
             )}
           </div>
         </div>
@@ -1482,17 +1495,23 @@ const CreateRequest = () => {
         {!showPricingModal && (
           <div className="space-y-8">
             {/* Progress Bar */}
-            <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6 border border-gray-100">
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-2xl shadow-sm p-4 sm:p-6 border border-gray-100"
+            >
               <div className="relative">
                 {/* Progress Line */}
                 <div className="absolute top-0 left-0 h-1 bg-gray-200 w-full rounded-full">
-                  <div
-                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-red-600 to-red-700 rounded-full transition-all duration-500"
-                    style={{
+                  <motion.div
+                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-red-600 to-red-700 rounded-full"
+                    initial={{ width: 0 }}
+                    animate={{
                       width: `${
                         ((currentStep - 1) / (steps.length - 1)) * 100
                       }%`,
                     }}
+                    transition={{ duration: 0.5 }}
                   />
                 </div>
 
@@ -1500,9 +1519,16 @@ const CreateRequest = () => {
                 <div className="relative">
                   <div className="flex items-center justify-between">
                     {steps.map((step, index) => (
-                      <div key={step.id} className="flex flex-col items-center">
+                      <motion.div
+                        key={step.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="flex flex-col items-center"
+                      >
                         {/* Step Circle */}
-                        <div
+                        <motion.div
+                          whileHover={{ scale: 1.1 }}
                           className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center mb-2 transition-all duration-200 ${
                             currentStep >= step.id
                               ? "bg-gradient-to-r from-red-600 to-red-700 text-white"
@@ -1510,10 +1536,13 @@ const CreateRequest = () => {
                           }`}
                         >
                           <step.icon className="h-4 w-4 sm:h-5 sm:w-5" />
-                        </div>
+                        </motion.div>
                         {/* Desktop Text */}
                         <div className="hidden md:block text-center">
-                          <div
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: index * 0.1 + 0.2 }}
                             className={`text-sm font-medium whitespace-nowrap ${
                               currentStep >= step.id
                                 ? "text-gray-900"
@@ -1521,8 +1550,11 @@ const CreateRequest = () => {
                             }`}
                           >
                             {step.title}
-                          </div>
-                          <div
+                          </motion.div>
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: index * 0.1 + 0.3 }}
                             className={`text-xs ${
                               currentStep >= step.id
                                 ? "text-gray-500"
@@ -1530,15 +1562,19 @@ const CreateRequest = () => {
                             }`}
                           >
                             {step.description}
-                          </div>
+                          </motion.div>
                         </div>
-                      </div>
+                      </motion.div>
                     ))}
                   </div>
                 </div>
 
                 {/* Mobile Step Indicator */}
-                <div className="md:hidden mt-4 text-center">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="md:hidden mt-4 text-center"
+                >
                   <div className="inline-flex items-center bg-red-50 px-4 py-2 rounded-xl">
                     <div className="w-2 h-2 bg-red-600 rounded-full mr-2 animate-pulse"></div>
                     <span className="text-sm font-medium text-gray-900">
@@ -1548,76 +1584,137 @@ const CreateRequest = () => {
                   <div className="mt-1 text-xs text-gray-500">
                     {steps[currentStep - 1].description}
                   </div>
-                </div>
+                </motion.div>
               </div>
-            </div>
+            </motion.div>
 
-            {currentStep === 4 ? (
-              <form onSubmit={handleSubmit}>{renderStepContent()}</form>
-            ) : (
-              renderStepContent()
-            )}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentStep}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2 }}
+              >
+                {currentStep === 4 ? (
+                  <form onSubmit={handleSubmit}>{renderStepContent()}</form>
+                ) : (
+                  renderStepContent()
+                )}
+              </motion.div>
+            </AnimatePresence>
 
             {/* Mensaje de Error General */}
-            {error && (
-              <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm flex items-center">
-                <AlertCircle className="h-5 w-5 mr-2" />
-                {error}
-              </div>
-            )}
+            <AnimatePresence>
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="bg-red-50 text-red-600 p-4 rounded-xl text-sm flex items-center"
+                >
+                  <AlertCircle className="h-5 w-5 mr-2" />
+                  {error}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         )}
 
         {/* Modal de Confirmación */}
-        {isModalOpen && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 max-w-md w-full transform transition-all animate-fade-in">
-              <div className="text-center">
-                {/* Icono de éxito animado */}
-                <div className="flex justify-center mb-6">
-                  <div className="relative">
-                    <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center animate-pulse">
-                      <CheckCircle2 className="h-10 w-10 text-green-500" />
+        <AnimatePresence>
+          {isModalOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="bg-white rounded-2xl shadow-2xl p-6 sm:p-8 max-w-md w-full"
+              >
+                <div className="text-center">
+                  {/* Icono de éxito animado */}
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", duration: 0.5 }}
+                    className="flex justify-center mb-6"
+                  >
+                    <div className="relative">
+                      <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center">
+                        <CheckCircle2 className="h-10 w-10 text-green-500" />
+                      </div>
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1.5, opacity: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="absolute inset-0 w-20 h-20 bg-green-50 rounded-full"
+                      />
                     </div>
-                    <div className="absolute inset-0 w-20 h-20 bg-green-50 rounded-full animate-ping opacity-20"></div>
-                  </div>
+                  </motion.div>
+
+                  {/* Título y mensaje */}
+                  <motion.h3
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="text-2xl font-bold text-gray-900 mb-3"
+                  >
+                    ¡Solicitud enviada!
+                  </motion.h3>
+                  <motion.p
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="text-gray-600 mb-6 text-sm sm:text-base"
+                  >
+                    Tu solicitud se ha enviado correctamente. Hemos enviado un
+                    correo electrónico con tu número de confirmación.
+                  </motion.p>
+
+                  {/* Número de confirmación */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="bg-gradient-to-r from-red-50 to-red-100 rounded-xl p-4 mb-6 border border-red-100"
+                  >
+                    <p className="text-sm text-gray-600 mb-1 font-medium">
+                      Número de Confirmación
+                    </p>
+                    <p className="text-2xl font-bold bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent">
+                      {confirmationNumber}
+                    </p>
+                  </motion.div>
+
+                  {/* Botón de acción */}
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => navigate("/dashboard")}
+                    className="w-full inline-flex justify-center items-center px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                  >
+                    Ir al Dashboard
+                  </motion.button>
+
+                  {/* Mensaje adicional */}
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                    className="mt-4 text-xs text-gray-500"
+                  >
+                    Guarda este número para dar seguimiento a tu solicitud
+                  </motion.p>
                 </div>
-
-                {/* Título y mensaje */}
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                  ¡Solicitud enviada!
-                </h3>
-                <p className="text-gray-600 mb-6 text-sm sm:text-base">
-                  Tu solicitud se ha enviado correctamente. Hemos enviado un
-                  correo electrónico con tu número de confirmación.
-                </p>
-
-                {/* Número de confirmación */}
-                <div className="bg-gradient-to-r from-red-50 to-red-100 rounded-xl p-4 mb-6 border border-red-100">
-                  <p className="text-sm text-gray-600 mb-1 font-medium">
-                    Número de Confirmación
-                  </p>
-                  <p className="text-2xl font-bold bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent">
-                    {confirmationNumber}
-                  </p>
-                </div>
-
-                {/* Botón de acción */}
-                <button
-                  onClick={() => navigate("/dashboard")}
-                  className="w-full inline-flex justify-center items-center px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-                >
-                  Ir al Dashboard
-                </button>
-
-                {/* Mensaje adicional */}
-                <p className="mt-4 text-xs text-gray-500">
-                  Guarda este número para dar seguimiento a tu solicitud
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
     </div>
   );

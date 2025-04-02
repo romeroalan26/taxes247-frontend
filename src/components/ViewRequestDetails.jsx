@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getAuth } from "firebase/auth";
 import { ClipLoader } from "react-spinners";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Eye,
   EyeOff,
@@ -23,7 +24,10 @@ const SensitiveField = ({ label, value, icon: Icon }) => {
   const [isVisible, setIsVisible] = useState(false);
 
   return (
-    <div className="bg-white p-4 rounded-xl border border-gray-100 hover:border-red-200 transition-all duration-200">
+    <motion.div
+      whileHover={{ scale: 1.01 }}
+      className="bg-white p-4 rounded-xl border border-gray-100 hover:border-red-200 transition-all duration-200"
+    >
       <div className="flex justify-between items-center mb-2">
         <div className="flex items-center gap-2">
           <div className="p-2 bg-red-50 rounded-full">
@@ -31,7 +35,9 @@ const SensitiveField = ({ label, value, icon: Icon }) => {
           </div>
           <span className="text-sm font-medium text-gray-600">{label}</span>
         </div>
-        <button
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
           onClick={() => setIsVisible(!isVisible)}
           className="text-gray-500 hover:text-red-600 transition-all duration-200"
         >
@@ -40,17 +46,20 @@ const SensitiveField = ({ label, value, icon: Icon }) => {
           ) : (
             <Eye className="h-4 w-4" />
           )}
-        </button>
+        </motion.button>
       </div>
       <p className="font-mono text-base">
         {isVisible ? value : "•".repeat(value.length)}
       </p>
-    </div>
+    </motion.div>
   );
 };
 
 const InfoCard = ({ icon: Icon, label, value }) => (
-  <div className="bg-white p-4 rounded-xl border border-gray-100 hover:border-red-200 transition-all duration-200">
+  <motion.div
+    whileHover={{ scale: 1.01 }}
+    className="bg-white p-4 rounded-xl border border-gray-100 hover:border-red-200 transition-all duration-200"
+  >
     <div className="flex items-center gap-3 mb-2">
       <div className="p-2 bg-red-50 rounded-full">
         <Icon className="h-4 w-4 text-red-600" />
@@ -58,7 +67,7 @@ const InfoCard = ({ icon: Icon, label, value }) => (
       <span className="text-sm font-medium text-gray-600">{label}</span>
     </div>
     <p className="text-gray-900">{value}</p>
-  </div>
+  </motion.div>
 );
 
 const StatusBadge = ({ status }) => {
@@ -85,11 +94,13 @@ const StatusBadge = ({ status }) => {
   };
 
   return (
-    <span
+    <motion.span
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
       className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium ${getStatusStyle()}`}
     >
       {status}
-    </span>
+    </motion.span>
   );
 };
 
@@ -127,13 +138,15 @@ const ViewRequestDetails = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
         <p className="text-lg text-gray-600 mb-4">Solicitud no encontrada</p>
-        <button
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           onClick={() => navigate("/dashboard")}
           className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-200"
         >
           <ArrowLeft className="h-4 w-4" />
           Volver al Dashboard
-        </button>
+        </motion.button>
       </div>
     );
   }
@@ -144,30 +157,42 @@ const ViewRequestDetails = () => {
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <button
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center gap-4"
+            >
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => navigate("/dashboard")}
                 className="p-2 hover:bg-red-50 rounded-xl transition-all duration-200"
               >
                 <ArrowLeft className="h-5 w-5 text-gray-700" />
-              </button>
+              </motion.button>
               <div>
                 <p className="text-sm text-gray-500">Solicitud</p>
                 <h1 className="text-2xl font-bold text-gray-900">
                   #{request.confirmationNumber}
                 </h1>
               </div>
-            </div>
-            <div className="flex items-center gap-4">
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center gap-4"
+            >
               <StatusBadge status={request.status} />
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => window.print()}
                 className="flex items-center gap-2 px-4 py-2 rounded-xl text-gray-700 hover:text-red-600 hover:bg-red-50 transition-all duration-200"
               >
                 <Printer className="h-4 w-4" />
                 <span className="hidden sm:inline">Imprimir</span>
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
           </div>
         </div>
       </header>
@@ -175,13 +200,22 @@ const ViewRequestDetails = () => {
       <main className="max-w-7xl mx-auto px-4 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Columna Principal - Información Personal */}
-          <div className="lg:col-span-2 space-y-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="lg:col-span-2 space-y-6"
+          >
             {/* Información Personal */}
             <section className="bg-white rounded-2xl p-6 shadow-sm">
-              <h2 className="flex items-center gap-2 text-lg font-semibold mb-6">
+              <motion.h2
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex items-center gap-2 text-lg font-semibold mb-6"
+              >
                 <User className="h-5 w-5 text-red-600" />
                 Información Personal
-              </h2>
+              </motion.h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <InfoCard icon={User} label="Nombre" value={request.fullName} />
                 <InfoCard icon={Mail} label="Email" value={request.email} />
@@ -196,10 +230,15 @@ const ViewRequestDetails = () => {
 
             {/* Información Sensible */}
             <section className="bg-white rounded-2xl p-6 shadow-sm">
-              <h2 className="flex items-center gap-2 text-lg font-semibold mb-6">
+              <motion.h2
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+                className="flex items-center gap-2 text-lg font-semibold mb-6"
+              >
                 <Shield className="h-5 w-5 text-red-600" />
                 Información Sensible
-              </h2>
+              </motion.h2>
               <div className="space-y-4">
                 <SensitiveField
                   label="Número de Seguro Social"
@@ -218,16 +257,26 @@ const ViewRequestDetails = () => {
                 />
               </div>
             </section>
-          </div>
+          </motion.div>
 
           {/* Columna Lateral - Información General */}
-          <div className="space-y-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="space-y-6"
+          >
             {/* Resumen de la Solicitud */}
             <section className="bg-white rounded-2xl p-6 shadow-sm">
-              <h2 className="flex items-center gap-2 text-lg font-semibold mb-6">
+              <motion.h2
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.5 }}
+                className="flex items-center gap-2 text-lg font-semibold mb-6"
+              >
                 <FileText className="h-5 w-5 text-red-600" />
                 Resumen de la Solicitud
-              </h2>
+              </motion.h2>
               <div className="space-y-4">
                 <InfoCard
                   icon={Calendar}
@@ -249,15 +298,22 @@ const ViewRequestDetails = () => {
 
             {/* Ayuda y Soporte */}
             <section className="bg-white rounded-2xl p-6 shadow-sm">
-              <h2 className="flex items-center gap-2 text-lg font-semibold mb-6">
+              <motion.h2
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.6 }}
+                className="flex items-center gap-2 text-lg font-semibold mb-6"
+              >
                 <MessageCircle className="h-5 w-5 text-red-600" />
                 ¿Necesitas Ayuda?
-              </h2>
+              </motion.h2>
               <p className="text-gray-600 mb-4">
                 Nuestro equipo está disponible para ayudarte con cualquier
                 pregunta sobre tu solicitud.
               </p>
-              <a
+              <motion.a
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 href="https://wa.me/18094039726"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -265,9 +321,9 @@ const ViewRequestDetails = () => {
               >
                 <MessageCircle className="h-4 w-4" />
                 Contactar Soporte
-              </a>
+              </motion.a>
             </section>
-          </div>
+          </motion.div>
         </div>
       </main>
     </div>

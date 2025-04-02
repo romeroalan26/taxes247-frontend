@@ -21,6 +21,7 @@ import {
   AlertCircle,
   Menu,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Login = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -222,34 +223,44 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Header Mejorado */}
-      <header className="bg-white shadow-sm">
+      {/* Header */}
+      <header className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-3">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center space-x-3"
+            >
               <FileText className="w-8 h-8 text-red-600" />
               <h1 className="text-2xl font-bold bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent">
                 Taxes247
               </h1>
-            </div>
+            </motion.div>
 
-            {/* Botones para pantallas medianas y grandes */}
+            {/* Desktop Navigation */}
             <div className="hidden md:flex space-x-4">
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => navigate("/pricing")}
                 className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 transition-all duration-200"
               >
                 <DollarSign className="w-4 h-4 mr-2" />
                 Precios
-              </button>
-              <button
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => navigate("/faq")}
                 className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 transition-all duration-200"
               >
                 <HelpCircle className="w-4 h-4 mr-2" />
                 FAQ
-              </button>
-              <button
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() =>
                   window.open("https://wa.me/18094039726", "_blank")
                 }
@@ -257,124 +268,156 @@ const Login = () => {
               >
                 <MessageCircle className="w-4 h-4 mr-2" />
                 Contacto
-              </button>
+              </motion.button>
             </div>
 
-            {/* Botón hamburguesa para móvil */}
-            <div className="md:hidden">
-              <button
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="p-2 rounded-full hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-200 transition-all duration-200"
-              >
-                <Menu className="w-6 h-6 text-gray-700" />
-              </button>
-            </div>
+            {/* Mobile Menu Button */}
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="md:hidden p-2 rounded-full hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-200 transition-all duration-200"
+            >
+              <Menu className="w-6 h-6 text-gray-700" />
+            </motion.button>
           </div>
 
-          {/* Menú móvil */}
-          {isMenuOpen && (
-            <div className="md:hidden pb-3 space-y-1">
-              <button
-                onClick={() => {
-                  navigate("/pricing");
-                  setIsMenuOpen(false);
-                }}
-                className="block w-full px-3 py-2 rounded-lg text-base font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 text-left transition-all duration-200"
+          {/* Mobile Menu with Animation */}
+          <AnimatePresence>
+            {isMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="md:hidden pb-3 space-y-1"
               >
-                <DollarSign className="w-4 h-4 inline mr-2" />
-                Precios
-              </button>
-              <button
-                onClick={() => {
-                  navigate("/faq");
-                  setIsMenuOpen(false);
-                }}
-                className="block w-full px-3 py-2 rounded-lg text-base font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 text-left transition-all duration-200"
-              >
-                <HelpCircle className="w-4 h-4 inline mr-2" />
-                FAQ
-              </button>
-              <button
-                onClick={() => {
-                  window.open("https://wa.me/18094039726", "_blank");
-                  setIsMenuOpen(false);
-                }}
-                className="block w-full px-3 py-2 rounded-lg text-base font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 text-left transition-all duration-200"
-              >
-                <MessageCircle className="w-4 h-4 inline mr-2" />
-                Contacto
-              </button>
-            </div>
-          )}
+                <motion.button
+                  whileHover={{ x: 5 }}
+                  onClick={() => {
+                    navigate("/pricing");
+                    setIsMenuOpen(false);
+                  }}
+                  className="block w-full px-3 py-2 rounded-lg text-base font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 text-left transition-all duration-200"
+                >
+                  <DollarSign className="w-4 h-4 inline mr-2" />
+                  Precios
+                </motion.button>
+                <motion.button
+                  whileHover={{ x: 5 }}
+                  onClick={() => {
+                    navigate("/faq");
+                    setIsMenuOpen(false);
+                  }}
+                  className="block w-full px-3 py-2 rounded-lg text-base font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 text-left transition-all duration-200"
+                >
+                  <HelpCircle className="w-4 h-4 inline mr-2" />
+                  FAQ
+                </motion.button>
+                <motion.button
+                  whileHover={{ x: 5 }}
+                  onClick={() => {
+                    window.open("https://wa.me/18094039726", "_blank");
+                    setIsMenuOpen(false);
+                  }}
+                  className="block w-full px-3 py-2 rounded-lg text-base font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 text-left transition-all duration-200"
+                >
+                  <MessageCircle className="w-4 h-4 inline mr-2" />
+                  Contacto
+                </motion.button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
-          {/* Sección de Login */}
-          <div className="flex-1 w-full max-w-md mx-auto">
-            {/* Formulario */}
-            <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
-              {/* Banner de Bienvenida Integrado */}
-              <div className="bg-gradient-to-br from-red-600 to-red-700 rounded-xl p-4 sm:p-6 text-white mb-6">
-                <h2 className="text-xl sm:text-2xl font-bold mb-2">
-                  ¡Bienvenido a Taxes247!
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start justify-center">
+          {/* Login Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="w-full max-w-md mx-auto"
+          >
+            {/* Login Form */}
+            <div className="bg-white/90 rounded-2xl shadow-xl p-6  border border-white/20">
+              {/* Welcome Banner */}
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="text-center mb-6 bg-gradient-to-r from-red-600 to-red-700 p-6 rounded-t-2xl -mx-6 -mt-6"
+              >
+                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+                  ¡Bienvenido!
                 </h2>
-                <p className="text-red-100 text-sm sm:text-base">
-                  Simplifica y asegura tu proceso de declaración de impuestos
-                  con nuestra plataforma.
+                <p className="text-base text-white/90">
+                  Inicia sesión para continuar
                 </p>
-              </div>
+              </motion.div>
 
-              <form onSubmit={handleLogin} className="space-y-4 sm:space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <form onSubmit={handleLogin} className="space-y-5">
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <label className="block text-base font-medium text-gray-700 mb-2">
                     Correo Electrónico
                   </label>
-                  <div className="relative group">
+                  <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Mail className="h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors duration-200" />
+                      <Mail className="h-5 w-5 text-gray-700" />
                     </div>
                     <input
                       type="email"
-                      className="block w-full pl-10 px-4 py-2.5 sm:py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                      className="block w-full pl-10 px-4 py-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 text-base"
                       placeholder="correo@ejemplo.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
                     />
                   </div>
-                </div>
+                </motion.div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  <label className="block text-base font-medium text-gray-700 mb-2">
                     Contraseña
                   </label>
-                  <div className="relative group">
+                  <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Lock className="h-5 w-5 text-gray-400 group-focus-within:text-red-500 transition-colors duration-200" />
+                      <Lock className="h-5 w-5 text-gray-700" />
                     </div>
                     <input
                       type="password"
-                      className="block w-full pl-10 px-4 py-2.5 sm:py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                      className="block w-full pl-10 px-4 py-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 text-base"
                       placeholder="********"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
                     />
                   </div>
-                </div>
+                </motion.div>
 
                 {errorMessage && (
-                  <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 sm:p-4 rounded-xl border border-red-100">
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-center gap-2 text-red-600 bg-red-50 p-4 rounded-lg border border-red-100 text-base"
+                  >
                     <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                    <p className="text-sm">{errorMessage}</p>
-                  </div>
+                    <p>{errorMessage}</p>
+                  </motion.div>
                 )}
 
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   type="submit"
-                  className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-2.5 sm:py-3 px-4 rounded-xl hover:from-red-700 hover:to-red-800 transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+                  className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white py-3 px-4 rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg text-base font-medium"
                   disabled={isEmailLoading}
                 >
                   {isEmailLoading ? (
@@ -385,23 +428,25 @@ const Login = () => {
                       <ChevronRight className="w-5 h-5" />
                     </>
                   )}
-                </button>
+                </motion.button>
 
-                <div className="relative my-4 sm:my-6">
+                <div className="relative my-5">
                   <div className="absolute inset-0 flex items-center">
                     <div className="w-full border-t border-gray-200"></div>
                   </div>
-                  <div className="relative flex justify-center text-sm">
+                  <div className="relative flex justify-center text-base">
                     <span className="px-2 bg-white text-gray-500">
                       O continúa con
                     </span>
                   </div>
                 </div>
 
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   type="button"
                   onClick={handleGoogleLogin}
-                  className="w-full bg-white border border-gray-200 text-gray-700 py-2.5 sm:py-3 px-4 rounded-xl hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:shadow-md"
+                  className="w-full bg-white border border-gray-200 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-2 shadow-sm hover:shadow-md text-base font-medium"
                   disabled={isGoogleLoading}
                 >
                   {isGoogleLoading ? (
@@ -430,31 +475,35 @@ const Login = () => {
                       Iniciar sesión con Google
                     </>
                   )}
-                </button>
+                </motion.button>
 
-                <div className="space-y-3 sm:space-y-4 text-center">
-                  <button
+                <div className="space-y-4 text-center">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     type="button"
                     onClick={() => navigate("/forgot-password")}
-                    className="text-sm text-red-600 hover:text-red-700 font-medium transition-colors duration-200"
+                    className="text-base text-red-600 hover:text-red-700 font-medium transition-colors duration-200"
                   >
                     ¿Olvidaste tu contraseña?
-                  </button>
+                  </motion.button>
 
-                  <div className="text-sm text-gray-600">
+                  <div className="text-base text-gray-600">
                     ¿No tienes una cuenta?{" "}
-                    <button
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                       type="button"
                       onClick={() => navigate("/register")}
                       className="font-medium text-red-600 hover:text-red-700 transition-colors duration-200"
                     >
                       Regístrate aquí
-                    </button>
+                    </motion.button>
                   </div>
                 </div>
               </form>
             </div>
-          </div>
+          </motion.div>
         </div>
       </main>
     </div>
