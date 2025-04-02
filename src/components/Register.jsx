@@ -232,6 +232,7 @@ const Register = () => {
                       type: "text",
                       name: "name",
                       placeholder: "John Doe",
+                      maxLength: 50,
                     },
                     {
                       label: "Correo Electrónico",
@@ -239,6 +240,7 @@ const Register = () => {
                       type: "email",
                       name: "email",
                       placeholder: "correo@ejemplo.com",
+                      maxLength: 100,
                     },
                     {
                       label: "Teléfono",
@@ -246,6 +248,7 @@ const Register = () => {
                       type: "tel",
                       name: "phone",
                       placeholder: "809-555-1234",
+                      maxLength: 15,
                     },
                   ].map((field, index) => (
                     <motion.div
@@ -269,6 +272,7 @@ const Register = () => {
                           className="block w-full pl-10 px-4 py-2.5 sm:py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
                           placeholder={field.placeholder}
                           required
+                          maxLength={field.maxLength}
                         />
                       </div>
                     </motion.div>
@@ -295,6 +299,7 @@ const Register = () => {
                         placeholder="********"
                         required
                         minLength={8}
+                        maxLength={20}
                       />
                       <motion.button
                         whileHover={{ scale: 1.1 }}
@@ -311,7 +316,7 @@ const Register = () => {
                       </motion.button>
                     </div>
                     <p className="mt-1 text-xs text-gray-500">
-                      Mínimo 8 caracteres
+                      Entre 8 y 20 caracteres
                     </p>
                   </motion.div>
 
