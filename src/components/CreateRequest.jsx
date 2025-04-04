@@ -1462,7 +1462,7 @@ const CreateRequest = () => {
               >
                 <ArrowLeft className="h-5 w-5" />
                 <div className="flex flex-col">
-                  <h1 className="text-xl font-semibold text-white">
+                  <h1 className="text-sm font-semibold text-white">
                     Dashboard
                   </h1>
                 </div>
