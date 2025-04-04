@@ -10,6 +10,7 @@ import {
   Shield,
   Mail,
   LogIn,
+  ArrowLeft,
 } from "lucide-react";
 
 const ActivateAccount = () => {
@@ -29,7 +30,6 @@ const ActivateAccount = () => {
         if (response.ok) {
           setStatus("success");
           setMessage("¡Cuenta activada con éxito!");
-          // Iniciamos el contador aquí
           timer = setInterval(() => {
             setCountdown((prev) => prev - 1);
           }, 1000);
@@ -49,13 +49,11 @@ const ActivateAccount = () => {
 
     activateAccount();
 
-    // Cleanup del timer
     return () => {
       if (timer) clearInterval(timer);
     };
   }, [token]);
 
-  // Efecto separado para manejar la navegación
   useEffect(() => {
     if (status === "success" && countdown <= 0) {
       navigate("/");
@@ -98,20 +96,34 @@ const ActivateAccount = () => {
   const statusConfig = getStatusConfig();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header */}
-      <header className="bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center space-x-2">
-            <FileText className="w-8 h-8" />
-            <h1 className="text-2xl font-bold">Taxes247</h1>
+      <header className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16 items-center">
+            <div className="flex items-center">
+              <button
+                onClick={() => navigate("/")}
+                className="mr-4 p-2 inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </button>
+              <div className="flex flex-col">
+                <h1 className="text-xl font-semibold text-gray-900">
+                  Activación de Cuenta
+                </h1>
+                <p className="text-sm text-gray-500">
+                  Verificando tu cuenta...
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-lg mx-auto px-4 py-12">
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          {/* Icon Banner */}
+      <main className="max-w-lg mx-auto px-4 py-8">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          {/* Status Banner */}
           <div
             className={`p-8 flex flex-col items-center justify-center bg-gradient-to-r
             ${
@@ -123,7 +135,7 @@ const ActivateAccount = () => {
             } 
             text-white`}
           >
-            <div className="bg-white rounded-full p-3 mb-4">
+            <div className="bg-white/10 backdrop-blur-sm rounded-full p-4 mb-4">
               {statusConfig.icon}
             </div>
             <h2 className="text-2xl font-bold text-center">
@@ -144,11 +156,11 @@ const ActivateAccount = () => {
                   <p className="text-gray-600 mb-6">{statusConfig.message}</p>
                   {status === "success" ? (
                     <div className="space-y-6">
-                      <div className="flex items-center justify-center space-x-2 text-green-600">
+                      <div className="flex items-center justify-center space-x-2 text-green-600 bg-green-50 px-4 py-3 rounded-xl">
                         <Mail className="w-5 h-5" />
                         <span>Tu correo ha sido verificado</span>
                       </div>
-                      <div className="bg-gray-50 rounded-lg p-4">
+                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
                         <p className="text-sm text-gray-600">
                           Redirigiendo al login en{" "}
                           <span className="font-bold text-red-600">
@@ -159,7 +171,7 @@ const ActivateAccount = () => {
                       </div>
                       <button
                         onClick={() => navigate("/")}
-                        className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 transition-all duration-200"
+                        className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
                       >
                         <LogIn className="w-5 h-5 mr-2" />
                         Ir al Login
@@ -168,7 +180,7 @@ const ActivateAccount = () => {
                   ) : (
                     <button
                       onClick={() => navigate("/")}
-                      className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 transition-all duration-200"
+                      className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
                     >
                       <ArrowRight className="w-5 h-5 mr-2" />
                       Volver al Inicio
@@ -188,7 +200,7 @@ const ActivateAccount = () => {
               href="https://wa.me/18094039726"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-red-600 hover:text-red-700 font-medium"
+              className="text-red-600 hover:text-red-700 font-medium transition-colors"
             >
               Contáctanos
             </a>

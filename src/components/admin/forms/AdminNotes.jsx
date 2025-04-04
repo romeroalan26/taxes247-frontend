@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { auth } from "../../../firebaseConfig";
 import { ClipLoader } from "react-spinners";
-import { MessageSquare, AlertCircle } from "lucide-react";
+import { MessageSquare, AlertCircle, Plus } from "lucide-react";
 
 const AdminNotes = ({ requestId, notes = [], onNoteAdded, isDarkMode }) => {
   const [newNote, setNewNote] = useState("");
@@ -45,20 +45,50 @@ const AdminNotes = ({ requestId, notes = [], onNoteAdded, isDarkMode }) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Lista de notas existentes */}
-      <div className="space-y-3">
+      <div className="space-y-4">
         {notes.map((note, index) => (
           <div
             key={index}
-            className="bg-gray-50 p-4 rounded-lg border border-gray-200"
+            className={`relative pl-6 pb-4 ${
+              index !== notes.length - 1 ? "border-l" : ""
+            } ${isDarkMode ? "border-gray-700" : "border-gray-200"}`}
           >
-            <div className="flex items-start space-x-3">
-              <MessageSquare className="h-5 w-5 text-gray-400" />
-              <div className="flex-1">
-                <p className="text-gray-700">{note.note}</p>
-                <p className="text-sm text-gray-500 mt-1">
-                  {new Date(note.date).toLocaleString()}
+            <div
+              className={`absolute left-0 top-0 w-3 h-3 rounded-full ${
+                isDarkMode ? "bg-gray-700" : "bg-gray-200"
+              }`}
+            />
+
+            <div
+              className={`rounded-xl border ${
+                isDarkMode
+                  ? "bg-gray-800/50 border-gray-700"
+                  : "bg-white border-gray-200"
+              }`}
+            >
+              <div className="p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <MessageSquare
+                    className={`h-4 w-4 ${
+                      isDarkMode ? "text-gray-400" : "text-gray-500"
+                    }`}
+                  />
+                  <span
+                    className={`text-xs ${
+                      isDarkMode ? "text-gray-400" : "text-gray-500"
+                    }`}
+                  >
+                    {new Date(note.date).toLocaleString()}
+                  </span>
+                </div>
+                <p
+                  className={`text-sm ${
+                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                  }`}
+                >
+                  {note.note}
                 </p>
               </div>
             </div>
@@ -69,42 +99,67 @@ const AdminNotes = ({ requestId, notes = [], onNoteAdded, isDarkMode }) => {
       {/* Formulario para nueva nota */}
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <div className="flex items-center gap-2 p-3 text-red-600 bg-red-50 rounded-md">
-            <AlertCircle className="h-5 w-5" />
-            <span>{error}</span>
+          <div
+            className={`flex items-center gap-3 p-4 rounded-xl ${
+              isDarkMode
+                ? "bg-red-900/20 text-red-400"
+                : "bg-red-50 text-red-600"
+            }`}
+          >
+            <AlertCircle className="h-5 w-5 flex-shrink-0" />
+            <p className="text-sm">{error}</p>
           </div>
         )}
 
         <div>
           <label
-            className={`block text-sm font-medium  mb-1 ${
-              isDarkMode ? "text-gray-100" : "text-gray-700"
+            className={`block text-sm font-medium mb-2 ${
+              isDarkMode ? "text-gray-200" : "text-gray-700"
             }`}
           >
-            Nueva Nota
+            <div className="flex items-center gap-2">
+              <Plus
+                className={`h-4 w-4 ${
+                  isDarkMode ? "text-gray-400" : "text-gray-500"
+                }`}
+              />
+              <span>Nueva Nota</span>
+            </div>
           </label>
-          <textarea
-            value={newNote}
-            onChange={(e) => setNewNote(e.target.value)}
-            className={`w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 ${
-              isDarkMode ? "bg-gray-600 text-gray-100" : "bg-white text-white"
+          <div
+            className={`relative rounded-xl border ${
+              isDarkMode
+                ? "bg-gray-800/50 border-gray-700"
+                : "bg-white border-gray-200"
             }`}
-            rows="3"
-            placeholder="Añade una nota administrativa..."
-            required
-          />
+          >
+            <textarea
+              value={newNote}
+              onChange={(e) => setNewNote(e.target.value)}
+              className={`w-full bg-transparent py-3 px-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-red-500 rounded-xl resize-none ${
+                isDarkMode ? "text-gray-200" : "text-gray-900"
+              }`}
+              rows="4"
+              placeholder="Añade una nota administrativa..."
+              required
+            />
+          </div>
         </div>
 
         <button
           type="submit"
           disabled={loading || !newNote.trim()}
-          className="w-full px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 disabled:opacity-50 flex items-center justify-center"
+          className={`w-full px-4 py-2.5 rounded-xl text-sm font-medium bg-red-600 text-white transition-all duration-200 ${
+            loading || !newNote.trim()
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:bg-red-700"
+          } flex items-center justify-center gap-2`}
         >
           {loading ? (
             <ClipLoader size={20} color="#ffffff" />
           ) : (
             <>
-              <MessageSquare className="h-4 w-4 mr-2" />
+              <MessageSquare className="h-4 w-4" />
               Añadir Nota
             </>
           )}

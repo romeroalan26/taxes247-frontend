@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getAuth } from "firebase/auth";
 import { ClipLoader } from "react-spinners";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Eye,
   EyeOff,
@@ -15,6 +16,7 @@ import {
   Mail,
   ArrowLeft,
   Printer,
+  MessageCircle,
 } from "lucide-react";
 import api from "../utils/api";
 
@@ -22,32 +24,42 @@ const SensitiveField = ({ label, value, icon: Icon }) => {
   const [isVisible, setIsVisible] = useState(false);
 
   return (
-    <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-red-200 transition-colors">
+    <motion.div
+      whileHover={{ scale: 1.01 }}
+      className="bg-white p-4 rounded-xl border border-gray-100 hover:border-red-200 transition-all duration-200"
+    >
       <div className="flex justify-between items-center mb-2">
         <div className="flex items-center gap-2">
-          <Icon className="h-4 w-4 text-gray-500" />
+          <div className="p-2 bg-red-50 rounded-full">
+            <Icon className="h-4 w-4 text-red-600" />
+          </div>
           <span className="text-sm font-medium text-gray-600">{label}</span>
         </div>
-        <button
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
           onClick={() => setIsVisible(!isVisible)}
-          className="text-gray-500 hover:text-red-600 transition-colors"
+          className="text-gray-500 hover:text-red-600 transition-all duration-200"
         >
           {isVisible ? (
             <EyeOff className="h-4 w-4" />
           ) : (
             <Eye className="h-4 w-4" />
           )}
-        </button>
+        </motion.button>
       </div>
-      <p className="font-mono text-lg">
+      <p className="font-mono text-base">
         {isVisible ? value : "•".repeat(value.length)}
       </p>
-    </div>
+    </motion.div>
   );
 };
 
 const InfoCard = ({ icon: Icon, label, value }) => (
-  <div className="bg-white p-4 rounded-lg border border-gray-100 hover:border-red-200 transition-all shadow-sm hover:shadow-md">
+  <motion.div
+    whileHover={{ scale: 1.01 }}
+    className="bg-white p-4 rounded-xl border border-gray-100 hover:border-red-200 transition-all duration-200"
+  >
     <div className="flex items-center gap-3 mb-2">
       <div className="p-2 bg-red-50 rounded-full">
         <Icon className="h-4 w-4 text-red-600" />
@@ -55,7 +67,7 @@ const InfoCard = ({ icon: Icon, label, value }) => (
       <span className="text-sm font-medium text-gray-600">{label}</span>
     </div>
     <p className="text-gray-900">{value}</p>
-  </div>
+  </motion.div>
 );
 
 const StatusBadge = ({ status }) => {
@@ -82,11 +94,13 @@ const StatusBadge = ({ status }) => {
   };
 
   return (
-    <span
-      className={`px-4 py-2 rounded-full text-sm font-medium ${getStatusStyle()}`}
+    <motion.span
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium ${getStatusStyle()}`}
     >
       {status}
-    </span>
+    </motion.span>
   );
 };
 
@@ -114,7 +128,7 @@ const ViewRequestDetails = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
         <ClipLoader size={40} color="#DC2626" />
       </div>
     );
@@ -122,116 +136,194 @@ const ViewRequestDetails = () => {
 
   if (!request) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
         <p className="text-lg text-gray-600 mb-4">Solicitud no encontrada</p>
-        <button
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           onClick={() => navigate("/dashboard")}
-          className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+          className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-200"
         >
           <ArrowLeft className="h-4 w-4" />
           Volver al Dashboard
-        </button>
+        </motion.button>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header */}
-      <header className="bg-gradient-to-r from-red-600 to-red-700 text-white">
+      <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <button
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center gap-4"
+            >
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => navigate("/dashboard")}
-                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                className="p-2 hover:bg-red-50 rounded-xl transition-all duration-200"
               >
-                <ArrowLeft className="h-5 w-5" />
-              </button>
+                <ArrowLeft className="h-5 w-5 text-gray-700" />
+              </motion.button>
               <div>
-                <p className="text-sm text-red-100">Solicitud</p>
-                <h1 className="text-2xl font-bold">
+                <p className="text-sm text-gray-500">Solicitud</p>
+                <h1 className="text-2xl font-bold text-gray-900">
                   #{request.confirmationNumber}
                 </h1>
               </div>
-            </div>
-            <div className="flex items-center gap-4">
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center gap-4"
+            >
               <StatusBadge status={request.status} />
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => window.print()}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white/20 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl text-gray-700 hover:text-red-600 hover:bg-red-50 transition-all duration-200"
               >
                 <Printer className="h-4 w-4" />
                 <span className="hidden sm:inline">Imprimir</span>
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        {/* General Information */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <InfoCard
-            icon={Calendar}
-            label="Fecha de Solicitud"
-            value={new Date(request.createdAt).toLocaleDateString()}
-          />
-          <InfoCard
-            icon={FileText}
-            label="Tipo de Servicio"
-            value={request.requestType}
-          />
-          <InfoCard
-            icon={DollarSign}
-            label="Precio"
-            value={`$${request.price}`}
-          />
-        </div>
+      <main className="max-w-7xl mx-auto px-4 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Columna Principal - Información Personal */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="lg:col-span-2 space-y-6"
+          >
+            {/* Información Personal */}
+            <section className="bg-white rounded-2xl p-6 shadow-sm">
+              <motion.h2
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex items-center gap-2 text-lg font-semibold mb-6"
+              >
+                <User className="h-5 w-5 text-red-600" />
+                Información Personal
+              </motion.h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <InfoCard icon={User} label="Nombre" value={request.fullName} />
+                <InfoCard icon={Mail} label="Email" value={request.email} />
+                <InfoCard icon={Phone} label="Teléfono" value={request.phone} />
+                <InfoCard
+                  icon={MapPin}
+                  label="Dirección"
+                  value={request.address}
+                />
+              </div>
+            </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Personal Information */}
-          <section className="bg-white rounded-xl p-6 shadow-sm">
-            <h2 className="flex items-center gap-2 text-lg font-semibold mb-6">
-              <User className="h-5 w-5 text-red-600" />
-              Información Personal
-            </h2>
-            <div className="space-y-4">
-              <InfoCard icon={User} label="Nombre" value={request.fullName} />
-              <InfoCard icon={Mail} label="Email" value={request.email} />
-              <InfoCard icon={Phone} label="Teléfono" value={request.phone} />
-              <InfoCard
-                icon={MapPin}
-                label="Dirección"
-                value={request.address}
-              />
-            </div>
-          </section>
+            {/* Información Sensible */}
+            <section className="bg-white rounded-2xl p-6 shadow-sm">
+              <motion.h2
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+                className="flex items-center gap-2 text-lg font-semibold mb-6"
+              >
+                <Shield className="h-5 w-5 text-red-600" />
+                Información Sensible
+              </motion.h2>
+              <div className="space-y-4">
+                <SensitiveField
+                  label="Número de Seguro Social"
+                  value={request.ssn}
+                  icon={Shield}
+                />
+                <SensitiveField
+                  label="Número de Cuenta"
+                  value={request.accountNumber}
+                  icon={Shield}
+                />
+                <SensitiveField
+                  label="Número de Ruta"
+                  value={request.routingNumber}
+                  icon={Shield}
+                />
+              </div>
+            </section>
+          </motion.div>
 
-          {/* Sensitive Information */}
-          <section className="bg-white rounded-xl p-6 shadow-sm">
-            <h2 className="flex items-center gap-2 text-lg font-semibold mb-6">
-              <Shield className="h-5 w-5 text-red-600" />
-              Información Sensible
-            </h2>
-            <div className="space-y-4">
-              <SensitiveField
-                label="Número de Seguro Social"
-                value={request.ssn}
-                icon={Shield}
-              />
-              <SensitiveField
-                label="Número de Cuenta"
-                value={request.accountNumber}
-                icon={Shield}
-              />
-              <SensitiveField
-                label="Número de Ruta"
-                value={request.routingNumber}
-                icon={Shield}
-              />
-            </div>
-          </section>
+          {/* Columna Lateral - Información General */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="space-y-6"
+          >
+            {/* Resumen de la Solicitud */}
+            <section className="bg-white rounded-2xl p-6 shadow-sm">
+              <motion.h2
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.5 }}
+                className="flex items-center gap-2 text-lg font-semibold mb-6"
+              >
+                <FileText className="h-5 w-5 text-red-600" />
+                Resumen de la Solicitud
+              </motion.h2>
+              <div className="space-y-4">
+                <InfoCard
+                  icon={Calendar}
+                  label="Fecha de Solicitud"
+                  value={new Date(request.createdAt).toLocaleDateString()}
+                />
+                <InfoCard
+                  icon={FileText}
+                  label="Tipo de Servicio"
+                  value={request.requestType}
+                />
+                <InfoCard
+                  icon={DollarSign}
+                  label="Precio"
+                  value={`$${request.price}`}
+                />
+              </div>
+            </section>
+
+            {/* Ayuda y Soporte */}
+            <section className="bg-white rounded-2xl p-6 shadow-sm">
+              <motion.h2
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.6 }}
+                className="flex items-center gap-2 text-lg font-semibold mb-6"
+              >
+                <MessageCircle className="h-5 w-5 text-red-600" />
+                ¿Necesitas Ayuda?
+              </motion.h2>
+              <p className="text-gray-600 mb-4">
+                Nuestro equipo está disponible para ayudarte con cualquier
+                pregunta sobre tu solicitud.
+              </p>
+              <motion.a
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                href="https://wa.me/18094039726"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-200"
+              >
+                <MessageCircle className="h-4 w-4" />
+                Contactar Soporte
+              </motion.a>
+            </section>
+          </motion.div>
         </div>
       </main>
     </div>

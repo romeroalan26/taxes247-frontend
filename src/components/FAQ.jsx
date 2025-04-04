@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   HelpCircle,
   ChevronRight,
@@ -154,90 +155,140 @@ const FAQ = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header */}
-      <header className="bg-gradient-to-r from-red-600 to-red-700 text-white shadow-lg">
+      <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-2">
-              <FileText className="w-8 h-8" />
-              <h1 className="text-2xl font-bold">Taxes247</h1>
-            </div>
-            <button
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center space-x-3"
+            >
+              <FileText className="w-8 h-8 text-red-600" />
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent">
+                Taxes247
+              </h1>
+            </motion.div>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => navigate("/")}
-              className="px-4 py-2 bg-white/10 rounded-md hover:bg-white/20 transition-colors"
+              className="px-4 py-2 rounded-full text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 transition-all duration-200"
             >
               Login
-            </button>
+            </motion.button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-white rounded-xl shadow-lg p-8">
-          <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <HelpCircle className="w-6 h-6 text-red-600" />
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-2xl shadow-lg p-6 sm:p-8"
+        >
+          <motion.h3
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 flex items-center gap-2"
+          >
+            <HelpCircle className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
             Preguntas Frecuentes
-          </h3>
+          </motion.h3>
+
           {/* Barra de búsqueda */}
-          <div className="relative mb-6">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="relative mb-4 sm:mb-6"
+          >
             <input
               type="text"
-              className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+              className="w-full px-4 py-2.5 sm:py-3 pl-10 border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
               placeholder="Buscar preguntas..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
             <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-          </div>
+          </motion.div>
 
           {/* Lista de FAQs */}
-          <div className="space-y-4">
-            {filteredFaqs.length > 0 ? (
-              filteredFaqs.map((faq, index) => (
-                <details
-                  key={index}
-                  className="group bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+          <div className="space-y-3 sm:space-y-4">
+            <AnimatePresence>
+              {filteredFaqs.length > 0 ? (
+                filteredFaqs.map((faq, index) => (
+                  <motion.details
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 + index * 0.1 }}
+                    className="group bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors duration-200"
+                  >
+                    <motion.summary
+                      whileHover={{ x: 5 }}
+                      className="flex items-center gap-3 p-4 font-medium cursor-pointer list-none"
+                    >
+                      {faq.icon}
+                      <span className="text-sm sm:text-base">
+                        {faq.question}
+                      </span>
+                      <ChevronRight className="w-5 h-5 ml-auto transition-transform group-open:rotate-90" />
+                    </motion.summary>
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="px-4 pb-4 text-sm sm:text-base text-gray-600"
+                    >
+                      {faq.answer}
+                    </motion.div>
+                  </motion.details>
+                ))
+              ) : (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-center text-gray-500 text-sm sm:text-base"
                 >
-                  <summary className="flex items-center gap-3 p-4 font-medium cursor-pointer list-none">
-                    {faq.icon}
-                    {faq.question}
-                    <ChevronRight className="w-5 h-5 ml-auto transition-transform group-open:rotate-90" />
-                  </summary>
-                  <div className="px-4 pb-4 text-gray-600">{faq.answer}</div>
-                </details>
-              ))
-            ) : (
-              <p className="text-center text-gray-500">
-                No se encontraron preguntas relacionadas.
-              </p>
-            )}
+                  No se encontraron preguntas relacionadas.
+                </motion.p>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Banner de contacto */}
-          <div className="mt-8 p-4 bg-red-50 rounded-lg">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+            className="mt-6 sm:mt-8 p-4 sm:p-6 bg-red-50 rounded-xl"
+          >
             <div className="flex items-start gap-3">
-              <BellRing className="w-6 h-6 text-red-600 flex-shrink-0 mt-1" />
+              <BellRing className="w-5 h-5 sm:w-6 sm:h-6 text-red-600 flex-shrink-0 mt-1" />
               <div>
-                <h4 className="font-medium text-red-900">
+                <h4 className="font-medium text-red-900 text-sm sm:text-base">
                   ¿Necesitas más ayuda?
                 </h4>
                 <p className="mt-1 text-sm text-red-700">
                   Nuestro equipo está disponible para responder todas tus
                   preguntas.
-                  <a
+                  <motion.a
+                    whileHover={{ x: 5 }}
                     href="https://wa.me/18094039726"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block mt-2 text-red-600 hover:text-red-700 font-medium"
+                    className="block mt-2 text-red-600 hover:text-red-700 font-medium transition-colors duration-200"
                   >
                     Contactar soporte →
-                  </a>
+                  </motion.a>
                 </p>
               </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </main>
     </div>
   );

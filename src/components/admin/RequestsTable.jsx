@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, memo } from "react";
 import { auth } from "../../firebaseConfig";
 import { ClipLoader } from "react-spinners";
 import {
@@ -8,11 +8,36 @@ import {
   Search,
   ChevronLeft,
   ChevronRight,
+  Filter,
+  Users,
+  FileText,
+  Clock,
+  X,
 } from "lucide-react";
 import RequestDetailsModal from "./RequestDetailsModal";
 import DeleteConfirmationDialog from "./modals/DeleteConfirmationDialog";
 
-const RequestsTable = ({ isDarkMode }) => {
+// Definir el orden de los status
+const STATUS_ORDER = [
+  "Pendiente",
+  "En proceso",
+  "Pago programado",
+  "Pago recibido",
+  "Completado",
+  "Cancelado",
+  "Rechazado",
+];
+
+// Función para ordenar los status según el orden definido
+const sortStatuses = (statuses) => {
+  return [...statuses].sort((a, b) => {
+    const indexA = STATUS_ORDER.indexOf(a);
+    const indexB = STATUS_ORDER.indexOf(b);
+    return indexA - indexB;
+  });
+};
+
+const RequestsTable = memo(({ onViewDetails, isDarkMode, onStatsUpdate }) => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -96,13 +121,14 @@ const RequestsTable = ({ isDarkMode }) => {
         setTotalPages(data.pages);
         setStats(data.stats);
         setStatusSteps(data.statusSteps);
+        onStatsUpdate?.(data.stats);
       }
     } catch (error) {
       console.error("Error cargando solicitudes:", error);
     } finally {
       setLoading(false);
     }
-  }, [currentPage, debouncedSearchTerm, selectedStatus]);
+  }, [currentPage, debouncedSearchTerm, selectedStatus, onStatsUpdate]);
 
   useEffect(() => {
     loadRequests();
@@ -184,203 +210,257 @@ const RequestsTable = ({ isDarkMode }) => {
     }
   };
 
+  // Función para generar los números de página a mostrar
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    const halfMaxPages = Math.floor(maxVisiblePages / 2);
+
+    let startPage = Math.max(currentPage - halfMaxPages, 1);
+    let endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
+
+    if (endPage - startPage + 1 < maxVisiblePages) {
+      startPage = Math.max(endPage - maxVisiblePages + 1, 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+
+    return pages;
+  };
+
+  // Obtener status únicos y ordenados
+  const uniqueStatuses = sortStatuses(Object.keys(stats));
+
   if (loading) {
     return (
-      <div className="w-full h-64 flex items-center justify-center">
+      <div
+        className={`w-full h-64 flex items-center justify-center rounded-2xl border ${
+          isDarkMode
+            ? "bg-gray-800 border-gray-700"
+            : "bg-white border-gray-100"
+        }`}
+      >
         <ClipLoader color="#DC2626" />
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="space-y-6">
       {/* Filtros y Búsqueda */}
-      <div className="mb-6 flex flex-col sm:flex-row gap-4">
-        <select
-          value={selectedStatus}
-          onChange={(e) => {
-            setSelectedStatus(e.target.value);
-            setCurrentPage(1);
-          }}
-          className={`rounded-lg border ${
+      <div
+        className={`space-y-4 ${isDarkMode ? "text-white" : "text-gray-900"}`}
+      >
+        {/* Barra de búsqueda moderna */}
+        <div
+          className={`relative rounded-xl border shadow-sm ${
             isDarkMode
-              ? "border-gray-700 bg-gray-800 text-white"
-              : "border-gray-300 bg-white text-gray-900"
-          } px-4 py-2`}
+              ? "bg-gray-800/50 border-gray-700"
+              : "bg-white border-gray-100"
+          }`}
         >
-          <option
-            value=""
-            className={isDarkMode ? "text-gray-400" : "text-gray-600"}
-          >
-            Todos los estados
-          </option>
-          {statusSteps.map((status) => (
-            <option
-              key={status.value}
-              value={status.value}
-              className={isDarkMode ? "text-white" : "text-gray-900"}
-            >
-              {status.value}
-            </option>
-          ))}
-        </select>
-
-        <div className="flex-1">
           <div className="relative">
+            <div
+              className={`absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 ${
+                isDarkMode ? "text-gray-400" : "text-gray-500"
+              }`}
+            >
+              <Search className="h-4 w-4" />
+            </div>
             <input
               type="text"
               placeholder="Buscar por número, email o nombre..."
               value={inputSearchTerm}
               onChange={handleSearchChange}
-              className={`w-full rounded-lg border ${
+              className={`w-full pl-9 pr-9 py-2.5 rounded-xl border-0 text-sm font-medium transition-all duration-200 ${
                 isDarkMode
-                  ? "border-gray-700 bg-gray-800 text-white"
-                  : "border-gray-300 bg-white text-gray-900"
-              } pl-10 pr-4 py-2`}
+                  ? "bg-transparent text-white placeholder-gray-400 focus:bg-gray-800/80"
+                  : "bg-transparent text-gray-900 placeholder-gray-500 focus:bg-gray-50"
+              } focus:ring-2 focus:ring-red-500/20`}
             />
-            <Search
-              className={`absolute left-3 top-2.5 h-5 w-5 ${
-                isDarkMode ? "text-gray-400" : "text-gray-400"
-              }`}
-            />
+            {inputSearchTerm && (
+              <button
+                onClick={() => setInputSearchTerm("")}
+                className={`absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full transition-all duration-200 ${
+                  isDarkMode
+                    ? "text-gray-400 hover:bg-gray-700 hover:text-gray-300"
+                    : "text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                }`}
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
           </div>
         </div>
-      </div>
 
-      {/* Estadísticas */}
-      <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {Object.entries(stats).map(([status, count]) => (
-          <div
-            key={status}
-            className={`rounded-lg shadow p-4 ${
-              isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
+        {/* Filtros de estado */}
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => {
+              setSelectedStatus("");
+              setCurrentPage(1);
+            }}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+              selectedStatus === ""
+                ? isDarkMode
+                  ? "bg-red-600 text-white"
+                  : "bg-red-600 text-white"
+                : isDarkMode
+                ? "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
-            <h3 className="font-semibold">{status}</h3>
-            <p
-              className={`text-2xl font-bold ${
-                isDarkMode ? "text-gray-200" : "text-red-600"
+            Todos ({Object.values(stats).reduce((a, b) => a + b, 0)})
+          </button>
+          {uniqueStatuses.map((status) => (
+            <button
+              key={status}
+              onClick={() => {
+                setSelectedStatus(status);
+                setCurrentPage(1);
+              }}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+                selectedStatus === status
+                  ? isDarkMode
+                    ? "bg-red-600 text-white"
+                    : "bg-red-600 text-white"
+                  : isDarkMode
+                  ? "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
-              {count}
-            </p>
-          </div>
-        ))}
+              {status} ({stats[status] || 0})
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Tabla */}
       <div
-        className={`shadow rounded-lg overflow-hidden ${
-          isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
+        className={`rounded-2xl border overflow-hidden ${
+          isDarkMode
+            ? "bg-gray-800 border-gray-700"
+            : "bg-white border-gray-100"
         }`}
       >
         <div className="overflow-x-auto">
-          <table className="min-w-full d">
-            <thead
-              className={`${
-                isDarkMode
-                  ? "ivide-y-0 divide-gray-600 bg-gray-700"
-                  : "ivide-y-0 divide-gray-200 bg-gray-50 "
-              }`}
-            >
+          <table className="min-w-full">
+            <thead className={isDarkMode ? "bg-gray-700" : "bg-gray-50"}>
               <tr>
                 <th
-                  className={`px-6 py-3 text-left text-xs font-medium ${
-                    isDarkMode ? "text-gray-100" : "text-gray-500"
-                  }  uppercase tracking-wider`}
+                  className={`px-4 py-3 text-left text-xs font-medium ${
+                    isDarkMode ? "text-gray-300" : "text-gray-500"
+                  } uppercase tracking-wider`}
                 >
-                  Nº Confirmación
+                  Nº
                 </th>
                 <th
-                  className={`px-6 py-3 text-left text-xs font-medium ${
-                    isDarkMode ? "text-gray-100" : "text-gray-500"
-                  }  uppercase tracking-wider`}
+                  className={`px-4 py-3 text-left text-xs font-medium ${
+                    isDarkMode ? "text-gray-300" : "text-gray-500"
+                  } uppercase tracking-wider`}
                 >
                   Cliente
                 </th>
                 <th
-                  className={`px-6 py-3 text-left text-xs font-medium ${
-                    isDarkMode ? "text-gray-100" : "text-gray-500"
-                  }  uppercase tracking-wider`}
-                >
-                  Email
-                </th>
-                <th
-                  className={`px-6 py-3 text-left text-xs font-medium ${
-                    isDarkMode ? "text-gray-100" : "text-gray-500"
-                  }  uppercase tracking-wider`}
+                  className={`px-4 py-3 text-left text-xs font-medium ${
+                    isDarkMode ? "text-gray-300" : "text-gray-500"
+                  } uppercase tracking-wider`}
                 >
                   Estado
                 </th>
                 <th
-                  className={`px-6 py-3 text-left text-xs font-medium ${
-                    isDarkMode ? "text-gray-100" : "text-gray-500"
-                  }  uppercase tracking-wider`}
+                  className={`px-4 py-3 text-left text-xs font-medium ${
+                    isDarkMode ? "text-gray-300" : "text-gray-500"
+                  } uppercase tracking-wider`}
                 >
-                  Última Actualización
+                  Actualizado
                 </th>
                 <th
-                  className={`px-6 py-3 text-left text-xs font-medium ${
-                    isDarkMode ? "text-gray-100" : "text-gray-500"
-                  }  uppercase tracking-wider`}
+                  className={`px-4 py-3 text-left text-xs font-medium ${
+                    isDarkMode ? "text-gray-300" : "text-gray-500"
+                  } uppercase tracking-wider`}
                 >
                   Acciones
                 </th>
               </tr>
             </thead>
             <tbody
-              className={`  ${
-                isDarkMode
-                  ? "divide-y divide-gray-600 bg-gray-800 text-white"
-                  : "divide-y divide-gray-200 bg-white text-gray-900"
-              }`}
+              className={isDarkMode ? "divide-gray-700" : "divide-gray-200"}
             >
               {requests.map((request) => (
                 <tr
                   key={request._id}
-                  className={`hover:bg-gray-50 ${
-                    isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-50"
+                  className={`transition-colors duration-200 cursor-pointer ${
+                    isDarkMode ? "hover:bg-gray-700/50" : "hover:bg-gray-50"
                   }`}
+                  onClick={() => handleOpenModal(request)}
                 >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <td
+                    className={`px-4 py-3 whitespace-nowrap text-sm font-medium ${
+                      isDarkMode ? "text-white" : "text-gray-900"
+                    }`}
+                  >
                     {request.confirmationNumber}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    {request.fullName}
+                  <td
+                    className={`px-4 py-3 whitespace-nowrap text-sm ${
+                      isDarkMode ? "text-gray-300" : "text-gray-600"
+                    }`}
+                  >
+                    <div className="flex flex-col">
+                      <span>{request.fullName}</span>
+                      <span
+                        className={`text-xs ${
+                          isDarkMode ? "text-gray-400" : "text-gray-500"
+                        }`}
+                      >
+                        {request.email}
+                      </span>
+                    </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    {request.email}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 py-3 whitespace-nowrap">
                     <span
-                      className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(
+                      className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
                         request.status
                       )}`}
                     >
                       {request.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                  <td
+                    className={`px-4 py-3 whitespace-nowrap text-sm ${
+                      isDarkMode ? "text-gray-300" : "text-gray-600"
+                    }`}
+                  >
                     {new Date(
                       request.lastStatusUpdate || request.updatedAt
                     ).toLocaleString()}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-3">
+                  <td
+                    className="px-4 py-3 whitespace-nowrap text-sm font-medium space-x-2"
+                    onClick={(e) => e.stopPropagation()} // Prevenir que el click en los botones abra el modal
+                  >
                     <button
                       onClick={() => handleOpenModal(request)}
-                      className={`text-blue-600 hover:text-blue-400 ${
-                        isDarkMode ? "text-blue-400" : "text-blue-600"
+                      className={`p-1.5 rounded-lg transition-colors duration-200 ${
+                        isDarkMode
+                          ? "text-blue-400 hover:bg-blue-400/10"
+                          : "text-blue-600 hover:bg-blue-50"
                       }`}
                     >
-                      <Eye className="h-5 w-5" />
+                      <Eye className="h-4 w-4" />
                     </button>
                     <button
                       onClick={() => handleDeleteClick(request)}
-                      className={`text-red-600 hover:text-red-400 ${
-                        isDarkMode ? "text-red-400" : "text-red-600"
+                      className={`p-1.5 rounded-lg transition-colors duration-200 ${
+                        isDarkMode
+                          ? "text-red-400 hover:bg-red-400/10"
+                          : "text-red-600 hover:bg-red-50"
                       }`}
                     >
-                      <Trash2 className="h-5 w-5" />
+                      <Trash2 className="h-4 w-4" />
                     </button>
                   </td>
                 </tr>
@@ -391,40 +471,60 @@ const RequestsTable = ({ isDarkMode }) => {
 
         {/* Paginación */}
         <div
-          className={` px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 ${
-            isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white"
+          className={`px-4 py-3 flex items-center justify-between border-t ${
+            isDarkMode ? "border-gray-700" : "border-gray-200"
           }`}
         >
           <div className="flex-1 flex justify-between items-center">
             <p
               className={`text-sm ${
-                isDarkMode ? "text-gray-400" : "text-gray-700"
+                isDarkMode ? "text-gray-400" : "text-gray-600"
               }`}
             >
               Página <span className="font-medium">{currentPage}</span> de{" "}
               <span className="font-medium">{totalPages}</span>
             </p>
-            <div className="flex space-x-2">
+            <div className="flex items-center space-x-1">
               <button
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
-                className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                className={`p-1.5 rounded-lg transition-colors duration-200 ${
                   isDarkMode
-                    ? "text-gray-400 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                    : "text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    ? "text-gray-400 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    : "text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
                 }`}
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
+
+              {/* Números de página */}
+              {getPageNumbers().map((pageNum) => (
+                <button
+                  key={pageNum}
+                  onClick={() => setCurrentPage(pageNum)}
+                  className={`px-2 py-1 rounded-lg transition-colors duration-200 ${
+                    currentPage === pageNum
+                      ? isDarkMode
+                        ? "bg-red-500 text-white"
+                        : "bg-red-600 text-white"
+                      : isDarkMode
+                      ? "text-gray-400 hover:bg-gray-700"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  {pageNum}
+                </button>
+              ))}
+
               <button
                 onClick={() =>
                   setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                 }
                 disabled={currentPage === totalPages}
-                className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                className={`p-1.5 rounded-lg transition-colors duration-200 ${
                   isDarkMode
-                    ? "text-gray-400 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                    : "text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    ? "text-gray-400 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    : "text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
                 }`}
               >
                 <ChevronRight className="h-4 w-4" />
@@ -434,7 +534,7 @@ const RequestsTable = ({ isDarkMode }) => {
         </div>
       </div>
 
-      {/* Modal de Detalles de Solicitud */}
+      {/* Modales */}
       {isModalOpen && selectedRequest && (
         <RequestDetailsModal
           isOpen={isModalOpen}
@@ -447,7 +547,6 @@ const RequestsTable = ({ isDarkMode }) => {
           isDarkMode={isDarkMode}
         />
       )}
-      {/* Añade el diálogo de eliminación al final del componente */}
       {showDeleteDialog && requestToDelete && (
         <DeleteConfirmationDialog
           requestId={requestToDelete._id}
@@ -462,6 +561,6 @@ const RequestsTable = ({ isDarkMode }) => {
       )}
     </div>
   );
-};
+});
 
 export default RequestsTable;

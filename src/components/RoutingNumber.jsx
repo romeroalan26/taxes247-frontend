@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Search, Building2, MapPin, Landmark } from "lucide-react";
+import { Search, Building2, MapPin, Landmark, ChevronDown } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -145,46 +145,50 @@ const RoutingNumber = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
-        {/* Header con diseño moderno */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center p-2 bg-red-50 rounded-full mb-4">
-            <Landmark className="h-6 w-6 text-red-600" />
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      {/* Header */}
+      <header className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16 items-center">
+            <div className="flex items-center">
+              <div className="flex flex-col">
+                <h1 className="text-xl font-semibold text-gray-900">
+                  Número de Ruta Bancaria
+                </h1>
+                <p className="text-sm text-gray-500">
+                  Encuentra el número de ruta de tu banco
+                </p>
+              </div>
+            </div>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Encuentra tu Número de Ruta Bancaria
-          </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Selecciona tu banco y obtén instrucciones detalladas para encontrar
-            tu número de ruta.
-          </p>
         </div>
+      </header>
 
-        {/* Barra de búsqueda modernizada */}
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Barra de búsqueda */}
         <div className="relative mb-8">
           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
             <Search className="h-5 w-5 text-gray-400" />
           </div>
           <input
             type="text"
-            className="block w-full pl-12 pr-4 py-4 border-0 rounded-xl bg-white shadow-lg 
-                     focus:ring-2 focus:ring-red-500 placeholder-gray-400 transition-shadow
-                     duration-200 hover:shadow-xl"
+            className="block w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl bg-white shadow-sm 
+                     focus:ring-2 focus:ring-red-500 focus:border-red-500 placeholder-gray-400 transition-all
+                     duration-200 hover:border-red-300"
             placeholder="Busca tu banco aquí..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
 
-        {/* Lista de bancos con diseño moderno */}
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-          <Accordion type="single" collapsible className="divide-y-1">
+        {/* Lista de bancos */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <Accordion type="single" collapsible className=" divide-gray-100">
             {filteredBanks.map((bank) => (
               <AccordionItem key={bank.id} value={bank.id} className="group">
-                <AccordionTrigger className="hover:no-underline px-6 py-4">
+                <AccordionTrigger className="hover:no-underline px-6 py-4 hover:bg-gray-50 transition-colors">
                   <div className="flex items-center gap-4 w-full">
-                    <div className="flex-shrink-0 w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center">
+                    <div className="flex-shrink-0 w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center group-hover:bg-red-100 transition-colors">
                       <Building2 className="h-5 w-5 text-red-600" />
                     </div>
                     <div className="flex-1 text-left">
@@ -197,20 +201,25 @@ const RoutingNumber = () => {
                 <AccordionContent className="px-6 pb-6">
                   <div className="space-y-6">
                     {/* Instrucciones */}
-                    <div className="bg-gray-50 rounded-xl p-6">
-                      <h4 className="text-lg font-semibold text-gray-900 mb-4">
+                    <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                      <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                        <span className="w-8 h-8 flex items-center justify-center bg-red-50 rounded-lg">
+                          <span className="text-red-600 font-medium">1</span>
+                        </span>
                         Instrucciones paso a paso
                       </h4>
                       <ol className="space-y-3">
                         {bank.routingInfo.steps.map((step, index) => (
                           <li
                             key={index}
-                            className="flex items-start gap-3 text-gray-600"
+                            className="flex items-start gap-3 text-gray-600 group/item"
                           >
-                            <span className="flex-shrink-0 w-6 h-6 bg-red-100 rounded-full flex items-center justify-center text-sm font-medium text-red-600">
+                            <span className="flex-shrink-0 w-6 h-6 bg-red-100 rounded-full flex items-center justify-center text-sm font-medium text-red-600 group-hover/item:bg-red-200 transition-colors">
                               {index + 1}
                             </span>
-                            <span>{step}</span>
+                            <span className="group-hover/item:text-gray-900 transition-colors">
+                              {step}
+                            </span>
                           </li>
                         ))}
                       </ol>
@@ -219,19 +228,21 @@ const RoutingNumber = () => {
                     {/* Números de ruta por estado */}
                     <div>
                       <h4 className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-4">
-                        <MapPin className="h-5 w-5 text-red-600" />
+                        <span className="w-8 h-8 flex items-center justify-center bg-red-50 rounded-lg">
+                          <MapPin className="h-5 w-5 text-red-600" />
+                        </span>
                         Números de ruta por estado
                       </h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {bank.routingInfo.commonNumbers.map((item, index) => (
                           <div
                             key={index}
-                            className="bg-white rounded-lg border border-gray-200 p-4 hover:border-red-200 hover:shadow-md transition-all duration-200"
+                            className="bg-gray-50 rounded-xl border border-gray-100 p-4 hover:border-red-200 hover:bg-white transition-all duration-200 group"
                           >
-                            <p className="font-medium text-gray-900 mb-1">
+                            <p className="font-medium text-gray-900 mb-1 group-hover:text-red-600 transition-colors">
                               {item.state}
                             </p>
-                            <p className="text-red-600 font-mono text-lg">
+                            <p className="text-red-600 font-mono text-lg bg-white rounded-lg p-2 border border-gray-100">
                               {item.number}
                             </p>
                           </div>
@@ -245,10 +256,10 @@ const RoutingNumber = () => {
           </Accordion>
         </div>
 
-        {/* Mensaje de no resultados modernizado */}
+        {/* Mensaje de no resultados */}
         {filteredBanks.length === 0 && (
-          <div className="text-center py-12">
-            <div className="inline-flex items-center justify-center p-4 bg-gray-100 rounded-full mb-4">
+          <div className="text-center py-12 bg-white rounded-2xl shadow-sm border border-gray-100">
+            <div className="inline-flex items-center justify-center p-4 bg-gray-50 rounded-full mb-4">
               <Search className="h-6 w-6 text-gray-400" />
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -259,7 +270,7 @@ const RoutingNumber = () => {
             </p>
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 };
