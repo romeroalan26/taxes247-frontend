@@ -20,6 +20,8 @@ import {
   DollarSign,
   AlertCircle,
   Menu,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -27,6 +29,7 @@ const Login = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isEmailLoading, setIsEmailLoading] = useState(false); // Nuevo estado para login con email
   const [isGoogleLoading, setIsGoogleLoading] = useState(false); // Nuevo estado para login con Google
@@ -38,6 +41,23 @@ const Login = () => {
     e.preventDefault();
     setErrorMessage("");
     setIsEmailLoading(true);
+
+    // Validar longitud de email y contraseña
+    if (email.length > 254) {
+      setErrorMessage(
+        "Credenciales incorrectas. Verifica tu email y contraseña."
+      );
+      setIsEmailLoading(false);
+      return;
+    }
+
+    if (password.length > 128) {
+      setErrorMessage(
+        "Credenciales incorrectas. Verifica tu email y contraseña."
+      );
+      setIsEmailLoading(false);
+      return;
+    }
 
     try {
       const methods = await fetchSignInMethodsForEmail(auth, email);
@@ -387,6 +407,7 @@ const Login = () => {
                     </div>
                     <input
                       type="email"
+                      maxLength={254}
                       className="block w-full pl-10 px-4 py-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 text-base"
                       placeholder="correo@ejemplo.com"
                       value={email}
@@ -409,13 +430,27 @@ const Login = () => {
                       <Lock className="h-5 w-5 text-gray-700" />
                     </div>
                     <input
-                      type="password"
-                      className="block w-full pl-10 px-4 py-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 text-base"
+                      type={showPassword ? "text" : "password"}
+                      maxLength={128}
+                      className="block w-full pl-10 pr-12 py-3 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 text-base"
                       placeholder="********"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
                     />
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-0 bottom-0 flex items-center justify-center p-1.5 rounded-lg text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </motion.button>
                   </div>
                 </motion.div>
 
